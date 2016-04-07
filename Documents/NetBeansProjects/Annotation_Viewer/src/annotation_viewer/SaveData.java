@@ -15,6 +15,8 @@ import java.util.logging.Logger;
  */
 public class SaveData{
     
+    //// Fields
+    
     private Databridge dataBridge;
     private TreeMap<Integer, Integer> annotationMap;
     private ArrayList<String> aminoList;
@@ -22,10 +24,18 @@ public class SaveData{
     private String proteinString; 
     private int keysSize;
     
+    //// Constructor
+    
     public SaveData(){
         dataBridge = new Databridge();
     }
     
+    //// Methods
+    
+    /**
+     * 
+     * @return 
+     */
     public String DatabridgeSequence(){        
         try {
             
@@ -41,6 +51,10 @@ public class SaveData{
             
     }
     
+    /**
+     * 
+     * @return 
+     */
     public String DatabridgeSequenceToProtein(){
         
         String[] sequenceArray = DatabridgeSequence().toUpperCase().split("(?<=\\G...)");
@@ -64,6 +78,13 @@ public class SaveData{
         return proteinString;
     }
     
+    /**
+     * 
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws SQLException 
+     */
     public void DatabridgeAnnotation() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException{
         annotationMap = new TreeMap<Integer, Integer>();
         
@@ -84,23 +105,32 @@ public class SaveData{
             } 
             
             else if(parseInt(keys[i]) > parseInt(values[i])){
-                //annotationMap.put(Integer.parseInt(values[i]), Integer.parseInt(keys[i]));
                 // Maybe Still useful for reverse strand mapping
+                //annotationMap.put(Integer.parseInt(values[i]), Integer.parseInt(keys[i]));
             }
             
         }  
     }
 
+    /**
+     * 
+     * @return 
+     */
     public TreeMap<Integer, Integer> getAnnotationMap() {
         return annotationMap;
     }
 
-    // get total number of annotated genes
+    /**
+     * Get total number of annotated genes
+     * @return 
+     */
     public int getKeysSize() {
         return keysSize;
     }
     
-    //HashMap codonTable, used for the translation of the main sequence in "ATGC" to amino acids.
+    /**
+     * HashMap codonTable, used for the translation of the main sequence in "ATGC" to amino acids.
+     */
     public static final HashMap<String, String> codonTable = new HashMap<String, String>() {{
     put("TTT", "F"); put("TCT", "S"); put("TAT", "Y"); put("TGT", "C");
     put("TTC", "F"); put("TCC", "S"); put("TAC", "Y"); put("TGC", "C");

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package annotation_viewer;
 
 /**
@@ -10,12 +5,17 @@ package annotation_viewer;
  * @author Alex
  */
 public class CurrentDatabase extends javax.swing.JFrame {
-    private ChooseDatabase database;
-    /**
-     * Creates new form CurrentDatabase    /**
-     * Creates new form CurrentDatabase
-     */
     
+    //// Fields
+    
+    private ChooseDatabase database;
+    
+    //// Constructor
+    
+    /**
+     * Creates new form CurrentDatabase    
+     * Creates new form CurrentDatabase
+     */ 
     public CurrentDatabase() {
         initComponents();
         database = new ChooseDatabase();
@@ -24,9 +24,13 @@ public class CurrentDatabase extends javax.swing.JFrame {
         current_Password.setText(database.getPassword());
         setVisible(true);
         pack();
-        
     }
     
+    //// Methods
+    
+    /**
+     * 
+     */
     private void SetDatabaseDetails(){
         database.setDatabase_url(current_URL.getText());
         database.setUsername(current_Username.getText());
@@ -36,6 +40,7 @@ public class CurrentDatabase extends javax.swing.JFrame {
         System.out.println("current username: "+database.getUsername());
         System.out.println("current password: "+database.getPassword());
     }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -136,6 +141,10 @@ public class CurrentDatabase extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * 
+     * @param evt 
+     */
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         SetDatabaseDetails();
     }//GEN-LAST:event_jButton1ActionPerformed

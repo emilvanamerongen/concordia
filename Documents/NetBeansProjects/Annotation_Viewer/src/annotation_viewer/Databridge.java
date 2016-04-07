@@ -11,13 +11,21 @@ import java.sql.Statement;
  * @author Alex
  */
 public class Databridge {
+    
+    //// Fields
+    
     private ChooseDatabase database;
     private String startString = "";
     private String stopString = "";
     
+    //// Constructor
+    
     public Databridge(){
         database = new ChooseDatabase();
     }
+    
+    
+    //// Methods
     
     /**
      * De uitleg!
@@ -81,10 +89,18 @@ public class Databridge {
         stopString = posStopString;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String getStartString() {
         return startString;
     }
-
+    
+    /**
+     * 
+     * @return 
+     */
     public String getStopString() {
         return stopString;
     }

@@ -32,6 +32,7 @@ public class IC03_GUI extends javax.swing.JFrame{
     Connection con = null;
 
     //// Constructor
+    
     public IC03_GUI() {
         initComponents();
         //annotationViewer = new Annotation_Viewer();
@@ -41,7 +42,11 @@ public class IC03_GUI extends javax.swing.JFrame{
         pack();
         SelectToHighlight_Button.setSelected(false);
     }
-
+    
+    /**
+     * 
+     * @param aThis 
+     */
     IC03_GUI(Annotation_Viewer aThis) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -200,12 +205,19 @@ public class IC03_GUI extends javax.swing.JFrame{
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    // prototype button. initiates file choosing window. Not functional until uploading data from pc is available.
+    /**
+     * prototype button. initiates file choosing window. Not functional until uploading data from pc is available.
+     * @param evt 
+     */
     private void Annotation_From_File_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Annotation_From_File_ButtonActionPerformed
         chooseFile();
     }//GEN-LAST:event_Annotation_From_File_ButtonActionPerformed
 
-    // opens the sequence data from the class SaveData to display all the sequence information received from the database.
+    
+    /**
+     * Opens the sequence data from the class SaveData to display all the sequence information received from the database.
+     * @param evt 
+     */
     private void Open_Files_From_DB_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Open_Files_From_DB_ButtonActionPerformed
         fromDatabase = true;
         displayData();
@@ -221,12 +233,20 @@ public class IC03_GUI extends javax.swing.JFrame{
         displaySequenceFeatures();
     }//GEN-LAST:event_Open_Files_From_DB_ButtonActionPerformed
 
-    // prototype button. initiates file choosing window. Not functional until uploading data from pc is available.
+    
+    /**
+     * Prototype button. Initiates file choosing window. Not functional until uploading data from pc is available.
+     * @param evt 
+     */
     private void Sequence_From_File_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Sequence_From_File_ButtonActionPerformed
         chooseFile();
     }//GEN-LAST:event_Sequence_From_File_ButtonActionPerformed
 
-    // checkbox for turning the highlighted annotations on and off.
+    
+    /**
+     * Checkbox for turning the highlighted annotations on and off.
+     * @param evt 
+     */
     private void SelectToHighlight_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SelectToHighlight_ButtonActionPerformed
         try {
             if (SelectToHighlight_Button.isSelected()) {
@@ -244,12 +264,19 @@ public class IC03_GUI extends javax.swing.JFrame{
         }
     }//GEN-LAST:event_SelectToHighlight_ButtonActionPerformed
 
-    // initiates the class for viewing the current database credentials. The data is mutable.
+    
+    /**
+     * Initiates the class for viewing the current database credentials. The data is mutable.
+     * @param evt 
+     */
     private void Choose_Database_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Choose_Database_ButtonActionPerformed
         chooseCurrentDatabase = new CurrentDatabase();
     }//GEN-LAST:event_Choose_Database_ButtonActionPerformed
 
-    // used to display the data from the database. if fromFile == true, it would display the data received from pc files, but this function is not ready.
+
+    /**
+     * Used to display the data from the database. if fromFile == true, it would display the data received from pc files, but this function is not ready.
+     */
     private void displayData() {
         if (fromDatabase) {
             try {
@@ -267,7 +294,9 @@ public class IC03_GUI extends javax.swing.JFrame{
 
     }
     
-    // fileviewer, this method is unused. Would be used if the application was upgraded with data upload from pc files.
+    /**
+     * Fileviewer, this method is unused. Would be used if the application was upgraded with data upload from pc files.
+     */
     private void chooseFile() {
         File selectedFile;
         int reply;
@@ -280,7 +309,10 @@ public class IC03_GUI extends javax.swing.JFrame{
         }
     }
     
-    // used to highlight the annotated genes in the main sequence. It uses the two positions from the start and stopcodon found in the database to highlight the sequence
+
+    /**
+     * Used to highlight the annotated genes in the main sequence. It uses the two positions from the start and stopcodon found in the database to highlight the sequence
+     */
     private void highLighter(){
         Highlighter h = forwardStrandTextArea.getHighlighter();
         h.removeAllHighlights();
@@ -300,7 +332,9 @@ public class IC03_GUI extends javax.swing.JFrame{
         }
     }
     
-    //Counts the number of annotated genes and displays them with a number and the position of its start codon and stop codon
+    /**
+     * Counts the number of annotated genes and displays them with a number and the position of its start codon and stop codon.
+     */
     private void displaySequenceFeatures(){
         jTextArea3.append("Sequence features:");
         
