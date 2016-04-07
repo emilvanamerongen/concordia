@@ -35,12 +35,11 @@ public class IC03_GUI extends javax.swing.JFrame{
     
     public IC03_GUI() {
         initComponents();
-        //annotationViewer = new Annotation_Viewer();
         database = new ChooseDatabase();
         saveData = new SaveData();
         setVisible(true);
         pack();
-        SelectToHighlight_Button.setSelected(false);
+        selectToHighlight_Button.setSelected(false);
     }
     
     /**
@@ -66,23 +65,23 @@ public class IC03_GUI extends javax.swing.JFrame{
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        proteinsequenceTextField = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea3 = new javax.swing.JTextArea();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        sequenceDetailsTextField = new javax.swing.JTextArea();
+        forwardStrand_label = new javax.swing.JLabel();
+        translationStrand_label = new javax.swing.JLabel();
+        totalbases_label = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         forwardStrandTextArea = new javax.swing.JTextArea();
         jMenuBar2 = new javax.swing.JMenuBar();
         File_From_Database_Button = new javax.swing.JMenu();
-        Open_Files_From_DB_Button = new javax.swing.JMenuItem();
-        Sequence_From_File_Button = new javax.swing.JMenuItem();
-        Annotation_From_File_Button = new javax.swing.JMenuItem();
-        SelectToHighlight_Button = new javax.swing.JCheckBoxMenuItem();
+        open_Files_From_DB_Button = new javax.swing.JMenuItem();
+        sequence_From_File_Button = new javax.swing.JMenuItem();
+        annotation_From_File_Button = new javax.swing.JMenuItem();
+        selectToHighlight_Button = new javax.swing.JCheckBoxMenuItem();
         jMenu4 = new javax.swing.JMenu();
-        Check_Connection_Button = new javax.swing.JMenuItem();
-        Choose_Database_Button = new javax.swing.JMenuItem();
+        check_Connection_Button = new javax.swing.JMenuItem();
+        choose_Database_Button = new javax.swing.JMenuItem();
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -93,19 +92,19 @@ public class IC03_GUI extends javax.swing.JFrame{
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Annotation Viewer");
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jScrollPane2.setViewportView(jTextArea2);
+        proteinsequenceTextField.setColumns(20);
+        proteinsequenceTextField.setRows(5);
+        jScrollPane2.setViewportView(proteinsequenceTextField);
 
-        jTextArea3.setColumns(20);
-        jTextArea3.setRows(5);
-        jScrollPane3.setViewportView(jTextArea3);
+        sequenceDetailsTextField.setColumns(20);
+        sequenceDetailsTextField.setRows(5);
+        jScrollPane3.setViewportView(sequenceDetailsTextField);
 
-        jLabel1.setText("Forward Strand");
+        forwardStrand_label.setText("Forward Strand");
 
-        jLabel2.setText("Translation");
+        translationStrand_label.setText("Translation");
 
-        jLabel3.setText("Total bases: ");
+        totalbases_label.setText("Total bases: ");
 
         forwardStrandTextArea.setColumns(20);
         forwardStrandTextArea.setRows(5);
@@ -113,54 +112,54 @@ public class IC03_GUI extends javax.swing.JFrame{
 
         File_From_Database_Button.setText("File");
 
-        Open_Files_From_DB_Button.setText("Open files from database");
-        Open_Files_From_DB_Button.addActionListener(new java.awt.event.ActionListener() {
+        open_Files_From_DB_Button.setText("Open files from database");
+        open_Files_From_DB_Button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Open_Files_From_DB_ButtonActionPerformed(evt);
+                open_Files_From_DB_ButtonActionPerformed(evt);
             }
         });
-        File_From_Database_Button.add(Open_Files_From_DB_Button);
+        File_From_Database_Button.add(open_Files_From_DB_Button);
 
-        Sequence_From_File_Button.setText("Choose sequence from file");
-        Sequence_From_File_Button.addActionListener(new java.awt.event.ActionListener() {
+        sequence_From_File_Button.setText("Choose sequence from file");
+        sequence_From_File_Button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Sequence_From_File_ButtonActionPerformed(evt);
+                sequence_From_File_ButtonActionPerformed(evt);
             }
         });
-        File_From_Database_Button.add(Sequence_From_File_Button);
+        File_From_Database_Button.add(sequence_From_File_Button);
 
-        Annotation_From_File_Button.setText("Choose annotation from file");
-        Annotation_From_File_Button.addActionListener(new java.awt.event.ActionListener() {
+        annotation_From_File_Button.setText("Choose annotation from file");
+        annotation_From_File_Button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Annotation_From_File_ButtonActionPerformed(evt);
+                annotation_From_File_ButtonActionPerformed(evt);
             }
         });
-        File_From_Database_Button.add(Annotation_From_File_Button);
+        File_From_Database_Button.add(annotation_From_File_Button);
 
-        SelectToHighlight_Button.setSelected(true);
-        SelectToHighlight_Button.setText("Highlight annotations");
-        SelectToHighlight_Button.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        SelectToHighlight_Button.addActionListener(new java.awt.event.ActionListener() {
+        selectToHighlight_Button.setSelected(true);
+        selectToHighlight_Button.setText("Highlight annotations");
+        selectToHighlight_Button.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        selectToHighlight_Button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SelectToHighlight_ButtonActionPerformed(evt);
+                selectToHighlight_ButtonActionPerformed(evt);
             }
         });
-        File_From_Database_Button.add(SelectToHighlight_Button);
+        File_From_Database_Button.add(selectToHighlight_Button);
 
         jMenuBar2.add(File_From_Database_Button);
 
         jMenu4.setText("Database status");
 
-        Check_Connection_Button.setText("Check connection");
-        jMenu4.add(Check_Connection_Button);
+        check_Connection_Button.setText("Check connection");
+        jMenu4.add(check_Connection_Button);
 
-        Choose_Database_Button.setText("Choose database");
-        Choose_Database_Button.addActionListener(new java.awt.event.ActionListener() {
+        choose_Database_Button.setText("Choose database");
+        choose_Database_Button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Choose_Database_ButtonActionPerformed(evt);
+                choose_Database_ButtonActionPerformed(evt);
             }
         });
-        jMenu4.add(Choose_Database_Button);
+        jMenu4.add(choose_Database_Button);
 
         jMenuBar2.add(jMenu4);
 
@@ -175,12 +174,12 @@ public class IC03_GUI extends javax.swing.JFrame{
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(forwardStrand_label)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 1315, Short.MAX_VALUE)
-                        .addComponent(jLabel3))
+                        .addComponent(totalbases_label))
                     .addComponent(jScrollPane2)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
+                        .addComponent(translationStrand_label)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane3))
                 .addContainerGap())
@@ -189,12 +188,12 @@ public class IC03_GUI extends javax.swing.JFrame{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel3))
+                    .addComponent(forwardStrand_label)
+                    .addComponent(totalbases_label))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel2)
+                .addComponent(translationStrand_label)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -209,69 +208,69 @@ public class IC03_GUI extends javax.swing.JFrame{
      * prototype button. initiates file choosing window. Not functional until uploading data from pc is available.
      * @param evt 
      */
-    private void Annotation_From_File_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Annotation_From_File_ButtonActionPerformed
+    private void annotation_From_File_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_annotation_From_File_ButtonActionPerformed
         chooseFile();
-    }//GEN-LAST:event_Annotation_From_File_ButtonActionPerformed
+    }//GEN-LAST:event_annotation_From_File_ButtonActionPerformed
 
     
     /**
      * Opens the sequence data from the class SaveData to display all the sequence information received from the database.
      * @param evt 
      */
-    private void Open_Files_From_DB_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Open_Files_From_DB_ButtonActionPerformed
+    private void open_Files_From_DB_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_open_Files_From_DB_ButtonActionPerformed
         fromDatabase = true;
         displayData();
         forwardStrandTextArea.setText(originalSequence);
         
         // counts the total number of nucleotides in the primary sequence.
-        jLabel3.setText("Total bases: " + originalSequence.length());
+        totalbases_label.setText("Total bases: " + originalSequence.length());
         
         // displays the translated original sequence to protein sequence.
-        jTextArea2.setText(proteinSequence);
+        proteinsequenceTextField.setText(proteinSequence);
         
         // displays the features of the annotated genes.
         displaySequenceFeatures();
-    }//GEN-LAST:event_Open_Files_From_DB_ButtonActionPerformed
+    }//GEN-LAST:event_open_Files_From_DB_ButtonActionPerformed
 
     
     /**
      * Prototype button. Initiates file choosing window. Not functional until uploading data from pc is available.
      * @param evt 
      */
-    private void Sequence_From_File_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Sequence_From_File_ButtonActionPerformed
+    private void sequence_From_File_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sequence_From_File_ButtonActionPerformed
         chooseFile();
-    }//GEN-LAST:event_Sequence_From_File_ButtonActionPerformed
+    }//GEN-LAST:event_sequence_From_File_ButtonActionPerformed
 
     
     /**
      * Checkbox for turning the highlighted annotations on and off.
      * @param evt 
      */
-    private void SelectToHighlight_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SelectToHighlight_ButtonActionPerformed
+    private void selectToHighlight_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectToHighlight_ButtonActionPerformed
         try {
-            if (SelectToHighlight_Button.isSelected()) {
+            if (selectToHighlight_Button.isSelected()) {
                 highLighter();
-                SelectToHighlight_Button.setSelected(true);
+                selectToHighlight_Button.setSelected(true);
                 
-            } else if (!SelectToHighlight_Button.isSelected()) {
+            } else if (!selectToHighlight_Button.isSelected()) {
                 
                 Highlighter h = forwardStrandTextArea.getHighlighter();
                 h.removeAllHighlights();
-                SelectToHighlight_Button.setSelected(false);
+                selectToHighlight_Button.setSelected(false);
             }
         } catch (NullPointerException e) {
             JOptionPane.showMessageDialog(null, "Error: Required files not found");
         }
-    }//GEN-LAST:event_SelectToHighlight_ButtonActionPerformed
+    }//GEN-LAST:event_selectToHighlight_ButtonActionPerformed
 
     
     /**
      * Initiates the class for viewing the current database credentials. The data is mutable.
      * @param evt 
      */
-    private void Choose_Database_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Choose_Database_ButtonActionPerformed
+    private void choose_Database_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_choose_Database_ButtonActionPerformed
         chooseCurrentDatabase = new CurrentDatabase();
-    }//GEN-LAST:event_Choose_Database_ButtonActionPerformed
+    }//GEN-LAST:event_choose_Database_ButtonActionPerformed
 
 
     /**
@@ -280,9 +279,9 @@ public class IC03_GUI extends javax.swing.JFrame{
     private void displayData() {
         if (fromDatabase) {
             try {
-                originalSequence = saveData.DatabridgeSequence();
-                proteinSequence = saveData.DatabridgeSequenceToProtein();
-                saveData.DatabridgeAnnotation();
+                originalSequence = saveData.databridgeSequence();
+                proteinSequence = saveData.databridgeSequenceToProtein();
+                saveData.databridgeAnnotation();
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex) {
                 Logger.getLogger(SaveData.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -336,14 +335,14 @@ public class IC03_GUI extends javax.swing.JFrame{
      * Counts the number of annotated genes and displays them with a number and the position of its start codon and stop codon.
      */
     private void displaySequenceFeatures(){
-        jTextArea3.append("Sequence features:");
+        sequenceDetailsTextField.append("Sequence features:");
         
         int genecount = 1;
         
         //it counts each gene found in AnnotationMap and prints the start codon (key) and stop codon saveData.getAnnotationMap().get(key)
         for (Integer key : saveData.getAnnotationMap().keySet()){
             
-            jTextArea3.append("\ngene "+genecount+"\t"+key+"\t"+saveData.getAnnotationMap().get(key));
+            sequenceDetailsTextField.append("\ngene "+genecount+"\t"+key+"\t"+saveData.getAnnotationMap().get(key));
             
             genecount++;
         }
@@ -388,17 +387,12 @@ public class IC03_GUI extends javax.swing.JFrame{
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuItem Annotation_From_File_Button;
-    private javax.swing.JMenuItem Check_Connection_Button;
-    private javax.swing.JMenuItem Choose_Database_Button;
     private javax.swing.JMenu File_From_Database_Button;
-    private javax.swing.JMenuItem Open_Files_From_DB_Button;
-    private javax.swing.JCheckBoxMenuItem SelectToHighlight_Button;
-    private javax.swing.JMenuItem Sequence_From_File_Button;
+    private javax.swing.JMenuItem annotation_From_File_Button;
+    private javax.swing.JMenuItem check_Connection_Button;
+    private javax.swing.JMenuItem choose_Database_Button;
     private javax.swing.JTextArea forwardStrandTextArea;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel forwardStrand_label;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu4;
@@ -407,7 +401,12 @@ public class IC03_GUI extends javax.swing.JFrame{
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTextArea jTextArea2;
-    private javax.swing.JTextArea jTextArea3;
+    private javax.swing.JMenuItem open_Files_From_DB_Button;
+    private javax.swing.JTextArea proteinsequenceTextField;
+    private javax.swing.JCheckBoxMenuItem selectToHighlight_Button;
+    private javax.swing.JTextArea sequenceDetailsTextField;
+    private javax.swing.JMenuItem sequence_From_File_Button;
+    private javax.swing.JLabel totalbases_label;
+    private javax.swing.JLabel translationStrand_label;
     // End of variables declaration//GEN-END:variables
 }

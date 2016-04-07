@@ -35,7 +35,7 @@ public class Databridge {
      * @throws IllegalAccessException
      * @throws SQLException 
      */
-    public String DatabaseSequence() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException {
+    public String databaseSequence() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException {
         
         Connection con = DriverManager.getConnection(database.getDatabase_url(), database.getUsername(), database.getPassword());
         //System.out.println("db is connected!");
@@ -62,7 +62,7 @@ public class Databridge {
      * @throws IllegalAccessException
      * @throws SQLException 
      */
-    public void DatabaseAnnotation() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException {
+    public void databaseAnnotation() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException {
         
         Connection con = DriverManager.getConnection(database.getDatabase_url(), database.getUsername(), database.getPassword());
 

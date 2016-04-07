@@ -31,7 +31,7 @@ public class CurrentDatabase extends javax.swing.JFrame {
     /**
      * 
      */
-    private void SetDatabaseDetails(){
+    private void setDatabaseDetails(){
         database.setDatabase_url(current_URL.getText());
         database.setUsername(current_Username.getText());
         database.setPassword(current_Password.getText());
@@ -50,25 +50,25 @@ public class CurrentDatabase extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        currentDatabaseDetails_label = new javax.swing.JLabel();
+        databaseURL_label = new javax.swing.JLabel();
+        databaseUsername_label = new javax.swing.JLabel();
+        databasePassword_label = new javax.swing.JLabel();
         current_URL = new javax.swing.JTextField();
         current_Username = new javax.swing.JTextField();
         current_Password = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jLabel5 = new javax.swing.JLabel();
+        updateDetails_button = new javax.swing.JButton();
+        updateDatabase_label = new javax.swing.JLabel();
 
         setTitle("Database Details");
 
-        jLabel1.setText("Current Database Details:");
+        currentDatabaseDetails_label.setText("Current Database Details:");
 
-        jLabel2.setText("Database URL: ");
+        databaseURL_label.setText("Database URL: ");
 
-        jLabel3.setText("Database Username: ");
+        databaseUsername_label.setText("Database Username: ");
 
-        jLabel4.setText("Database Password: ");
+        databasePassword_label.setText("Database Password: ");
 
         current_URL.setText("url");
 
@@ -76,14 +76,14 @@ public class CurrentDatabase extends javax.swing.JFrame {
 
         current_Password.setText("password");
 
-        jButton1.setText("Update");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        updateDetails_button.setText("Update");
+        updateDetails_button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                updateDetails_buttonActionPerformed(evt);
             }
         });
 
-        jLabel5.setText("Click here to update Database details");
+        updateDatabase_label.setText("Click here to update Database details");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -93,19 +93,19 @@ public class CurrentDatabase extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(currentDatabaseDetails_label)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel5)
+                                .addComponent(updateDatabase_label)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(updateDetails_button, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel4))
+                                    .addComponent(databaseUsername_label)
+                                    .addComponent(databaseURL_label)
+                                    .addComponent(databasePassword_label))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(current_URL)
@@ -118,23 +118,23 @@ public class CurrentDatabase extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(currentDatabaseDetails_label)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
+                    .addComponent(databaseURL_label)
                     .addComponent(current_URL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
+                    .addComponent(databaseUsername_label)
                     .addComponent(current_Username, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(current_Password, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
+                    .addComponent(databasePassword_label))
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jLabel5))
+                    .addComponent(updateDetails_button)
+                    .addComponent(updateDatabase_label))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
@@ -145,9 +145,9 @@ public class CurrentDatabase extends javax.swing.JFrame {
      * 
      * @param evt 
      */
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        SetDatabaseDetails();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void updateDetails_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateDetails_buttonActionPerformed
+        setDatabaseDetails();
+    }//GEN-LAST:event_updateDetails_buttonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -185,15 +185,15 @@ public class CurrentDatabase extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel currentDatabaseDetails_label;
     private javax.swing.JTextField current_Password;
     private javax.swing.JTextField current_URL;
     private javax.swing.JTextField current_Username;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel databasePassword_label;
+    private javax.swing.JLabel databaseURL_label;
+    private javax.swing.JLabel databaseUsername_label;
+    private javax.swing.JLabel updateDatabase_label;
+    private javax.swing.JButton updateDetails_button;
     // End of variables declaration//GEN-END:variables
 
     

@@ -36,11 +36,11 @@ public class SaveData{
      * 
      * @return 
      */
-    public String DatabridgeSequence(){        
+    public String databridgeSequence(){        
         try {
             
             // the SD.fa sequence from the database is saved and put into one long String 
-            sequence = dataBridge.DatabaseSequence();
+            sequence = dataBridge.databaseSequence();
             sequence = sequence.replaceAll("\n", "");
             
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex) {
@@ -55,9 +55,9 @@ public class SaveData{
      * 
      * @return 
      */
-    public String DatabridgeSequenceToProtein(){
+    public String databridgeSequenceToProtein(){
         
-        String[] sequenceArray = DatabridgeSequence().toUpperCase().split("(?<=\\G...)");
+        String[] sequenceArray = databridgeSequence().toUpperCase().split("(?<=\\G...)");
         
         aminoList = new ArrayList<String>();
         
@@ -85,10 +85,10 @@ public class SaveData{
      * @throws IllegalAccessException
      * @throws SQLException 
      */
-    public void DatabridgeAnnotation() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException{
+    public void databridgeAnnotation() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException{
         annotationMap = new TreeMap<Integer, Integer>();
         
-        dataBridge.DatabaseAnnotation();
+        dataBridge.databaseAnnotation();
         
         String[] keys = dataBridge.getStartString().split(";");
         
