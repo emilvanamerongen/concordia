@@ -14,15 +14,17 @@ import javax.swing.JOptionPane;
 /**
  *
  * @author Alex
+ * @version 2.0
+ * @since 8-4-2016
  */
 public class IC03_GUI extends javax.swing.JFrame{
     
     //// Fields
+    
     /**
      * Creates new form Viewer_GUI
      */
     private Annotation_Viewer annotationViewer;
-    private ChooseDatabase database;
     private CurrentDatabase chooseCurrentDatabase;
     private SaveData saveData;
     private Boolean fromFile;
@@ -35,7 +37,6 @@ public class IC03_GUI extends javax.swing.JFrame{
     
     public IC03_GUI() {
         initComponents();
-        database = new ChooseDatabase();
         saveData = new SaveData();
         setVisible(true);
         pack();
@@ -205,7 +206,7 @@ public class IC03_GUI extends javax.swing.JFrame{
     }// </editor-fold>//GEN-END:initComponents
 
     /**
-     * prototype button. initiates file choosing window. Not functional until uploading data from pc is available.
+     * Prototype button. initiates file choosing window. Not functional until uploading data from pc is available.
      * @param evt 
      */
     private void annotation_From_File_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_annotation_From_File_ButtonActionPerformed
@@ -215,6 +216,7 @@ public class IC03_GUI extends javax.swing.JFrame{
     
     /**
      * Opens the sequence data from the class SaveData to display all the sequence information received from the database.
+     * Counts the total number of nucleotides in the primary sequence.
      * @param evt 
      */
     private void open_Files_From_DB_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_open_Files_From_DB_ButtonActionPerformed
@@ -294,7 +296,7 @@ public class IC03_GUI extends javax.swing.JFrame{
     }
     
     /**
-     * Fileviewer, this method is unused. Would be used if the application was upgraded with data upload from pc files.
+     * File viewer, this method is unused. Would be used if the application was upgraded with data upload from PC files.
      */
     private void chooseFile() {
         File selectedFile;
@@ -339,13 +341,17 @@ public class IC03_GUI extends javax.swing.JFrame{
         
         int genecount = 1;
         
-        //it counts each gene found in AnnotationMap and prints the start codon (key) and stop codon saveData.getAnnotationMap().get(key)
+        //It counts each gene found in AnnotationMap and prints the start codon (key) and stop codon saveData.getAnnotationMap().get(key)
         for (Integer key : saveData.getAnnotationMap().keySet()){
             
             sequenceDetailsTextField.append("\ngene "+genecount+"\t"+key+"\t"+saveData.getAnnotationMap().get(key));
             
             genecount++;
         }
+        
+        //Sets the textfield as uneditable.
+        sequenceDetailsTextField.setEditable(false);
+        
     }
     
 

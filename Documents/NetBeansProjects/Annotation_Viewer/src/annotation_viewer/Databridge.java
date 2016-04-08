@@ -9,26 +9,30 @@ import java.sql.Statement;
 /**
  *
  * @author Alex
+ * @version 2.0
+ * @since 8-4-2016
  */
 public class Databridge {
     
     //// Fields
     
-    private ChooseDatabase database;
+    private ChooseDatabaseDetails database;
     private String startString = "";
     private String stopString = "";
     
     //// Constructor
     
     public Databridge(){
-        database = new ChooseDatabase();
+        database = new ChooseDatabaseDetails();
     }
     
     
     //// Methods
     
     /**
-     * De uitleg!
+     * Gets database connection and query details from ChooseDatabaseDetails.
+     * Creates a String from the primary sequence obtained via database.
+     * 
      * @return
      * @throws ClassNotFoundException
      * @throws InstantiationException
@@ -42,7 +46,7 @@ public class Databridge {
 
         StringBuffer sequence = new StringBuffer();
         Statement st = con.createStatement();
-        String sql = ("SELECT * FROM Gen;");
+        String sql = (database.getSequenceQuery());
         ResultSet rs = st.executeQuery(sql);
         
         if (rs.next()) {
@@ -56,6 +60,9 @@ public class Databridge {
     }
     
     /**
+     * Gets database connection and query details from ChooseDatabaseDetails.
+     * Creates two new Strings from database connection. 
+     * One String with all the startcodons and one String with all the stopcodons from the annotated genes.
      * 
      * @throws ClassNotFoundException
      * @throws InstantiationException
@@ -70,7 +77,7 @@ public class Databridge {
         StringBuffer posStop = new StringBuffer();
         
         Statement st = con.createStatement();
-        String sql = ("SELECT * FROM Feature;");
+        String sql = (database.getAnnotationQuery());
         ResultSet rs = st.executeQuery(sql);
         
         if (rs.next()) {

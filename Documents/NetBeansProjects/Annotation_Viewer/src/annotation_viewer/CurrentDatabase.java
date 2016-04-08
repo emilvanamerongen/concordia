@@ -3,25 +3,31 @@ package annotation_viewer;
 /**
  *
  * @author Alex
+ * @version 2.0
+ * @since 8-4-2016
  */
 public class CurrentDatabase extends javax.swing.JFrame {
     
     //// Fields
     
-    private ChooseDatabase database;
+    private ChooseDatabaseDetails database;
     
     //// Constructor
     
     /**
-     * Creates new form CurrentDatabase    
+     * 
      * Creates new form CurrentDatabase
      */ 
     public CurrentDatabase() {
         initComponents();
-        database = new ChooseDatabase();
+        
+        database = new ChooseDatabaseDetails();
         current_URL.setText(database.getDatabase_url());
         current_Username.setText(database.getUsername());
         current_Password.setText(database.getPassword());
+        current_primarySequenceQuery.setText(database.getSequenceQuery());
+        current_AnnotationQuery.setText(database.getAnnotationQuery());
+        
         setVisible(true);
         pack();
     }
@@ -29,16 +35,23 @@ public class CurrentDatabase extends javax.swing.JFrame {
     //// Methods
     
     /**
-     * 
+     * Updates the user modified database credentials.
+     * Prints the database credentials as a backgroundcheck.
      */
     private void setDatabaseDetails(){
         database.setDatabase_url(current_URL.getText());
         database.setUsername(current_Username.getText());
         database.setPassword(current_Password.getText());
+        database.setSequenceQuery(current_primarySequenceQuery.getText());
+        database.setAnnotationQuery(current_AnnotationQuery.getText());
         
+        // Prints the current database credentials as a check to confirm the change.
         System.out.println("current url: "+database.getDatabase_url());
         System.out.println("current username: "+database.getUsername());
         System.out.println("current password: "+database.getPassword());
+        System.out.println("current sequence query: "+database.getSequenceQuery());
+        System.out.println("current annotation query: "+database.getAnnotationQuery());
+        System.out.println("");
     }
     
     /**
@@ -59,6 +72,11 @@ public class CurrentDatabase extends javax.swing.JFrame {
         current_Password = new javax.swing.JTextField();
         updateDetails_button = new javax.swing.JButton();
         updateDatabase_label = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        current_primarySequenceQuery = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        current_AnnotationQuery = new javax.swing.JTextField();
 
         setTitle("Database Details");
 
@@ -85,6 +103,16 @@ public class CurrentDatabase extends javax.swing.JFrame {
 
         updateDatabase_label.setText("Click here to update Database details");
 
+        jLabel1.setText("Current Queries:");
+
+        jLabel2.setText("Primary Sequence: ");
+
+        current_primarySequenceQuery.setText("query");
+
+        jLabel3.setText("Annotation: ");
+
+        current_AnnotationQuery.setText("query");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -92,15 +120,20 @@ public class CurrentDatabase extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(updateDatabase_label)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(updateDetails_button, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(currentDatabaseDetails_label)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(current_primarySequenceQuery))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(updateDatabase_label)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(updateDetails_button, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addGap(48, 48, 48)
+                                .addComponent(current_AnnotationQuery))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(databaseUsername_label)
@@ -110,9 +143,11 @@ public class CurrentDatabase extends javax.swing.JFrame {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(current_URL)
                                     .addComponent(current_Username, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-                                    .addComponent(current_Password))
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                                    .addComponent(current_Password)))
+                            .addComponent(currentDatabaseDetails_label)
+                            .addComponent(jLabel1))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -131,18 +166,28 @@ public class CurrentDatabase extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(current_Password, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(databasePassword_label))
-                .addGap(25, 25, 25)
+                .addGap(12, 12, 12)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(current_primarySequenceQuery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(current_AnnotationQuery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(updateDetails_button)
                     .addComponent(updateDatabase_label))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     /**
-     * 
+     * Gets clicked when the database credentials in the GUI are updated.
      * @param evt 
      */
     private void updateDetails_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateDetails_buttonActionPerformed
@@ -186,12 +231,17 @@ public class CurrentDatabase extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel currentDatabaseDetails_label;
+    private javax.swing.JTextField current_AnnotationQuery;
     private javax.swing.JTextField current_Password;
     private javax.swing.JTextField current_URL;
     private javax.swing.JTextField current_Username;
+    private javax.swing.JTextField current_primarySequenceQuery;
     private javax.swing.JLabel databasePassword_label;
     private javax.swing.JLabel databaseURL_label;
     private javax.swing.JLabel databaseUsername_label;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel updateDatabase_label;
     private javax.swing.JButton updateDetails_button;
     // End of variables declaration//GEN-END:variables

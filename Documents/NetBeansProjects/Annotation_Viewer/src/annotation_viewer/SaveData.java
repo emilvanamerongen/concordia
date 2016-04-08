@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 /**
  *
  * @author Alex
+ * @version 2.0
+ * @since 8-4-2016
  */
 public class SaveData{
     
@@ -33,6 +35,7 @@ public class SaveData{
     //// Methods
     
     /**
+     * Creates one long, printable, primary sequence as String from the database by deleting the empty spacing. 
      * 
      * @return 
      */
@@ -52,6 +55,7 @@ public class SaveData{
     }
     
     /**
+     * Translates the primary DNA sequence with the corresponding amino acids from aminoList to a protein sequence.
      * 
      * @return 
      */
@@ -79,6 +83,9 @@ public class SaveData{
     }
     
     /**
+     * Splits up the long received Strings with startcodons and stopcodons.
+     * Matches the startcodons to the appropriate stopcodons.
+     * Makes a TreeMap to sort the pairs of startcodons and stopcodons.
      * 
      * @throws ClassNotFoundException
      * @throws InstantiationException
@@ -129,7 +136,7 @@ public class SaveData{
     }
     
     /**
-     * HashMap codonTable, used for the translation of the main sequence in "ATGC" to amino acids.
+     * HashMap codonTable, used for the translation of the main sequence in "ATGC" to the corresponding amino acids.
      */
     public static final HashMap<String, String> codonTable = new HashMap<String, String>() {{
     put("TTT", "F"); put("TCT", "S"); put("TAT", "Y"); put("TGT", "C");
