@@ -1,0 +1,19 @@
+----------------------------------------------------------------
+Thu Nov 17 15:01:24 CET 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (1765088): instance a816c00e-0158-7297-8ceb-00000eb40a68 
+on database directory C:\Users\Alex\Documents\NetBeansProjects\Bioinformatics_Minor_NGS_project_2\concordiaDB with class loader sun.misc.Launcher$AppClassLoader@70dea4e 
+Loaded from file:/C:/Users/Alex/Documents/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_60-b27
+user.dir=C:\Users\Alex\Documents\NetBeansProjects\Bioinformatics_Minor_NGS_project_2
+os.name=Windows 10
+os.arch=amd64
+os.version=10.0
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Thu Nov 17 15:01:25 CET 2016: Shutting down Derby engine
+----------------------------------------------------------------
+Thu Nov 17 15:01:25 CET 2016:
+Shutting down instance a816c00e-0158-7297-8ceb-00000eb40a68 on database directory C:\Users\Alex\Documents\NetBeansProjects\Bioinformatics_Minor_NGS_project_2\concordiaDB with class loader sun.misc.Launcher$AppClassLoader@70dea4e 
+----------------------------------------------------------------

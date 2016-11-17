@@ -118,15 +118,15 @@ public class DerbyTest {
              * authentication, see the Derby Developer's Guide.
              */
 
-            String dbName = "derbyDB"; // the name of the database
+            String dbName = "concordiaDB"; // the name of the database
 
             /*
              * This connection specifies create=true in the connection URL to
              * cause the database to be created when connecting for the first
-             * time. To remove the database, remove the directory derbyDB (the
+             * time. To remove the database, remove the directory concordiaDB (the
              * same as the database name) and its contents.
              *
-             * The directory derbyDB will be created under the directory that
+             * The directory concordiaDB will be created under the directory that
              * the system property derby.system.home points to, or the current
              * directory (user.dir) if derby.system.home is not set.
              */
