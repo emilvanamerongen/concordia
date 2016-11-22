@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 
-
-<AnchorPane id="AnchorPane" minHeight="600.0" minWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="concordia.GUIController">
+<AnchorPane id="AnchorPane" minHeight="600.0" minWidth="700.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="concordia.GUIController">
    <children>
       <TabPane layoutX="-1.0" layoutY="35.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
         <tabs>
@@ -27,7 +34,7 @@
                                     </Button>
                                     <ListView layoutX="19.0" layoutY="30.0" prefHeight="134.0" prefWidth="198.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="19.0" AnchorPane.topAnchor="30.0" />
                                     <Label layoutX="19.0" layoutY="14.0" text="Available Datasets" />
-                                    <Button layoutX="126.0" layoutY="167.0" mnemonicParsing="false" prefHeight="12.0" prefWidth="44.0" text="new">
+                                    <Button layoutX="126.0" layoutY="167.0" mnemonicParsing="false" onAction="#datasetswitchtab" prefHeight="12.0" prefWidth="44.0" text="new">
                                        <font>
                                           <Font size="9.0" />
                                        </font>
@@ -40,7 +47,7 @@
                                     <Label layoutX="243.0" layoutY="57.0" text="BLAST'ed sequences:" AnchorPane.leftAnchor="249.0" AnchorPane.topAnchor="57.0" />
                                     <Label layoutX="418.0" layoutY="38.0" text="0" AnchorPane.leftAnchor="398.0" AnchorPane.topAnchor="38.0" />
                                     <Label layoutX="418.0" layoutY="59.0" text="0" AnchorPane.leftAnchor="398.0" AnchorPane.topAnchor="57.0" />
-                                    <Button layoutX="250.0" layoutY="136.0" mnemonicParsing="false" text="add data" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="250.0" />
+                                    <Button layoutX="250.0" layoutY="136.0" mnemonicParsing="false" onAction="#datasetswitchtab" text="add data" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="250.0" />
                                     <Button layoutX="388.0" layoutY="139.0" mnemonicParsing="false" text="BLAST" />
                                     <Label layoutX="462.0" layoutY="84.0" text="+" />
                                     <Button layoutX="588.0" layoutY="166.0" mnemonicParsing="false" prefHeight="12.0" prefWidth="44.0" text="new">
@@ -57,7 +64,7 @@
                               </AnchorPane>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                  <children>
-                                    <TabPane prefHeight="200.0" prefWidth="200.0" style="-fx-tab-max-height: 0;" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <TabPane fx:id="datasetstabpane" prefHeight="200.0" prefWidth="200.0" style="-fx-tab-max-height: 0;" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                       <tabs>
                                         <Tab text="0">
                                           <content>
@@ -66,12 +73,43 @@
                                         </Tab>
                                           <Tab text="1">
                                              <content>
-                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                   <children>
+                                                      <Label layoutX="14.0" layoutY="14.0" prefHeight="38.0" prefWidth="250.0" text="New Dataset">
+                                                         <font>
+                                                            <Font size="29.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <TextField layoutX="296.0" layoutY="128.0" />
+                                                      <Label layoutX="361.0" layoutY="98.0" text="Title:" />
+                                                      <Button layoutX="344.0" layoutY="197.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="72.0" text="ADD" />
+                                                   </children></AnchorPane>
                                              </content>
                                           </Tab>
                                           <Tab text="2">
                                              <content>
-                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                   <children>
+                                                      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f5f5f5" height="200.0" layoutX="14.0" layoutY="73.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="572.0" />
+                                                      <TextArea layoutX="47.0" layoutY="104.0" prefHeight="153.0" prefWidth="294.0" />
+                                                      <RadioButton layoutX="612.0" layoutY="225.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="73.0" text="FASTA">
+                                                         <toggleGroup>
+                                                            <ToggleGroup fx:id="type" />
+                                                         </toggleGroup>
+                                                      </RadioButton>
+                                                      <RadioButton layoutX="612.0" layoutY="199.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="64.0" selected="true" text="FastQ" toggleGroup="$type" />
+                                                      <Label layoutX="612.0" layoutY="173.0" text="format:" />
+                                                      <Label layoutX="156.0" layoutY="82.0" text="Paste text:" />
+                                                      <Label layoutX="367.0" layoutY="173.0" text="OR" />
+                                                      <Button layoutX="441.0" layoutY="168.0" mnemonicParsing="false" text="open file" />
+                                                      <Label layoutX="479.0" layoutY="146.0" text="-" />
+                                                      <Label layoutX="18.0" layoutY="16.0" prefHeight="38.0" prefWidth="250.0" text="Add data">
+                                                         <font>
+                                                            <Font size="29.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Button layoutX="615.0" layoutY="259.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="65.0" text="ADD" />
+                                                   </children></AnchorPane>
                                              </content>
                                           </Tab>
                                           <Tab text="3">
