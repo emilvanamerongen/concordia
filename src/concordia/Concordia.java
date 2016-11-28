@@ -29,7 +29,6 @@ public class Concordia extends Application {
         Scene scene = new Scene(root);
         
         stage.setScene(scene);
-        stage.getIcons().add( new Image( Concordia.class.getResourceAsStream( "logo-concordia.png" )));
         stage.show();
     }
 
