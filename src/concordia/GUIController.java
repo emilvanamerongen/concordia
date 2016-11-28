@@ -7,21 +7,21 @@ package concordia;
 
 import Objects.dataset;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 /**
  *
@@ -33,10 +33,30 @@ public class GUIController implements Initializable {
     TabPane datasetstabpane;
     @FXML
     ListView datasetlist;
+    @FXML
+    ListView annotationlist;
+    @FXML
+    Label ngsdatalabel;
+    //buttons
+    @FXML
+    Button datasetdeletebutton;
+    @FXML
+    Button adddatabutton;
+    @FXML
+    Button blastbutton;
+    @FXML
+    Button annotationaddbutton;
+    @FXML
+    Button annotationremovebutton;
     //add dataset tab
     @FXML
     TextField datasettitle;
-    Button datasetaddbutton;
+    //add data tab
+    @FXML
+    TextArea addngstext;
+    @FXML
+    Label ngsfilelabel;
+    
     
     
     HashMap<String, dataset> datasets = new HashMap<>();
@@ -54,24 +74,68 @@ public class GUIController implements Initializable {
             
         }
         else if (source.contains("")){
-        
+            
         }
     }
     
     @FXML
     private void adddataset(ActionEvent event){
-        datasets.put(datasettitle.getText(), new dataset());
-        updategui();
-    }
-    
-    public void updategui(){
+        String newsettitle = datasettitle.getText();
+        if (newsettitle != ""){
+            datasets.put(newsettitle, new dataset());
+            datasettitle.setText("");
+            updateguilistviews();
+            updateguibuttons();
+            datasetstabpane.getSelectionModel().select(0);
+        }
+    }   
+    @FXML
+    private void deletedataset(ActionEvent event){
+        String removetitle = (String) datasetlist.getSelectionModel().getSelectedItem();
+        datasets.remove(removetitle);
+        updateguilistviews();
+        updateguibuttons();
+        datasetstabpane.getSelectionModel().select(0);
+    } 
+    public void updateguilistviews(){
         ObservableList<String> datasetlistitems =FXCollections.observableArrayList(datasets.keySet());
         datasetlist.setItems(datasetlistitems);
     }
+    @FXML
+    public void updateguibuttons(){
+        if (datasetlist.getItems().size() == 0){
+            datasetdeletebutton.setDisable(true);
+            adddatabutton.setDisable(true);
+            blastbutton.setDisable(true);
+            annotationaddbutton.setDisable(true);
+            annotationremovebutton.setDisable(true);
+        }   else {
+            datasetdeletebutton.setDisable(false);
+        }
+        if (datasetlist.getSelectionModel().getSelectedItem() != null){
+            adddatabutton.setDisable(false);
+        } else {
+            adddatabutton.setDisable(true);
+        }
+        updateguilabels();
+    }
+    @FXML
+    public void updateguilabels(){
+        ngsdatalabel.setText((String) datasetlist.getSelectionModel().getSelectedItem());
+    }
+    @FXML
+    public void openNGSfile(ActionEvent event){
+        Stage stage = new Stage();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open NGS data File");
+        fileChooser.showOpenDialog(stage);
+
+    }
+    
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+        //TODO - get data from database and load into datasetlist
     }    
     
 }

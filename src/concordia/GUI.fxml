@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -12,6 +13,8 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -28,7 +31,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <SplitPane dividerPositions="0.5" layoutX="26.0" layoutY="27.0" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <SplitPane dividerPositions="0.42452830188679247" layoutX="26.0" layoutY="27.0" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <items>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                  <children>
@@ -44,7 +47,7 @@
                                                       <Font name="System Bold" size="19.0" />
                                                    </font>
                                                 </Label>
-                                                <ListView fx:id="datasetlist1" maxWidth="200.0" prefHeight="134.0" prefWidth="100.0" />
+                                                <ListView fx:id="datasetlist" maxWidth="200.0" onMouseClicked="#updateguibuttons" prefHeight="134.0" prefWidth="100.0" />
                                                 <AnchorPane maxHeight="21.0" maxWidth="158.0" prefHeight="21.0" prefWidth="163.0">
                                                    <children>
                                                       <Button layoutX="106.0" layoutY="4.0" mnemonicParsing="false" onAction="#datasetswitchtab" prefHeight="12.0" prefWidth="44.0" text="new">
@@ -52,7 +55,7 @@
                                                             <Font size="9.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button layoutX="155.0" layoutY="4.0" mnemonicParsing="false" prefHeight="12.0" prefWidth="44.0" text="delete">
+                                                      <Button fx:id="datasetdeletebutton" disable="true" layoutX="155.0" layoutY="4.0" mnemonicParsing="false" onAction="#deletedataset" prefHeight="12.0" prefWidth="44.0" text="delete">
                                                          <font>
                                                             <Font size="9.0" />
                                                          </font>
@@ -73,7 +76,12 @@
                                                       <Font name="System Bold" size="19.0" />
                                                    </font>
                                                    <VBox.margin>
-                                                      <Insets bottom="30.0" />
+                                                      <Insets bottom="10.0" />
+                                                   </VBox.margin>
+                                                </Label>
+                                                <Label fx:id="ngsdatalabel" textFill="#000000af">
+                                                   <VBox.margin>
+                                                      <Insets bottom="10.0" top="10.0" />
                                                    </VBox.margin>
                                                 </Label>
                                                 <HBox alignment="CENTER" minWidth="180.0" prefHeight="19.0" prefWidth="182.0">
@@ -90,12 +98,12 @@
                                                 </HBox>
                                                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                                                    <children>
-                                                      <Button mnemonicParsing="false" onAction="#datasetswitchtab" text="add data">
+                                                      <Button fx:id="adddatabutton" disable="true" mnemonicParsing="false" onAction="#datasetswitchtab" text="add data">
                                                          <HBox.margin>
                                                             <Insets right="5.0" />
                                                          </HBox.margin>
                                                       </Button>
-                                                      <Button mnemonicParsing="false" text="BLAST">
+                                                      <Button fx:id="blastbutton" disable="true" mnemonicParsing="false" text="BLAST">
                                                          <HBox.margin>
                                                             <Insets left="5.0" />
                                                          </HBox.margin>
@@ -119,15 +127,15 @@
                                                       <Font name="System Bold" size="19.0" />
                                                    </font>
                                                 </Label>
-                                                <ListView fx:id="datasetlist11" maxWidth="200.0" prefHeight="134.0" prefWidth="100.0" />
+                                                <ListView fx:id="annotationlist" maxWidth="200.0" prefHeight="134.0" prefWidth="100.0" />
                                                 <AnchorPane maxHeight="21.0" maxWidth="163.0" prefHeight="21.0" prefWidth="163.0">
                                                    <children>
-                                                      <Button layoutX="107.0" layoutY="4.0" mnemonicParsing="false" onAction="#datasetswitchtab" prefHeight="12.0" prefWidth="44.0" text="new">
+                                                      <Button fx:id="annotationaddbutton" disable="true" layoutX="107.0" layoutY="4.0" mnemonicParsing="false" onAction="#datasetswitchtab" prefHeight="12.0" prefWidth="44.0" text="new">
                                                          <font>
                                                             <Font size="9.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button layoutX="155.0" layoutY="4.0" mnemonicParsing="false" prefHeight="12.0" prefWidth="44.0" text="delete">
+                                                      <Button fx:id="annotationremovebutton" disable="true" layoutX="155.0" layoutY="4.0" mnemonicParsing="false" prefHeight="12.0" prefWidth="44.0" text="delete">
                                                          <font>
                                                             <Font size="9.0" />
                                                          </font>
@@ -153,7 +161,7 @@
                                              <content>
                                                 <VBox alignment="CENTER">
                                                    <children>
-                                                      <Label alignment="CENTER" prefHeight="111.0" prefWidth="250.0" text="New Dataset">
+                                                      <Label alignment="CENTER" prefHeight="61.0" prefWidth="250.0" text="New Dataset">
                                                          <font>
                                                             <Font name="System Bold" size="29.0" />
                                                          </font>
@@ -208,7 +216,7 @@
                                                                      </padding>
                                                                   </Label>
                                                                   <Label text="OR" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                                                  <Button mnemonicParsing="false" text="open file" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                                                  <Button mnemonicParsing="false" onAction="#openNGSfile" text="open file" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                                                                   <Label text="-" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                                                                   <Label text="import file:" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                                                                      <font>
@@ -256,6 +264,80 @@
                                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                                    <children>
                                                       <Label layoutX="371.0" layoutY="90.0" text="-" />
+                                                      <VBox alignment="CENTER" layoutX="349.0" layoutY="46.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <children>
+                                                            <Label alignment="CENTER" prefHeight="38.0" prefWidth="176.0" text="BLAST" textAlignment="CENTER">
+                                                               <font>
+                                                                  <Font name="System Bold" size="29.0" />
+                                                               </font>
+                                                               <padding>
+                                                                  <Insets bottom="10.0" top="10.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <HBox prefHeight="231.0" prefWidth="698.0" VBox.vgrow="ALWAYS">
+                                                               <children>
+                                                                  <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                                                                     <HBox.margin>
+                                                                        <Insets right="20.0" top="5.0" />
+                                                                     </HBox.margin>
+                                                                     <children>
+                                                                        <Label text="NGS data">
+                                                                           <font>
+                                                                              <Font name="System Bold Italic" size="15.0" />
+                                                                           </font>
+                                                                           <VBox.margin>
+                                                                              <Insets bottom="20.0" />
+                                                                           </VBox.margin>
+                                                                        </Label>
+                                                                        <PieChart maxWidth="100.0" prefHeight="150.0" prefWidth="51.0" />
+                                                                     </children>
+                                                                  </VBox>
+                                                                  <VBox alignment="TOP_CENTER" prefHeight="237.0" prefWidth="71.0">
+                                                                     <children>
+                                                                        <Label alignment="TOP_CENTER" prefHeight="16.0" prefWidth="79.0" text="against &gt;">
+                                                                           <font>
+                                                                              <Font name="System Bold" size="13.0" />
+                                                                           </font>
+                                                                        </Label>
+                                                                     </children>
+                                                                     <HBox.margin>
+                                                                        <Insets left="10.0" right="10.0" top="40.0" />
+                                                                     </HBox.margin>
+                                                                  </VBox>
+                                                                  <VBox prefHeight="232.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                                                     <HBox.margin>
+                                                                        <Insets left="20.0" top="5.0" />
+                                                                     </HBox.margin>
+                                                                     <children>
+                                                                        <Label text="DIAMOND database">
+                                                                           <font>
+                                                                              <Font name="System Bold Italic" size="15.0" />
+                                                                           </font>
+                                                                           <VBox.margin>
+                                                                              <Insets bottom="20.0" />
+                                                                           </VBox.margin>
+                                                                        </Label>
+                                                                        <ListView fx:id="datasetlist1" maxWidth="200.0" onMouseClicked="#updateguibuttons" prefHeight="134.0" prefWidth="35.0" />
+                                                                        <AnchorPane maxHeight="21.0" maxWidth="158.0" prefHeight="21.0" prefWidth="0.0">
+                                                                           <children>
+                                                                              <Button layoutX="106.0" layoutY="4.0" mnemonicParsing="false" onAction="#datasetswitchtab" prefHeight="12.0" prefWidth="44.0" text="new">
+                                                                                 <font>
+                                                                                    <Font size="9.0" />
+                                                                                 </font>
+                                                                              </Button>
+                                                                              <Button fx:id="datasetdeletebutton1" disable="true" layoutX="155.0" layoutY="4.0" mnemonicParsing="false" onAction="#deletedataset" prefHeight="12.0" prefWidth="44.0" text="delete">
+                                                                                 <font>
+                                                                                    <Font size="9.0" />
+                                                                                 </font>
+                                                                              </Button>
+                                                                           </children>
+                                                                        </AnchorPane>
+                                                                     </children>
+                                                                  </VBox>
+                                                               </children>
+                                                            </HBox>
+                                                         </children>
+                                                      </VBox>
                                                    </children></AnchorPane>
                                              </content>
                                           </Tab>
@@ -293,7 +375,12 @@
       </TabPane>
       <ToolBar layoutX="-1.0" nodeOrientation="RIGHT_TO_LEFT" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
         <items>
-            <Label prefHeight="26.0" prefWidth="222.0" text="Concordia">
+            <ImageView fitHeight="110.0" fitWidth="24.0" preserveRatio="true">
+               <image>
+                  <Image url="@../img/logo-concordia2.png" />
+               </image>
+            </ImageView>
+            <Label prefHeight="26.0" prefWidth="222.0" text="Concordia" textAlignment="CENTER">
                <font>
                   <Font size="22.0" />
                </font>
