@@ -20,14 +20,9 @@ import javafx.stage.StageStyle;
  * @author emilvanamerongen
  */
 public class Concordia extends Application {
-    public static Stage loadingstage = new Stage(StageStyle.TRANSPARENT);
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent loadingroot = FXMLLoader.load(getClass().getResource("loadingGUI.fxml"));        
-        Scene loadingscene = new Scene(loadingroot); 
-        loadingscene.setFill(Color.TRANSPARENT);
-        loadingstage.setScene(loadingscene);
        
         Parent root = FXMLLoader.load(getClass().getResource("GUI.fxml"));
         
@@ -36,8 +31,6 @@ public class Concordia extends Application {
         stage.setScene(scene);
         stage.getIcons().add( new Image( Concordia.class.getResourceAsStream( "logo-concordia.png" )));
         stage.show();
-        loadingstage.show();
-        loadingstage.close();
     }
 
     /**
