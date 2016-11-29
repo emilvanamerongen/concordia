@@ -27,17 +27,20 @@ public class DerbyQuery {
       con = DriverManager.getConnection("jdbc:derby:NGSDB");
       Statement sta = con.createStatement(); 
 
+      //Dit werkt voor het inserten van data in de NGSDB.
+      /**
       int count = 0;
       int c = sta.executeUpdate("INSERT INTO READS"
         + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_RICHTING, SEQUENCE_ID)"
-        + " VALUES (55, 'ATGCTGCAAA', '*&^%$#@#$', false, 13)");
+        + " VALUES (556, 'ATGCTGCAAA', '*&^%$#@#$', false, 13)");
       count = count + c;
  
       c = sta.executeUpdate("INSERT INTO READS"
         + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_RICHTING, SEQUENCE_ID)"
-        + " VALUES (66, 'TGAAAGCTAD', '^##%^*&$#$%$', true, 12)");
+        + " VALUES (667, 'TGAAAGCTAD', '^##%^*&$#$%$', true, 12)");
       count = count + c;
       System.out.println("Number of rows inserted: "+count);
+      **/
       
     // getting the data back
       ResultSet res = sta.executeQuery(
