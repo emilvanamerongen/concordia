@@ -1,19 +1,106 @@
-----------------------------------------------------------------
-Thu Nov 17 15:01:24 CET 2016:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (1765088): instance a816c00e-0158-7297-8ceb-00000eb40a68 
-on database directory C:\Users\Alex\Documents\NetBeansProjects\Bioinformatics_Minor_NGS_project_2\concordiaDB with class loader sun.misc.Launcher$AppClassLoader@70dea4e 
-Loaded from file:/C:/Users/Alex/Documents/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar
-java.vendor=Oracle Corporation
-java.runtime.version=1.8.0_60-b27
-user.dir=C:\Users\Alex\Documents\NetBeansProjects\Bioinformatics_Minor_NGS_project_2
-os.name=Windows 10
-os.arch=amd64
-os.version=10.0
-derby.system.home=null
-Database Class Loader started - derby.database.classpath=''
-----------------------------------------------------------------
-Thu Nov 17 15:01:25 CET 2016: Shutting down Derby engine
-----------------------------------------------------------------
-Thu Nov 17 15:01:25 CET 2016:
-Shutting down instance a816c00e-0158-7297-8ceb-00000eb40a68 on database directory C:\Users\Alex\Documents\NetBeansProjects\Bioinformatics_Minor_NGS_project_2\concordiaDB with class loader sun.misc.Launcher$AppClassLoader@70dea4e 
-----------------------------------------------------------------
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.replication.master in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.resultSetStatisticsFactory in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.NoneAuthentication in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.lockManagerJ6 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.rawStore.log.readonly in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.jdbcJ8 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.resourceAdapterJ2 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.validation in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.lcf in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.optimizer in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.XPLAINFactory in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.javaCompiler in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.tcf in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.dataDictionary in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.jdk.cacheManagerJ6 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.ef in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.dvfJ2 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.jdk.dvfJ2 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.daemon in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.cacheManagerJ6 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.rawStore.data.genericJ4 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.timerJ1 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.jdk.rawStore.data.genericJ4 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.rawStore.data.genericJ1 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.basicAuthentication in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.jdk.rawStore.data.genericJ1 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.classes.JNDIAuthentication in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.database in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.rawStore.transaction in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.streams in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.classes.dvfJ2 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.jdk.mgmt.jmx in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.nativeAuthentication in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.jdk.cryptographyJ2 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.access.sort in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.classes.jdbcJ8 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.classes.cryptographyJ2 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.classes.rawStore.data.genericJ4 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.jdk.jdbcJ8 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.jdk.lockManagerJ6 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.cryptographyJ2 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.specificAuthentication in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.mgmt.jmx in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.netServer.autoStart in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.access.uniquewithduplicatenullssort in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.classManagerJ2 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.JNDIAuthentication in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.rawStore.log in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.access.heap in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.database.slave in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.jdk.resourceAdapterJ2 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.mgmt.null in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.env.classes.resourceAdapterJ2 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.access in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.replication.slave in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.lf in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.uuidJ1 in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.access.btree in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main] Ignored duplicate property derby.module.rawStore in jar:file:/home/emil/NetBeansProjects/Bioinformatics_Minor_NGS_project_2/lib/derby.jar!/org/apache/derby/modules.properties
+Tue Nov 29 09:48:44 CET 2016 Thread[main,5,main]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+Tue Nov 29 09:48:45 CET 2016 Thread[main,5,main] Cleanup action starting
+java.sql.SQLException: Database 'NGSDB' not found.
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory.getSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory.getSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.Util.generateCsSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.Util.generateCsSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.newSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.handleDBNotFound(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.<init>(Unknown Source)
+	at org.apache.derby.jdbc.InternalDriver$1.run(Unknown Source)
+	at org.apache.derby.jdbc.InternalDriver$1.run(Unknown Source)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.apache.derby.jdbc.InternalDriver.getNewEmbedConnection(Unknown Source)
+	at org.apache.derby.jdbc.InternalDriver.connect(Unknown Source)
+	at org.apache.derby.jdbc.InternalDriver.connect(Unknown Source)
+	at org.apache.derby.jdbc.AutoloadedDriver.connect(Unknown Source)
+	at java.sql.DriverManager.getConnection(DriverManager.java:664)
+	at java.sql.DriverManager.getConnection(DriverManager.java:270)
+	at concordia.DerbyQuery.main(DerbyQuery.java:33)
+Caused by: ERROR XJ004: Database 'NGSDB' not found.
+	at org.apache.derby.iapi.error.StandardException.newException(Unknown Source)
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory.wrapArgsForTransportAcrossDRDA(Unknown Source)
+	... 17 more
+============= begin nested exception, level (1) ===========
+ERROR XJ004: Database 'NGSDB' not found.
+	at org.apache.derby.iapi.error.StandardException.newException(Unknown Source)
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory.wrapArgsForTransportAcrossDRDA(Unknown Source)
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory.getSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory.getSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.Util.generateCsSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.Util.generateCsSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.newSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.handleDBNotFound(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.<init>(Unknown Source)
+	at org.apache.derby.jdbc.InternalDriver$1.run(Unknown Source)
+	at org.apache.derby.jdbc.InternalDriver$1.run(Unknown Source)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.apache.derby.jdbc.InternalDriver.getNewEmbedConnection(Unknown Source)
+	at org.apache.derby.jdbc.InternalDriver.connect(Unknown Source)
+	at org.apache.derby.jdbc.InternalDriver.connect(Unknown Source)
+	at org.apache.derby.jdbc.AutoloadedDriver.connect(Unknown Source)
+	at java.sql.DriverManager.getConnection(DriverManager.java:664)
+	at java.sql.DriverManager.getConnection(DriverManager.java:270)
+	at concordia.DerbyQuery.main(DerbyQuery.java:33)
+============= end nested exception, level (1) ===========
+Cleanup action completed
