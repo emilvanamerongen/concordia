@@ -25,7 +25,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
+import concordia.dbcon;
 /**
  *
  * @author emilvanamerongen
@@ -148,7 +148,12 @@ public class GUIController implements Initializable {
     }
     @FXML
     public void adddata(ActionEvent event) throws IOException{
-        
+        if (addngstext.getText() == null){
+            dbcon con = new dbcon();
+        }
+        else if (importfiletemp != null){
+            
+        }
     }
     
     @Override
