@@ -206,7 +206,7 @@
                                                                   <Insets left="30.0" right="30.0" />
                                                                </VBox.margin>
                                                                <children>
-                                                                  <TextArea prefHeight="86.0" prefWidth="319.0" GridPane.rowIndex="1" />
+                                                                  <TextArea fx:id="addngstext" prefHeight="86.0" prefWidth="319.0" GridPane.rowIndex="1" />
                                                                   <Label text="Paste text:" GridPane.halignment="CENTER">
                                                                      <font>
                                                                         <Font name="System Bold" size="13.0" />
@@ -217,7 +217,7 @@
                                                                   </Label>
                                                                   <Label text="OR" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                                                                   <Button mnemonicParsing="false" onAction="#openNGSfile" text="open file" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                                                  <Label text="-" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                                                  <Label fx:id="ngsfilelabel" text="-" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                                                                   <Label text="import file:" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                                                                      <font>
                                                                         <Font name="System Bold" size="13.0" />

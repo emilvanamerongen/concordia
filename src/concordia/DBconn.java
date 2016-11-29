@@ -1,8 +1,5 @@
 package concordia;
 
-
-
-
 /**
  *
  * @author Alex
@@ -20,11 +17,8 @@ import java.util.Properties;
 
 public class DBconn{
     
-    public DBconn(){
-        
-    }
     
-    public void ADDToDatabase(){
+    public static void ADDToDatabase(){
         try{
         String framework = "embedded";
         String protocol = "jdbc:derby:";
@@ -54,5 +48,7 @@ public class DBconn{
     
 
 }
-    
+    public static void main(String [] args){
+        ADDToDatabase();
+    }
 }

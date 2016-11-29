@@ -6,6 +6,8 @@
 package concordia;
 
 import Objects.dataset;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -17,6 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -56,8 +59,14 @@ public class GUIController implements Initializable {
     TextArea addngstext;
     @FXML
     Label ngsfilelabel;
+    @FXML 
+    RadioButton fastaradiobutton;
+    @FXML
+    RadioButton fastqradiobutton;
     
     
+    
+    public File importfiletemp;
     
     HashMap<String, dataset> datasets = new HashMap<>();
     
@@ -81,7 +90,7 @@ public class GUIController implements Initializable {
     @FXML
     private void adddataset(ActionEvent event){
         String newsettitle = datasettitle.getText();
-        if (newsettitle != ""){
+        if (!"".equals(newsettitle)){
             datasets.put(newsettitle, new dataset());
             datasettitle.setText("");
             updateguilistviews();
@@ -124,14 +133,23 @@ public class GUIController implements Initializable {
         ngsdatalabel.setText((String) datasetlist.getSelectionModel().getSelectedItem());
     }
     @FXML
-    public void openNGSfile(ActionEvent event){
+    public void openNGSfile(ActionEvent event) throws IOException{
         Stage stage = new Stage();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open NGS data File");
-        fileChooser.showOpenDialog(stage);
-
+                    fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("FASTQ", "*.fastq"),
+                new FileChooser.ExtensionFilter("FASTA", "*.fasta")
+            );
+        importfiletemp = fileChooser.showOpenDialog(stage);
+        if (importfiletemp != null){
+        ngsfilelabel.setText(importfiletemp.getName());
+        }
     }
-    
+    @FXML
+    public void adddata(ActionEvent event) throws IOException{
+        
+    }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
