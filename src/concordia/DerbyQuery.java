@@ -1,11 +1,5 @@
 package concordia;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 
 /**
  *
@@ -33,7 +27,19 @@ public class DerbyQuery {
       con = DriverManager.getConnection("jdbc:derby:NGSDB");
       Statement sta = con.createStatement(); 
 
-// getting the data back
+      int count = 0;
+      int c = sta.executeUpdate("INSERT INTO READS"
+        + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_RICHTING, SEQUENCE_ID)"
+        + " VALUES (55, 'ATGCTGCAAA', '*&^%$#@#$', false, 13)");
+      count = count + c;
+ 
+      c = sta.executeUpdate("INSERT INTO READS"
+        + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_RICHTING, SEQUENCE_ID)"
+        + " VALUES (66, 'TGAAAGCTAD', '^##%^*&$#$%$', true, 12)");
+      count = count + c;
+      System.out.println("Number of rows inserted: "+count);
+      
+    // getting the data back
       ResultSet res = sta.executeQuery(
         "SELECT * FROM APP.READS");
       System.out.println("Read contents: "); 
