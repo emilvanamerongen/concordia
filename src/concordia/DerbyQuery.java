@@ -29,7 +29,7 @@ public class DerbyQuery {
     String framework = "embedded";
     String protocol = "jdbc:derby:";
     Connection con = null;
-      String dbName = "concordiaDB";
+      String dbName = "NGSDB";
       con = DriverManager.getConnection("jdbc:derby:NGSDB");
       Statement sta = con.createStatement(); 
 
