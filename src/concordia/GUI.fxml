@@ -3,15 +3,15 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -23,7 +23,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" minHeight="600.0" minWidth="700.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="concordia.GUIController">
+<AnchorPane id="AnchorPane" minHeight="600.0" minWidth="700.0" prefHeight="700.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="concordia.GUIController">
    <children>
       <TabPane layoutX="-1.0" layoutY="35.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
         <tabs>
@@ -31,7 +31,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <SplitPane dividerPositions="0.42452830188679247" layoutX="26.0" layoutY="27.0" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <SplitPane dividerPositions="0.3380952380952381" layoutX="26.0" layoutY="27.0" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <items>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                  <children>
@@ -200,7 +200,6 @@
                                                               <rowConstraints>
                                                                 <RowConstraints maxHeight="40.0" minHeight="13.0" prefHeight="9.0" vgrow="SOMETIMES" />
                                                                 <RowConstraints maxHeight="83.0" minHeight="10.0" prefHeight="83.0" vgrow="SOMETIMES" />
-                                                                <RowConstraints maxHeight="20.0" minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
                                                               </rowConstraints>
                                                                <VBox.margin>
                                                                   <Insets left="30.0" right="30.0" />
@@ -216,8 +215,6 @@
                                                                      </padding>
                                                                   </Label>
                                                                   <Label text="OR" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                                                  <Button mnemonicParsing="false" onAction="#openNGSfile" text="open file" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                                                  <Label fx:id="ngsfilelabel" text="-" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                                                                   <Label text="import file:" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                                                                      <font>
                                                                         <Font name="System Bold" size="13.0" />
@@ -226,6 +223,12 @@
                                                                         <Insets bottom="3.0" />
                                                                      </padding>
                                                                   </Label>
+                                                                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                                                                     <children>
+                                                                        <Button mnemonicParsing="false" onAction="#openNGSfile" text="open file" />
+                                                                        <Label fx:id="ngsfilelabel" text="-" />
+                                                                     </children>
+                                                                  </VBox>
                                                                </children>
                                                             </GridPane>
                                                             <Label text="format:">
@@ -236,20 +239,73 @@
                                                                   <Font name="System Bold" size="13.0" />
                                                                </font>
                                                             </Label>
-                                                            <RadioButton contentDisplay="CENTER" mnemonicParsing="false" prefHeight="18.0" prefWidth="88.0" text="FASTA">
-                                                               <toggleGroup>
-                                                                  <ToggleGroup fx:id="type" />
-                                                               </toggleGroup>
-                                                               <padding>
-                                                                  <Insets bottom="3.0" />
-                                                               </padding>
-                                                            </RadioButton>
-                                                            <RadioButton contentDisplay="CENTER" mnemonicParsing="false" prefHeight="18.0" prefWidth="88.0" selected="true" text="FastQ" textAlignment="CENTER">
-                                                               <toggleGroup>
-                                                                  <ToggleGroup fx:id="type" />
-                                                               </toggleGroup>
-                                                            </RadioButton>
-                                                            <Button mnemonicParsing="false" prefHeight="47.0" prefWidth="65.0" text="ADD">
+                                                            <ChoiceBox fx:id="adddatachoicebox" prefWidth="150.0">
+                                                               <VBox.margin>
+                                                                  <Insets bottom="20.0" />
+                                                               </VBox.margin>
+                                                            </ChoiceBox>
+                                                            <GridPane alignment="CENTER" maxWidth="500.0" prefHeight="80.0" prefWidth="591.0">
+                                                              <columnConstraints>
+                                                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" prefWidth="100.0" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="100.0" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="100.0" />
+                                                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" prefWidth="100.0" />
+                                                              </columnConstraints>
+                                                              <rowConstraints>
+                                                                <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints maxHeight="120.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                                              </rowConstraints>
+                                                               <children>
+                                                                  <Label alignment="CENTER" text="Header identifier" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="13.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <TextField maxWidth="150.0" prefHeight="26.0" prefWidth="20.0" text="\@HWI" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                  <CheckBox fx:id="directioncheckbox" mnemonicParsing="false" onAction="#readdirectiondisable" selected="true" text="Read direction" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="13.0" />
+                                                                     </font>
+                                                                  </CheckBox>
+                                                                  <VBox alignment="CENTER" maxWidth="90.0" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                                     <children>
+                                                                        <TextField fx:id="forwardfield" alignment="CENTER_RIGHT" maxWidth="90.0" prefHeight="26.0" prefWidth="20.0" text="/1" />
+                                                                        <TextField fx:id="reversefield" alignment="CENTER_RIGHT" maxWidth="90.0" prefHeight="26.0" prefWidth="20.0" text="/2" />
+                                                                     </children>
+                                                                  </VBox>
+                                                                  <VBox alignment="CENTER" maxWidth="60.0" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                                                                     <children>
+                                                                        <Label fx:id="forwardtext" alignment="CENTER_RIGHT" text="forward">
+                                                                           <padding>
+                                                                              <Insets bottom="5.0" />
+                                                                           </padding>
+                                                                        </Label>
+                                                                        <Label fx:id="reversetext" alignment="CENTER_RIGHT" text="reverse">
+                                                                           <padding>
+                                                                              <Insets top="5.0" />
+                                                                           </padding>
+                                                                        </Label>
+                                                                     </children>
+                                                                  </VBox>
+                                                                  <Label alignment="CENTER" text="Start" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                                                                     <font>
+                                                                        <Font name="System Bold Italic" size="13.0" />
+                                                                     </font>
+                                                                     <padding>
+                                                                        <Insets right="10.0" />
+                                                                     </padding>
+                                                                  </Label>
+                                                                  <Label alignment="CENTER" text="End" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                                                     <font>
+                                                                        <Font name="System Bold Italic" size="13.0" />
+                                                                     </font>
+                                                                     <padding>
+                                                                        <Insets left="10.0" />
+                                                                     </padding>
+                                                                  </Label>
+                                                               </children>
+                                                            </GridPane>
+                                                            <Button mnemonicParsing="false" onAction="#adddata" prefHeight="36.0" prefWidth="65.0" text="ADD">
                                                                <VBox.margin>
                                                                   <Insets bottom="10.0" top="10.0" />
                                                                </VBox.margin>
@@ -289,7 +345,7 @@
                                                                               <Insets bottom="20.0" />
                                                                            </VBox.margin>
                                                                         </Label>
-                                                                        <PieChart maxWidth="100.0" prefHeight="150.0" prefWidth="51.0" />
+                                                                        <PieChart maxWidth="184.0" prefHeight="133.0" prefWidth="184.0" />
                                                                      </children>
                                                                   </VBox>
                                                                   <VBox alignment="TOP_CENTER" prefHeight="237.0" prefWidth="71.0">
