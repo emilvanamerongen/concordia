@@ -172,13 +172,13 @@ public class GUIController implements Initializable {
         if (ngstext.length() > 10){
             System.out.println("PARSER MODULE: GO text");
             dataparser newparser = new dataparser(ngstext, "");
-            newparser.process("", "");
+            newparser.process("","", "");
             
         }
         else if (importfiletemp != null){
             System.out.println("PARSER MODULE: GO file");
             dataparser newparser = new dataparser(importfiletemp, "");
-            newparser.process("", "");
+            newparser.process("","", "");
         }
     }
     @FXML 
