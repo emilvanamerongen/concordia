@@ -26,6 +26,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import concordia.dbcon;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 /**
  *
  * @author emilvanamerongen
@@ -63,6 +65,18 @@ public class GUIController implements Initializable {
     RadioButton fastaradiobutton;
     @FXML
     RadioButton fastqradiobutton;
+    @FXML
+    CheckBox directioncheckbox;
+    @FXML
+    ChoiceBox adddatachoicebox;
+    @FXML
+    TextField forwardfield;
+    @FXML
+    Label forwardtext;
+    @FXML
+    TextField reversefield;
+    @FXML
+    Label reversetext;
     
     
     
@@ -148,17 +162,41 @@ public class GUIController implements Initializable {
     }
     @FXML
     public void adddata(ActionEvent event) throws IOException{
-        if (addngstext.getText() == null){
-            dbcon con = new dbcon();
+        String ngstext = addngstext.getText();
+        System.out.println(ngstext);
+        System.out.println(adddatachoicebox.getValue());
+        if (ngstext.length() > 10){
+            System.out.println("PARSER MODULE: GO text");
+            dataparser newparser = new dataparser(ngstext, "");
+            newparser.process("", "");
+            
         }
         else if (importfiletemp != null){
-            
+            System.out.println("PARSER MODULE: GO file");
+            dataparser newparser = new dataparser(importfiletemp, "");
+            newparser.process("", "");
+        }
+    }
+    @FXML 
+    public void readdirectiondisable(ActionEvent event){
+        if (directioncheckbox.isSelected()){
+            forwardfield.setDisable(false);
+            reversefield.setDisable(false);
+            forwardtext.setDisable(false);
+            reversetext.setDisable(false);
+        } else{
+            forwardfield.setDisable(true);
+            reversefield.setDisable(true);
+            forwardtext.setDisable(true);
+            reversetext.setDisable(true);
         }
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //TODO - get data from database and load into datasetlist
+        adddatachoicebox.setItems(FXCollections.observableArrayList("FASTq", "FASTA"));
+        adddatachoicebox.getSelectionModel().selectFirst();
     }    
     
 }
