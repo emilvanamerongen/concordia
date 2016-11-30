@@ -15,7 +15,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Properties;
 
-public class DerbyQuery {
+public class DerbyQuery{
     /* the default framework is embedded */
 
     
