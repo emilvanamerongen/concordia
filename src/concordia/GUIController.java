@@ -80,7 +80,11 @@ public class GUIController implements Initializable {
     
     
     
-    public File importfiletemp;
+    public File importfiletemp; 
+    private String header;
+    private String sequence;
+    private String qualityvalues;
+    private Boolean readrichting;
     
     HashMap<String, dataset> datasets = new HashMap<>();
     
