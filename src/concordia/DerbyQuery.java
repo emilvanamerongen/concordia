@@ -31,12 +31,12 @@ public class DerbyQuery{
       /**
       int count = 0;
       int c = sta.executeUpdate("INSERT INTO READS"
-        + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_RICHTING, SEQUENCE_ID)"
+        + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_DIRECTION, SEQUENCE_ID)"
         + " VALUES (556, 'ATGCTGCAAA', '*&^%$#@#$', false, 13)");
       count = count + c;
  
       c = sta.executeUpdate("INSERT INTO READS"
-        + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_RICHTING, SEQUENCE_ID)"
+        + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_DIRECTION, SEQUENCE_ID)"
         + " VALUES (667, 'TGAAAGCTAD', '^##%^*&$#$%$', true, 12)");
       count = count + c;
       System.out.println("Number of rows inserted: "+count);
@@ -51,7 +51,7 @@ public class DerbyQuery{
            "  "+res.getInt("READ_ID")
            + ", "+res.getString("SEQUENCE")
            + ", "+res.getString("QUALITY_VALUES")
-           + ", "+res.getBoolean("READ_RICHTING")
+           + ", "+res.getBoolean("READ_DIRECTION")
            + ", "+res.getInt("SEQUENCE_ID"));
       }
       res.close();
