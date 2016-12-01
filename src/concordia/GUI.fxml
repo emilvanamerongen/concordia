@@ -7,6 +7,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -20,10 +21,11 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" minHeight="600.0" minWidth="700.0" prefHeight="700.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="concordia.GUIController">
+<AnchorPane id="AnchorPane" minHeight="600.0" minWidth="700.0" prefHeight="782.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="concordia.GUIController">
    <children>
       <TabPane layoutX="-1.0" layoutY="35.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
         <tabs>
@@ -31,7 +33,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <SplitPane dividerPositions="0.3380952380952381" layoutX="26.0" layoutY="27.0" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <SplitPane dividerPositions="0.29863013698630136" layoutX="26.0" layoutY="27.0" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <items>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                  <children>
@@ -183,12 +185,12 @@
                                                    <children>
                                                       <VBox alignment="CENTER" layoutX="54.0" layoutY="-12.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                          <children>
-                                                            <Label alignment="CENTER" prefHeight="38.0" prefWidth="176.0" text="Add data" textAlignment="CENTER">
+                                                            <Label alignment="CENTER" prefHeight="0.0" prefWidth="176.0" text="Add data" textAlignment="CENTER">
                                                                <font>
                                                                   <Font name="System Bold" size="29.0" />
                                                                </font>
                                                                <padding>
-                                                                  <Insets bottom="10.0" top="10.0" />
+                                                                  <Insets top="5.0" />
                                                                </padding>
                                                             </Label>
                                                             <GridPane alignment="CENTER" maxWidth="800.0" prefHeight="137.0" prefWidth="481.0">
@@ -198,7 +200,7 @@
                                                                   <ColumnConstraints hgrow="ALWAYS" maxWidth="200.0" minWidth="10.0" prefWidth="30.0" />
                                                               </columnConstraints>
                                                               <rowConstraints>
-                                                                <RowConstraints maxHeight="40.0" minHeight="13.0" prefHeight="9.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints maxHeight="20.0" minHeight="13.0" prefHeight="9.0" vgrow="SOMETIMES" />
                                                                 <RowConstraints maxHeight="83.0" minHeight="10.0" prefHeight="83.0" vgrow="SOMETIMES" />
                                                               </rowConstraints>
                                                                <VBox.margin>
@@ -210,18 +212,12 @@
                                                                      <font>
                                                                         <Font name="System Bold" size="13.0" />
                                                                      </font>
-                                                                     <padding>
-                                                                        <Insets bottom="3.0" />
-                                                                     </padding>
                                                                   </Label>
                                                                   <Label text="OR" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                                                                   <Label text="import file:" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                                                                      <font>
                                                                         <Font name="System Bold" size="13.0" />
                                                                      </font>
-                                                                     <padding>
-                                                                        <Insets bottom="3.0" />
-                                                                     </padding>
                                                                   </Label>
                                                                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
                                                                      <children>
@@ -231,9 +227,10 @@
                                                                   </VBox>
                                                                </children>
                                                             </GridPane>
+                                                            <Label text="---------------------------------------------------------------" />
                                                             <Label text="format:">
                                                                <VBox.margin>
-                                                                  <Insets bottom="5.0" top="10.0" />
+                                                                  <Insets bottom="5.0" top="5.0" />
                                                                </VBox.margin>
                                                                <font>
                                                                   <Font name="System Bold" size="13.0" />
@@ -261,7 +258,7 @@
                                                                         <Font name="System Bold" size="13.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <TextField maxWidth="150.0" prefHeight="26.0" prefWidth="20.0" text="\@HWI" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                  <TextField fx:id="headidentifierfield" maxWidth="150.0" prefHeight="26.0" prefWidth="20.0" text="\@HWI" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                                   <CheckBox fx:id="directioncheckbox" mnemonicParsing="false" onAction="#readdirectiondisable" selected="true" text="Read direction" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                                                                      <font>
                                                                         <Font name="System Bold" size="13.0" />
@@ -307,9 +304,15 @@
                                                             </GridPane>
                                                             <Button mnemonicParsing="false" onAction="#adddata" prefHeight="36.0" prefWidth="65.0" text="ADD">
                                                                <VBox.margin>
-                                                                  <Insets bottom="10.0" top="10.0" />
+                                                                  <Insets bottom="5.0" top="10.0" />
                                                                </VBox.margin>
                                                             </Button>
+                                                            <StackPane prefHeight="43.0" prefWidth="698.0">
+                                                               <children>
+                                                                  <ProgressBar fx:id="adddataprogressbar" prefHeight="33.0" prefWidth="460.0" progress="0.0" />
+                                                                  <Label fx:id="adddataprogresslabel" />
+                                                               </children>
+                                                            </StackPane>
                                                          </children>
                                                       </VBox>
                                                    </children></AnchorPane>

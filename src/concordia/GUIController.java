@@ -6,6 +6,7 @@
 package concordia;
 
 import Objects.dataset;
+import Objects.loadbar;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -25,9 +26,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import concordia.dbcon;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ProgressBar;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.ChangeListener;
+
 /**
  *
  * @author emilvanamerongen
@@ -77,14 +81,17 @@ public class GUIController implements Initializable {
     TextField reversefield;
     @FXML
     Label reversetext;
+    @FXML
+    TextField headidentifierfield;
+    @FXML 
+    ProgressBar adddataprogressbar;
+    @FXML
+    Label adddataprogresslabel;
     
-    
-    
+    public static String parserloadlabel;
+    public static loadbar parserloadbar = new loadbar();
+
     public File importfiletemp; 
-    private String header;
-    private String sequence;
-    private String qualityvalues;
-    private Boolean readrichting;
     
     HashMap<String, dataset> datasets = new HashMap<>();
     
@@ -150,6 +157,8 @@ public class GUIController implements Initializable {
     public void updateguilabels(){
         ngsdatalabel.setText((String) datasetlist.getSelectionModel().getSelectedItem());
     }
+    
+    // add data functions:
     @FXML
     public void openNGSfile(ActionEvent event) throws IOException{
         Stage stage = new Stage();
@@ -166,21 +175,32 @@ public class GUIController implements Initializable {
     }
     @FXML
     public void adddata(ActionEvent event) throws IOException{
-        String ngstext = addngstext.getText();
-        System.out.println(ngstext);
+        String[] ngstext = addngstext.getText().split("\\r?\\n");
+        String selecteddataset = (String) datasetlist.getSelectionModel().getSelectedItem();   
         System.out.println(adddatachoicebox.getValue());
-        if (ngstext.length() > 10){
+        if (! ngstext[0].isEmpty()){
             System.out.println("PARSER MODULE: GO text");
             dataparser newparser = new dataparser(ngstext, "");
-            newparser.process("","", "");
+            newparser.process(headidentifierfield.getText(),forwardfield.getText(),reversefield.getText(),selecteddataset);
             
         }
         else if (importfiletemp != null){
             System.out.println("PARSER MODULE: GO file");
             dataparser newparser = new dataparser(importfiletemp, "");
-            newparser.process("","", "");
+            newparser.process(headidentifierfield.getText(),forwardfield.getText(),reversefield.getText(),selecteddataset);
         }
+        adddataprogresslabel.setText("importing");
+        parserloadbar.doneproperty().addListener(new ChangeListener(){
+        @Override public void changed(ObservableValue o,Object oldVal, Object newVal){
+            double progress = parserloadbar.getdone();
+            adddataprogressbar.setProgress(parserloadbar.getdone());
+        }
+        });
     }
+
+    
+      
+    
     @FXML 
     public void readdirectiondisable(ActionEvent event){
         if (directioncheckbox.isSelected()){
@@ -196,11 +216,13 @@ public class GUIController implements Initializable {
         }
     }
     
+    //init
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //TODO - get data from database and load into datasetlist
         adddatachoicebox.setItems(FXCollections.observableArrayList("FASTq", "FASTA"));
         adddatachoicebox.getSelectionModel().selectFirst();
+        
     }    
     
 }
