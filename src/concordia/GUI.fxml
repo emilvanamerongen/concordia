@@ -259,7 +259,7 @@
                                                                      </font>
                                                                   </Label>
                                                                   <TextField fx:id="headidentifierfield" maxWidth="150.0" prefHeight="26.0" prefWidth="20.0" text="\@HWI" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                                  <CheckBox fx:id="directioncheckbox" mnemonicParsing="false" onAction="#readdirectiondisable" selected="true" text="Read direction" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+                                                                  <CheckBox fx:id="directioncheckbox" mnemonicParsing="false" onAction="#readdirectiondisable" selected="true" text="6" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                                                                      <font>
                                                                         <Font name="System Bold" size="13.0" />
                                                                      </font>
@@ -307,6 +307,28 @@
                                                                   <Insets bottom="5.0" top="10.0" />
                                                                </VBox.margin>
                                                             </Button>
+                                                         </children>
+                                                      </VBox>
+                                                   </children></AnchorPane>
+                                             </content>
+                                          </Tab>
+                                          <Tab text="3">
+                                            <content>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                   <children>
+                                                      <VBox alignment="CENTER" layoutX="219.0" layoutY="110.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <children>
+                                                            <Label alignment="CENTER" prefHeight="40.0" prefWidth="285.0" text="Data import" textAlignment="CENTER">
+                                                               <font>
+                                                                  <Font name="System Bold" size="29.0" />
+                                                               </font>
+                                                               <padding>
+                                                                  <Insets top="5.0" />
+                                                               </padding>
+                                                               <VBox.margin>
+                                                                  <Insets bottom="20.0" />
+                                                               </VBox.margin>
+                                                            </Label>
                                                             <StackPane prefHeight="43.0" prefWidth="698.0">
                                                                <children>
                                                                   <ProgressBar fx:id="adddataprogressbar" prefHeight="33.0" prefWidth="460.0" progress="0.0" />
@@ -315,10 +337,11 @@
                                                             </StackPane>
                                                          </children>
                                                       </VBox>
-                                                   </children></AnchorPane>
-                                             </content>
+                                                   </children>
+                                                </AnchorPane>
+                                            </content>
                                           </Tab>
-                                          <Tab text="3">
+                                          <Tab text="4">
                                              <content>
                                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                                    <children>
@@ -400,7 +423,7 @@
                                                    </children></AnchorPane>
                                              </content>
                                           </Tab>
-                                          <Tab text="4">
+                                          <Tab text="5">
                                              <content>
                                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                                              </content>

@@ -12,6 +12,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,6 +36,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ProgressBar;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.ChangeListener;
+import javafx.util.Duration;
 
 /**
  *
@@ -88,10 +94,16 @@ public class GUIController implements Initializable {
     @FXML
     Label adddataprogresslabel;
     
+    //parser variables
+    Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> parserloop()));
+    public static Boolean timelineactive = true;
     public static String parserloadlabel;
     public static loadbar parserloadbar = new loadbar();
-
+    public static String parserexample1;
+    public static String parserexample2;
     public File importfiletemp; 
+    
+    
     
     HashMap<String, dataset> datasets = new HashMap<>();
     
@@ -188,6 +200,8 @@ public class GUIController implements Initializable {
             System.out.println("PARSER MODULE: GO file");
             dataparser newparser = new dataparser(importfiletemp, "");
             newparser.process(headidentifierfield.getText(),forwardfield.getText(),reversefield.getText(),selecteddataset);
+        } else {
+            return;
         }
         adddataprogresslabel.setText("importing");
         parserloadbar.doneproperty().addListener(new ChangeListener(){
@@ -196,10 +210,10 @@ public class GUIController implements Initializable {
             adddataprogressbar.setProgress(parserloadbar.getdone());
         }
         });
-    }
-
-    
-      
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+        datasetstabpane.getSelectionModel().select(3);
+    }      
     
     @FXML 
     public void readdirectiondisable(ActionEvent event){
@@ -216,6 +230,17 @@ public class GUIController implements Initializable {
         }
     }
     
+    public void parserloop(){
+        adddataprogresslabel.setText(parserloadlabel);
+        if (timelineactive == false){
+            adddataprogresslabel.setText("import complete");
+            datasetstabpane.getSelectionModel().select(0);
+            System.out.println("parse complete");
+            parserloadlabel = "";
+            adddataprogresslabel.setText(parserloadlabel);
+            timeline.stop();
+        }
+    }
     //init
     @Override
     public void initialize(URL url, ResourceBundle rb) {
