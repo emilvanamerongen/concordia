@@ -8,21 +8,16 @@ package concordia;
 parcing the info from the GUI to be used by other modules
 @author theox
 */
-import Objects.loadbar;
-import java.io.BufferedInputStream;
+import Objects.NGSread;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 public class dataparser {
 /**
@@ -33,35 +28,42 @@ public class dataparser {
    private File importfile;
    private String[] importstring;
    private String filetype;
-   
-   public dataparser(File importfile, String filetype){
+   public processthread thread;
+    //constructors
+    public dataparser(File importfile, String filetype){
        this.importfile = importfile;
        this.filetype = filetype;
-   }
-   public dataparser(String[] importstring, String filetype){
+    } 
+    public dataparser(String[] importstring, String filetype){
        this.importstring = importstring;
        this.filetype = filetype;
-   }
+    }
    
-   public void process(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset) throws IOException{
+    public void process(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset) throws IOException{
        processthread thread = new processthread(headidentifier, forwardindicator, reverseindicator, selecteddataset);
        thread.start();
-
-   }
+    }
+   
     public class processthread extends Thread {
     //parameters
-    private String headidentifier;
-    private String forwardindicator;
-    private String reverseindicator;
+    private final String headidentifier;
+    private final String forwardindicator;
+    private final String reverseindicator;
+    private final String selecteddataset;
     //data
     private int seqnumber;
     private double done;
-    private double total;
+    private int total;
     DecimalFormat df = new DecimalFormat("#.##");
+    
+    dbcon dbconnector = new dbcon();
+    NGSread newread = new NGSread();
+    
     public processthread(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset) {
         this.headidentifier = headidentifier;
         this.forwardindicator = forwardindicator;
         this.reverseindicator = reverseindicator;
+        this.selecteddataset = selecteddataset;
     }
 
     public void run(){
@@ -75,7 +77,7 @@ public class dataparser {
        
        if (importfile != null){
             System.out.println("File found");
-           
+            GUIController.parserloadlabel = "Calculating Filesize";
             FileInputStream inputStream = null;
             try {
                inputStream = new FileInputStream(importfile.getAbsolutePath());
@@ -83,13 +85,13 @@ public class dataparser {
                Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
             }
             Scanner sc = new Scanner(inputStream, "UTF-8");
-            System.out.println(total);
             sc = new Scanner(inputStream, "UTF-8");
             while (sc.hasNextLine()) {
             sc.nextLine();
             total+=1;
             }
             sc.close();
+            GUIController.parserloadlabel = "importing "+total+" sequences";
             total = total/4;
             inputStream = null;
             try {
@@ -101,7 +103,11 @@ public class dataparser {
             while (sc.hasNextLine()) {
             String line = sc.nextLine();
                
-                processline(line);             
+                try {             
+                    processline(line);
+                } catch (SQLException ex) {
+                    Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 String format = df.format(done/total);
                 GUIController.parserloadbar.setdone(Double.parseDouble(format));
             }
@@ -110,7 +116,7 @@ public class dataparser {
             } catch (IOException ex) {
                Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
             }
-            System.out.println("parser done");
+            
            
        }
        else if (importstring != null){
@@ -120,28 +126,36 @@ public class dataparser {
                if (line.matches("^"+headidentifier+".*")){
                 total+=1;
             }
-            
-               
+                          
             }
             for (String line : importstring){
-                processline(line);
-               
-               
-            }
-           
+                try {
+                    processline(line);
+                } catch (SQLException ex) {
+                    Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
+                }                              
+            }           
        }
+       GUIController.timelineactive = false;
        
-        
     }
     
-   
-
     
-    public void processline(String line){
-        
+    public void processline(String line) throws SQLException{
         if (line.matches("^"+headidentifier+".*")){
+                //dbconnector.importReadsTabel(selecteddataset, newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection());
+                newread.clear();
                 done += 1;
-            }
+                newread.setHeader(line);
+                if (line.matches(".*"+forwardindicator)){
+                    newread.setReaddirection(false);
+                } else if (line.matches(".*"+reverseindicator)){
+                    newread.setReaddirection(true);
+                } 
+            } 
+        if (line.matches("[ATCGUatcgu]*")) {
+            newread.setSequence(line);
+        }
     }
     }
 }
