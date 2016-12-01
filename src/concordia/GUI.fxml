@@ -33,7 +33,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <SplitPane dividerPositions="0.29863013698630136" layoutX="26.0" layoutY="27.0" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <SplitPane dividerPositions="0.3103932584269663" layoutX="26.0" layoutY="27.0" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <items>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                  <children>
@@ -221,8 +221,14 @@
                                                                   </Label>
                                                                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
                                                                      <children>
-                                                                        <Button mnemonicParsing="false" onAction="#openNGSfile" text="open file" />
-                                                                        <Label fx:id="ngsfilelabel" text="-" />
+                                                                        <Button mnemonicParsing="false" onAction="#openNGSfile" text="open file">
+                                                                           <VBox.margin>
+                                                                              <Insets />
+                                                                           </VBox.margin></Button>
+                                                                        <Label fx:id="ngsfilelabel" text="-">
+                                                                           <VBox.margin>
+                                                                              <Insets top="10.0" />
+                                                                           </VBox.margin></Label>
                                                                      </children>
                                                                   </VBox>
                                                                </children>
@@ -259,7 +265,7 @@
                                                                      </font>
                                                                   </Label>
                                                                   <TextField fx:id="headidentifierfield" maxWidth="150.0" prefHeight="26.0" prefWidth="20.0" text="\@HWI" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                                  <CheckBox fx:id="directioncheckbox" mnemonicParsing="false" onAction="#readdirectiondisable" selected="true" text="6" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+                                                                  <CheckBox fx:id="directioncheckbox" mnemonicParsing="false" onAction="#readdirectiondisable" selected="true" text="Read direction" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                                                                      <font>
                                                                         <Font name="System Bold" size="13.0" />
                                                                      </font>
@@ -316,7 +322,7 @@
                                             <content>
                                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                                    <children>
-                                                      <VBox alignment="CENTER" layoutX="219.0" layoutY="110.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                      <VBox alignment="TOP_CENTER" layoutX="219.0" layoutY="110.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                          <children>
                                                             <Label alignment="CENTER" prefHeight="40.0" prefWidth="285.0" text="Data import" textAlignment="CENTER">
                                                                <font>
@@ -326,7 +332,7 @@
                                                                   <Insets top="5.0" />
                                                                </padding>
                                                                <VBox.margin>
-                                                                  <Insets bottom="20.0" />
+                                                                  <Insets bottom="20.0" top="30.0" />
                                                                </VBox.margin>
                                                             </Label>
                                                             <StackPane prefHeight="43.0" prefWidth="698.0">

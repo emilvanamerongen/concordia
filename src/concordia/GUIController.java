@@ -193,13 +193,13 @@ public class GUIController implements Initializable {
         if (! ngstext[0].isEmpty()){
             System.out.println("PARSER MODULE: GO text");
             dataparser newparser = new dataparser(ngstext, "");
-            newparser.process(headidentifierfield.getText(),forwardfield.getText(),reversefield.getText(),selecteddataset);
+            newparser.process(headidentifierfield.getText(),forwardfield.getText(),reversefield.getText(),selecteddataset,directioncheckbox.isSelected());
             
         }
         else if (importfiletemp != null){
             System.out.println("PARSER MODULE: GO file");
             dataparser newparser = new dataparser(importfiletemp, "");
-            newparser.process(headidentifierfield.getText(),forwardfield.getText(),reversefield.getText(),selecteddataset);
+            newparser.process(headidentifierfield.getText(),forwardfield.getText(),reversefield.getText(),selecteddataset,directioncheckbox.isSelected());
         } else {
             return;
         }
@@ -239,6 +239,8 @@ public class GUIController implements Initializable {
             parserloadlabel = "";
             adddataprogresslabel.setText(parserloadlabel);
             timeline.stop();
+            ngsfilelabel.setText("");
+            importfiletemp = null;
         }
     }
     //init

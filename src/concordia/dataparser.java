@@ -39,8 +39,8 @@ public class dataparser {
        this.filetype = filetype;
     }
    
-    public void process(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset) throws IOException{
-       processthread thread = new processthread(headidentifier, forwardindicator, reverseindicator, selecteddataset);
+    public void process(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset, Boolean indicatoroff) throws IOException{
+       processthread thread = new processthread(headidentifier, forwardindicator, reverseindicator, selecteddataset, indicatoroff);
        thread.start();
     }
    
@@ -50,6 +50,7 @@ public class dataparser {
     private final String forwardindicator;
     private final String reverseindicator;
     private final String selecteddataset;
+    private final Boolean indicatoroff;
     //data
     private int seqnumber;
     private double done;
@@ -59,11 +60,12 @@ public class dataparser {
     dbcon dbconnector = new dbcon();
     NGSread newread = new NGSread();
     
-    public processthread(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset) {
+    public processthread(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset, Boolean indicatoroff) {
         this.headidentifier = headidentifier;
         this.forwardindicator = forwardindicator;
         this.reverseindicator = reverseindicator;
         this.selecteddataset = selecteddataset;
+        this.indicatoroff = indicatoroff;
     }
 
     public void run(){
@@ -71,8 +73,10 @@ public class dataparser {
        System.out.println("##################");
        System.out.println("parameters:");
        System.out.println("head identifier: "+headidentifier);
+       if (! indicatoroff){
        System.out.println("forward indicator: "+forwardindicator);
        System.out.println("reverse indicator: "+reverseindicator);
+       }
        System.out.println("##################");
        
        if (importfile != null){
@@ -147,11 +151,13 @@ public class dataparser {
                 newread.clear();
                 done += 1;
                 newread.setHeader(line);
+                if (! indicatoroff){
                 if (line.matches(".*"+forwardindicator)){
                     newread.setReaddirection(false);
                 } else if (line.matches(".*"+reverseindicator)){
                     newread.setReaddirection(true);
                 } 
+                }
             } 
         if (line.matches("[ATCGUatcgu]*")) {
             newread.setSequence(line);
