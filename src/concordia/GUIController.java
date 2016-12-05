@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -93,7 +91,8 @@ public class GUIController implements Initializable {
     ProgressBar adddataprogressbar;
     @FXML
     Label adddataprogresslabel;
-    
+
+            
     //parser variables
     Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> parserloop()));
     public static Boolean timelineactive = true;
