@@ -16,7 +16,7 @@ public class dbcon {
     private int readid = 1;
     private int sequenceid = 1;
 
-    public void importDatabaseInfo(String header, String sequence, String qualityvalues, Boolean readrichting) throws SQLException{
+    public void importDatabaseInfo(String selecteddataset, String header, String sequence, String qualityvalues, Boolean readrichting) throws SQLException{
       String framework = "embedded";
       String protocol = "jdbc:derby:";
       Connection con = null;
@@ -46,6 +46,7 @@ public class dbcon {
         Statement sta = con.createStatement();
 
         ResultSet res = sta.executeQuery("SELECT DATASET_ID FROM READS WHERE DATASET_TITLE = \""+datasettitle+"\"");
+        
         
          
 //        int d = sta.executeUpdate("INSERT INTO DATASET"

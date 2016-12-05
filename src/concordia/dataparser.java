@@ -109,7 +109,11 @@ public class dataparser {
                     Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 String format = df.format(done/total);
-                GUIController.parserloadbar.setdone(Double.parseDouble(format));
+                try {
+                GUIController.parserloadbar.setdone(Double.parseDouble(format));}
+                catch (NumberFormatException ex) {
+                GUIController.parserloadbar.setdone(Double.parseDouble(format.replace(",",".")));
+            }
             }
             try {
                inputStream.close();
@@ -143,7 +147,7 @@ public class dataparser {
     
     public void processline(String line) throws SQLException{
         if (line.matches("^"+headidentifier+".*")){
-                //dbconnector.importReadsTabel(selecteddataset, newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection());
+                //dbconnector.importDatabaseInfo(selecteddataset, newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection());
                 newread.clear();
                 done += 1;
                 newread.setHeader(line);
