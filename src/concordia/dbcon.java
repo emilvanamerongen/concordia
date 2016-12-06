@@ -11,12 +11,12 @@ import java.util.Properties;
 
 public class dbcon {
     
-    private int datasetid = 1;
+    private int collectionid = 1;
     private int headerid = 1;
     private int readid = 1;
     private int sequenceid = 1;
 
-    public void importDatabaseInfo(String selecteddataset, String header, String sequence, String qualityvalues, Boolean readrichting) throws SQLException{
+    public void importDatabaseInfo(String selectedcollection, String header, String sequence, String qualityvalues, Boolean readrichting) throws SQLException{
       String framework = "embedded";
       String protocol = "jdbc:derby:";
       Connection con = null;
@@ -26,7 +26,7 @@ public class dbcon {
       
       int c = sta.executeUpdate("INSERT INTO HEADER"
         + " (HEADER_ID, DATASET_ID, HEADER)"
-        + " VALUES (headerid++, datasetid, header)");
+        + " VALUES (headerid++, collectionid, header)");
       
       c = sta.executeUpdate("INSERT INTO READS"
         + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_DIRECTION, SEQUENCE_ID)"
@@ -36,7 +36,7 @@ public class dbcon {
       con.close();  
 }
     
-    public void checkDataset(String datasettitle) throws SQLException{
+    public void checkDataset(String collectiontitle) throws SQLException{
         String framework = "embedded";
         String protocol = "jdbc:derby:";
         Connection con = null;
@@ -45,13 +45,13 @@ public class dbcon {
         con = DriverManager.getConnection("jdbc:derby:NGSDB");
         Statement sta = con.createStatement();
 
-        ResultSet res = sta.executeQuery("SELECT DATASET_ID FROM READS WHERE DATASET_TITLE = \""+datasettitle+"\"");
+        ResultSet res = sta.executeQuery("SELECT DATASET_ID FROM READS WHERE DATASET_TITLE = \""+collectiontitle+"\"");
         
         
          
 //        int d = sta.executeUpdate("INSERT INTO DATASET"
 //            + " (DATASET_ID, DATASET_TITLE)"
-//            + " VALUES (datasetid++, datasettitle)");
+//            + " VALUES (collectionid++, collectiontitle)");
         
         sta.close();
         con.close();
