@@ -24,6 +24,7 @@ public class dbcon {
       con = DriverManager.getConnection("jdbc:derby:NGSDB");
       Statement sta = con.createStatement(); 
       
+      
       int c = sta.executeUpdate("INSERT INTO HEADER"
         + " (HEADER_ID, DATASET_ID, HEADER)"
         + " VALUES (headerid++, collectionid, header)");
@@ -45,7 +46,7 @@ public class dbcon {
         con = DriverManager.getConnection("jdbc:derby:NGSDB");
         Statement sta = con.createStatement();
 
-        ResultSet res = sta.executeQuery("SELECT DATASET_ID FROM READS WHERE DATASET_TITLE = \""+collectiontitle+"\"");
+        ResultSet res = sta.executeQuery("SELECT COLLECTION_ID FROM READS WHERE COLLECTION_TITLE = \""+collectiontitle+"\"");
         
         
          
