@@ -114,7 +114,11 @@ public class dataparser {
                     Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 String format = df.format(done/total);
-                GUIController.parserloadbar.setdone(Double.parseDouble(format));
+                try {
+                GUIController.parserloadbar.setdone(Double.parseDouble(format));}
+                catch (NumberFormatException ex) {
+                GUIController.parserloadbar.setdone(Double.parseDouble(format.replace(",",".")));
+            }
             }
             try {
                inputStream.close();
@@ -151,7 +155,7 @@ public class dataparser {
         if (line.matches("^"+headidentifier+".*")){
                 linenr = 0;
                 if (newread.getHeader() != null){
-                    dbconnector.importDatabaseInfo(newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection());
+                    dbconnector.importDatabaseInfo(selecteddataset,newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection());
                     newread.clear();
                     done += 1;
                 }
