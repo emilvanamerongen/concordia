@@ -1,8 +1,8 @@
 ----------------------------------------------------------------
-Mon Dec 05 11:02:26 CET 2016:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (1765088): instance a816c00e-0158-ce6f-3bf9-0000080d6ee8 
+Tue Dec 06 13:09:46 CET 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (1765088): instance a816c00e-0158-d40a-2c07-0000086f9408 
 on database directory C:\Users\Alex\Documents\NetBeansProjects\Bioinformatics_Minor_NGS_project\NGSDB with class loader sun.misc.Launcher$AppClassLoader@33909752 
-Loaded from file:/C:/Users/Alex/Documents/NetBeansProjects/Bioinformatics_Minor_NGS_project/dist/run1871680930/lib/derby.jar
+Loaded from file:/C:/Users/Alex/Documents/NetBeansProjects/Bioinformatics_Minor_NGS_project/dist/run1894498043/lib/derby.jar
 java.vendor=Oracle Corporation
 java.runtime.version=1.8.0_60-b27
 user.dir=C:\Users\Alex\Documents\NetBeansProjects\Bioinformatics_Minor_NGS_project

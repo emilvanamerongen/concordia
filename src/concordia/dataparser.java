@@ -151,7 +151,7 @@ public class dataparser {
     
     public void processline(String line) throws SQLException{
         if (line.matches("^"+headidentifier+".*")){
-                //dbconnector.importDatabaseInfo(selecteddataset, newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection());
+                dbconnector.importDatabaseInfo(selecteddataset, newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection());
                 newread.clear();
                 done += 1;
                 newread.setHeader(line);
