@@ -55,6 +55,7 @@ public class dataparser {
     private int seqnumber;
     private double done;
     private int total;
+    int linenr = 0;
     DecimalFormat df = new DecimalFormat("#.##");
     
     dbcon dbconnector = new dbcon();
@@ -146,21 +147,32 @@ public class dataparser {
     
     
     public void processline(String line) throws SQLException{
+        linenr += 1;
         if (line.matches("^"+headidentifier+".*")){
-                //dbconnector.importReadsTabel(selecteddataset, newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection());
-                newread.clear();
-                done += 1;
-                newread.setHeader(line);
+                linenr = 0;
+                if (newread.getHeader() != null){
+                    dbconnector.importDatabaseInfo(newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection());
+                    newread.clear();
+                    done += 1;
+                }
+                newread.setHeader(line);   
                 if (! indicatoroff){
-                if (line.matches(".*"+forwardindicator)){
-                    newread.setReaddirection(false);
-                } else if (line.matches(".*"+reverseindicator)){
-                    newread.setReaddirection(true);
-                } 
+                    newread.setHeader(line.substring(0,line.length()-2));
+                    if (line.matches(".*"+forwardindicator+".*")){
+                        newread.setReaddirection(false);
+                    } else if (line.matches(".*"+reverseindicator+".*")){
+                        newread.setReaddirection(true);
+                    } 
                 }
             } 
+        if (linenr == 1){
         if (line.matches("[ATCGUatcgu]*")) {
             newread.setSequence(line);
+        }}
+        
+        if (linenr == 3) {
+            newread.setQualityvalues(line);
+            
         }
     }
     }

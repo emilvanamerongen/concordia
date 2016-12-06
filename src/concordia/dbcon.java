@@ -1,5 +1,6 @@
 package concordia;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -23,14 +24,23 @@ public class dbcon {
       String dbName = "NGSDB";
       con = DriverManager.getConnection("jdbc:derby:NGSDB");
       Statement sta = con.createStatement(); 
-      
-      int c = sta.executeUpdate("INSERT INTO HEADER"
-        + " (HEADER_ID, DATASET_ID, HEADER)"
-        + " VALUES (headerid++, datasetid, header)");
-      
-      c = sta.executeUpdate("INSERT INTO READS"
-        + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_DIRECTION, SEQUENCE_ID)"
-        + " VALUES (read_ID, sequence, qualityvalues, readrichting, sequenceid++)");
+      ResultSet headeridresult = sta.executeQuery("SELECT MAX(HEADER_ID) from HEADER");
+      ResultSet readidresult = sta.executeQuery("SELECT MAX(READ_ID) from READS");
+      int newheaderid = headeridresult.getInt(0)+1;
+      ResultSet checkheaderidresult = sta.executeQuery("SELECT HEADER_ID from HEADER WHERE HEADER LIKE \"%"+header+"%\"");
+      int check = headeridresult.getInt(0)+1;
+      if (check < newheaderid){
+          newheaderid = check;
+      }
+      int newreadid = readidresult.getInt(0)+1;
+      System.out.println("newreadid = "+newreadid+" newheaderid = "+headerid);
+//      int c = sta.executeUpdate("INSERT INTO HEADER"
+//        + " (HEADER_ID, DATASET_ID, HEADER)"
+//        + " VALUES (headerid++, datasetid, header)");
+//      
+//      c = sta.executeUpdate("INSERT INTO READS"
+//        + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_DIRECTION, SEQUENCE_ID)"
+//        + " VALUES (read_ID, sequence, qualityvalues, readrichting, sequenceid++)");
 
       sta.close();
       con.close();  
