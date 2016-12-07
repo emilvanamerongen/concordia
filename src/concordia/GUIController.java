@@ -10,6 +10,7 @@ import Objects.loadbar;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import javafx.animation.Animation;
@@ -91,6 +92,7 @@ public class GUIController implements Initializable {
     ProgressBar adddataprogressbar;
     @FXML
     Label adddataprogresslabel;
+    
 
             
     //parser variables
@@ -105,6 +107,12 @@ public class GUIController implements Initializable {
     
     
     HashMap<String, dataset> datasets = new HashMap<>();
+    CreateDatabase newdatabase = new CreateDatabase();
+    
+    @FXML
+    private void databaseButton(ActionEvent event) throws SQLException{
+        newdatabase.createDataTables();
+    }
     
     @FXML
     private void datasetswitchtab(ActionEvent event){
