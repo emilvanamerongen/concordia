@@ -67,6 +67,24 @@ public class dbcon {
         con.close();
     }
     
+    public void createDataTables() throws SQLException{
+        String framework = "embedded";
+        String protocol = "jdbc:derby:";
+        Connection con = null;
+        String dbName = "NGSDB";
+        Boolean recordAdded = false;
+        con = DriverManager.getConnection("jdbc:derby:NGSDB;create=true");
+        Statement sta = con.createStatement();
+        
+        String createCollectionTable = "CREATE TABLE COLLECTION (COLLECTION_ID INTEGER NOT NULL, COLLECTION_TITLE VARCHAR(1000) NOT NULL)";
+        String createHeaderTable = "CREATE TABLE HEADER (HEADER_ID INTEGER NOT NULL, COLLECTION_ID INTEGER NOT NULL, HEADER VARCHAR(1000) NOT NULL)";
+        String createReadsTable = "CREATE TABLE READS (READ_ID INTEGER NOT NULL, SEQUENCE VARCHAR(10000) NOT NULL, QUALITY_VALUES VARCHAR(10000) NOT NULL, SEQUENCE_ID INTEGER NOT NULL, READ_DIRECTION BOOLEAN NOT NULL, HEADER_ID INTEGER NOT NULL)";
+        Statement stmt = con.createStatement();
+        stmt.executeUpdate(createCollectionTable);
+    }
+    
+    
+    
 //    Work in Progress.
 //    public void displayDatasets() throws SQLException{
 //        Connection con = null;
