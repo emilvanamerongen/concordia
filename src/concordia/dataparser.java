@@ -39,8 +39,8 @@ public class dataparser {
        this.filetype = filetype;
     }
    
-    public void process(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset, Boolean indicatoroff) throws IOException{
-       processthread thread = new processthread(headidentifier, forwardindicator, reverseindicator, selecteddataset, indicatoroff);
+    public void process(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset, Boolean indicatoroff, String originfile) throws IOException{
+       processthread thread = new processthread(headidentifier, forwardindicator, reverseindicator, selecteddataset, indicatoroff, originfile);
        thread.start();
     }
    
@@ -51,6 +51,7 @@ public class dataparser {
     private final String reverseindicator;
     private final String selecteddataset;
     private final Boolean indicatoroff;
+    private String originfile = "none";
     //data
     private int seqnumber;
     private double done;
@@ -61,12 +62,14 @@ public class dataparser {
     dbcon dbconnector = new dbcon();
     NGSread newread = new NGSread();
     
-    public processthread(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset, Boolean indicatoroff) {
+    public processthread(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset, Boolean indicatoroff, String originfile) {
         this.headidentifier = headidentifier;
         this.forwardindicator = forwardindicator;
         this.reverseindicator = reverseindicator;
         this.selecteddataset = selecteddataset;
         this.indicatoroff = indicatoroff;
+        this.originfile = originfile;
+        
     }
 
     public void run(){
@@ -96,8 +99,9 @@ public class dataparser {
             total+=1;
             }
             sc.close();
-            GUIController.parserloadlabel = "importing "+total+" sequences";
             total = total/4;
+            GUIController.parserloadlabel = "importing "+total+" sequences";
+            
             inputStream = null;
             try {
                inputStream = new FileInputStream(importfile.getAbsolutePath());
@@ -145,6 +149,11 @@ public class dataparser {
                 }                              
             }           
        }
+        try {
+            dbconnector.getdatabasecontents();
+        } catch (SQLException ex) {
+            Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
+        }
        GUIController.timelineactive = false;
        
     }
@@ -155,7 +164,7 @@ public class dataparser {
         if (line.matches("^"+headidentifier+".*")){
                 linenr = 0;
                 if (newread.getHeader() != null){
-                    dbconnector.importDatabaseInfo(selecteddataset,newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection());
+                    dbconnector.importDatabaseInfo(selecteddataset,newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection(), originfile);
                     newread.clear();
                     done += 1;
                 }

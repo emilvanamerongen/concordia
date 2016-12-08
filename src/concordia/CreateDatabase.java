@@ -28,8 +28,9 @@ public class CreateDatabase {
         con = DriverManager.getConnection("jdbc:derby:NGSDB;create=true");
 
         String createCollectionTable = "CREATE TABLE COLLECTION (COLLECTION_ID INTEGER NOT NULL, COLLECTION_TITLE VARCHAR(1000) NOT NULL)";
-        String createHeaderTable = "CREATE TABLE HEADER (HEADER_ID INTEGER NOT NULL, COLLECTION_ID INTEGER NOT NULL, HEADER VARCHAR(1000) NOT NULL)";
-        String createReadsTable = "CREATE TABLE READS (READ_ID INTEGER NOT NULL, SEQUENCE VARCHAR(10000) NOT NULL, QUALITY_VALUES VARCHAR(10000) NOT NULL, SEQUENCE_ID INTEGER NOT NULL, READ_DIRECTION BOOLEAN NOT NULL, HEADER_ID INTEGER NOT NULL)";
+        String createFileTable =  "CREATE TABLE FILE (FILE_ID INTEGER NOT NULL, FILE_TITLE LONG VARCHAR NOT NULL)";
+        String createHeaderTable = "CREATE TABLE HEADER (HEADER_ID INTEGER NOT NULL, COLLECTION_ID INTEGER NOT NULL, FILE_ID INTEGER NOT NULL, HEADER VARCHAR(1000) NOT NULL)";
+        String createReadsTable = "CREATE TABLE READS (READ_ID INTEGER NOT NULL, SEQUENCE LONG VARCHAR NOT NULL, QUALITY_VALUES LONG VARCHAR NOT NULL, SEQUENCE_ID INTEGER NOT NULL, READ_DIRECTION BOOLEAN NOT NULL, HEADER_ID INTEGER NOT NULL)";
         Statement stmt = con.createStatement();
         
 
@@ -37,6 +38,7 @@ public class CreateDatabase {
         ResultSet rs = md.getTables(null, null, "COLLECTION", null);
         if (!rs.next()) {
             stmt.executeUpdate(createCollectionTable);
+            stmt.executeUpdate(createFileTable);
             stmt.executeUpdate(createHeaderTable);
             stmt.executeUpdate(createReadsTable);
             System.out.println("Database created");
