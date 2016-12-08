@@ -37,6 +37,8 @@ public class CreateDatabase {
         ResultSet rs = md.getTables(null, null, "COLLECTION", null);
         if (!rs.next()) {
             stmt.executeUpdate(createCollectionTable);
+            stmt.executeUpdate(createHeaderTable);
+            stmt.executeUpdate(createReadsTable);
             System.out.println("Database created");
         } else {
             System.out.println("Tables already exist");
