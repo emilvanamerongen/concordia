@@ -26,7 +26,9 @@ public class dbcon {
       Statement sta = con.createStatement(); 
       ResultSet headeridresult = sta.executeQuery("SELECT MAX(HEADER_ID) from HEADER");
       ResultSet readidresult = sta.executeQuery("SELECT MAX(READ_ID) from READS");
+      ResultSet sequenceidresult = sta.executeQuery("SELECT MAX(SEQUENCE_ID) from READS");
       int newheaderid = headeridresult.getInt(0)+1;
+      int newsequenceid = sequenceidresult.getInt(0)+1;
       ResultSet checkheaderidresult = sta.executeQuery("SELECT HEADER_ID from HEADER WHERE HEADER LIKE \"%"+header+"%\"");
       int check = headeridresult.getInt(0)+1;
       if (check < newheaderid){
@@ -34,6 +36,8 @@ public class dbcon {
       }
       int newreadid = readidresult.getInt(0)+1;
       System.out.println("newreadid = "+newreadid+" newheaderid = "+headerid);
+      sta.executeUpdate("INSERT INTO READS" + "(READ_ID,SEQUENCE,QUALITY_VALUES,SEQUENCE_ID,READ_DIRECTION,HEADER_ID))" + " VALUES ('"+newreadid+"','"+sequence+"', '"+qualityvalues+"', '"+newsequenceid+"','"+readrichting+"','"+newheaderid+"',)");
+      //"CREATE TABLE READS (READ_ID INTEGER NOT NULL, SEQUENCE VARCHAR(10000) NOT NULL, QUALITY_VALUES VARCHAR(10000) NOT NULL, SEQUENCE_ID INTEGER NOT NULL, READ_DIRECTION BOOLEAN NOT NULL, HEADER_ID INTEGER NOT NULL)
 //      int c = sta.executeUpdate("INSERT INTO HEADER"
 //        + " (HEADER_ID, DATASET_ID, HEADER)"
 //        + " VALUES (headerid++, datasetid, header)");
@@ -42,8 +46,22 @@ public class dbcon {
 //        + " (READ_ID, SEQUENCE, QUALITY_VALUES, READ_DIRECTION, SEQUENCE_ID)"
 //        + " VALUES (read_ID, sequence, qualityvalues, readrichting, sequenceid++)");
 
+        System.out.println("Check what's in the database:");
+        ResultSet res = sta.executeQuery(
+            "SELECT * FROM APP.READS");
+            System.out.println("Read contents: "); 
+            while (res.next()) {
+             System.out.println(
+               "  "+res.getInt("READ_ID")
+               + ", "+res.getString("SEQUENCE")
+               + ", "+res.getString("QUALITY_VALUES")
+               + ", "+res.getBoolean("READ_DIRECTION")
+               + ", "+res.getInt("SEQUENCE_ID")
+               + ", "+res.getInt("HEADER_ID"));
+            }
+
       sta.close();
-      con.close();  
+      con.close();
 }
     
     public void checkDataset(String collectiontitle) throws SQLException{
