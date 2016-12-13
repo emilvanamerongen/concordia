@@ -10,10 +10,9 @@ import Objects.loadbar;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -94,6 +93,8 @@ public class GUIController implements Initializable {
     @FXML
     Label adddataprogresslabel;
     
+
+            
     //parser variables
     Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> parserloop()));
     public static Boolean timelineactive = true;
@@ -106,6 +107,12 @@ public class GUIController implements Initializable {
     
     
     HashMap<String, dataset> datasets = new HashMap<>();
+    CreateDatabase newdatabase = new CreateDatabase();
+    
+    @FXML
+    private void databaseButton(ActionEvent event) throws SQLException{
+        newdatabase.createDataTables();
+    }
     
     @FXML
     private void datasetswitchtab(ActionEvent event){
@@ -193,13 +200,13 @@ public class GUIController implements Initializable {
         if (! ngstext[0].isEmpty()){
             System.out.println("PARSER MODULE: GO text");
             dataparser newparser = new dataparser(ngstext, "");
-            newparser.process(headidentifierfield.getText(),forwardfield.getText(),reversefield.getText(),selecteddataset,directioncheckbox.isSelected());
+            newparser.process(headidentifierfield.getText(),forwardfield.getText(),reversefield.getText(),selecteddataset,!directioncheckbox.isSelected(), "MANUAL INPUT");
             
         }
         else if (importfiletemp != null){
             System.out.println("PARSER MODULE: GO file");
             dataparser newparser = new dataparser(importfiletemp, "");
-            newparser.process(headidentifierfield.getText(),forwardfield.getText(),reversefield.getText(),selecteddataset,directioncheckbox.isSelected());
+            newparser.process(headidentifierfield.getText(),forwardfield.getText(),reversefield.getText(),selecteddataset,!directioncheckbox.isSelected(),importfiletemp.getName());
         } else {
             return;
         }

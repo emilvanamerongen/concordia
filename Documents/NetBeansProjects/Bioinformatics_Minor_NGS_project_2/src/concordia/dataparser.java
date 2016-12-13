@@ -39,8 +39,8 @@ public class dataparser {
        this.filetype = filetype;
     }
    
-    public void process(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset, Boolean indicatoroff) throws IOException{
-       processthread thread = new processthread(headidentifier, forwardindicator, reverseindicator, selecteddataset, indicatoroff);
+    public void process(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset, Boolean indicatoroff, String originfile) throws IOException{
+       processthread thread = new processthread(headidentifier, forwardindicator, reverseindicator, selecteddataset, indicatoroff, originfile);
        thread.start();
     }
    
@@ -51,21 +51,25 @@ public class dataparser {
     private final String reverseindicator;
     private final String selecteddataset;
     private final Boolean indicatoroff;
+    private String originfile = "none";
     //data
     private int seqnumber;
     private double done;
     private int total;
+    int linenr = 0;
     DecimalFormat df = new DecimalFormat("#.##");
     
     dbcon dbconnector = new dbcon();
     NGSread newread = new NGSread();
     
-    public processthread(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset, Boolean indicatoroff) {
+    public processthread(String headidentifier, String forwardindicator, String reverseindicator, String selecteddataset, Boolean indicatoroff, String originfile) {
         this.headidentifier = headidentifier;
         this.forwardindicator = forwardindicator;
         this.reverseindicator = reverseindicator;
         this.selecteddataset = selecteddataset;
         this.indicatoroff = indicatoroff;
+        this.originfile = originfile;
+        
     }
 
     public void run(){
@@ -95,8 +99,9 @@ public class dataparser {
             total+=1;
             }
             sc.close();
-            GUIController.parserloadlabel = "importing "+total+" sequences";
             total = total/4;
+            GUIController.parserloadlabel = "importing "+total+" sequences";
+            
             inputStream = null;
             try {
                inputStream = new FileInputStream(importfile.getAbsolutePath());
@@ -113,7 +118,11 @@ public class dataparser {
                     Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 String format = df.format(done/total);
-                GUIController.parserloadbar.setdone(Double.parseDouble(format));
+                try {
+                GUIController.parserloadbar.setdone(Double.parseDouble(format));}
+                catch (NumberFormatException ex) {
+                GUIController.parserloadbar.setdone(Double.parseDouble(format.replace(",",".")));
+            }
             }
             try {
                inputStream.close();
@@ -140,27 +149,43 @@ public class dataparser {
                 }                              
             }           
        }
+        try {
+            dbconnector.getdatabasecontents();
+        } catch (SQLException ex) {
+            Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
+        }
        GUIController.timelineactive = false;
        
     }
     
     
     public void processline(String line) throws SQLException{
+        linenr += 1;
         if (line.matches("^"+headidentifier+".*")){
-                //dbconnector.importReadsTabel(selecteddataset, newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection());
-                newread.clear();
-                done += 1;
-                newread.setHeader(line);
+                linenr = 0;
+                if (newread.getHeader() != null){
+                    dbconnector.importDatabaseInfo(selecteddataset,newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection(), originfile);
+                    newread.clear();
+                    done += 1;
+                }
+                newread.setHeader(line);   
                 if (! indicatoroff){
-                if (line.matches(".*"+forwardindicator)){
-                    newread.setReaddirection(false);
-                } else if (line.matches(".*"+reverseindicator)){
-                    newread.setReaddirection(true);
-                } 
+                    newread.setHeader(line.substring(0,line.length()-2));
+                    if (line.matches(".*"+forwardindicator+".*")){
+                        newread.setReaddirection(false);
+                    } else if (line.matches(".*"+reverseindicator+".*")){
+                        newread.setReaddirection(true);
+                    } 
                 }
             } 
+        if (linenr == 1){
         if (line.matches("[ATCGUatcgu]*")) {
             newread.setSequence(line);
+        }}
+        
+        if (linenr == 3) {
+            newread.setQualityvalues(line);
+            
         }
     }
     }
