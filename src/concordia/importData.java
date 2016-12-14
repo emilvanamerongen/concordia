@@ -18,16 +18,13 @@ import java.sql.Statement;
  */
 public class importData {
     
-    public void importCombinedTable(String selectedcollection, String header, String sequence, String qualityvalues, Boolean readrichting, String originfile) throws SQLException{
-        Connection con = null;   
-        con = DriverManager.getConnection("jdbc:derby:NGSDB");
+    public void importCombinedTable(Connection con, String selectedcollection, String header, String sequence, String qualityvalues, Boolean readrichting, String originfile) throws SQLException{
         Statement sta = con.createStatement(); 
 
         int newheaderid = 1;
         int check = 1;
         int newreadid = 1;
         int collectionid = getcollection(con, selectedcollection);
-        //newheaderid = newheaderid(con);
         newreadid = newreadid(con);
         
         String insertquery = "INSERT INTO COMBINED" + "(READ_ID,SEQUENCE,QUALITY_VALUES,READ_DIRECTION,HEADER,COLLECTION_ID,COLLECTION_TITLE,FILE_TITLE)" + " VALUES (?,?,?,?,?,?,?,?)";
@@ -41,9 +38,8 @@ public class importData {
         prepStmt.setString(7, selectedcollection);
         prepStmt.setString(8, originfile);
         prepStmt.executeUpdate();
-        con.commit();
+
         sta.close();
-        con.close();
     }
     
     public int newreadid(Connection con) throws SQLException{

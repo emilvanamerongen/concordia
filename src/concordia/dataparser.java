@@ -13,7 +13,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -29,6 +32,8 @@ public class dataparser {
    private String[] importstring;
    private String filetype;
    public processthread thread;
+   public Connection con = null;
+   
     //constructors
     public dataparser(File importfile, String filetype){
        this.importfile = importfile;
@@ -59,6 +64,7 @@ public class dataparser {
     int linenr = 0;
     DecimalFormat df = new DecimalFormat("#.##");
     
+    importData importdata = new importData();
     dbcon dbconnector = new dbcon();
     NGSread newread = new NGSread();
     
@@ -113,7 +119,9 @@ public class dataparser {
             String line = sc.nextLine();
                
                 try {             
+                    openConn();
                     processline(line);
+                    closeConn(con);
                 } catch (SQLException ex) {
                     Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -143,14 +151,17 @@ public class dataparser {
             }
             for (String line : importstring){
                 try {
+                    openConn();
                     processline(line);
+                    closeConn(con);
                 } catch (SQLException ex) {
                     Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
                 }                              
             }           
        }
         try {
-            dbconnector.getdatabasecontents();
+            //dbconnector.getdatabasecontents();
+            importdata.getdatabasecontents();
         } catch (SQLException ex) {
             Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -164,7 +175,8 @@ public class dataparser {
         if (line.matches("^"+headidentifier+".*")){
                 linenr = 0;
                 if (newread.getHeader() != null){
-                    dbconnector.importDatabaseInfo(selecteddataset,newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection(), originfile);
+                    //dbconnector.importDatabaseInfo(selecteddataset,newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection(), originfile);
+                    importdata.importCombinedTable(con, selecteddataset, newread.getHeader(), newread.getSequence(), newread.getQualityvalues(), newread.getReaddirection(), originfile);
                     newread.clear();
                     done += 1;
                 }
@@ -188,6 +200,15 @@ public class dataparser {
             
         }
     }
+    
+    public void openConn() throws SQLException{ 
+        con = DriverManager.getConnection("jdbc:derby:NGSDB");
+    }
+    
+    public void closeConn(Connection con) throws SQLException{
+        con.close();
+    }
+    
     }
 }
 
