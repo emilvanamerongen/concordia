@@ -19,13 +19,13 @@ import java.sql.Statement;
 public class importData {
     
     public void importCombinedTable(Connection con, String selectedcollection, String header, String sequence, String qualityvalues, Boolean readrichting, String originfile) throws SQLException{
-        Statement sta = con.createStatement(); 
+        //Statement sta = con.createStatement(); 
 
         int newheaderid = 1;
         int check = 1;
         int newreadid = 1;
         int collectionid = getcollection(con, selectedcollection);
-        newreadid = newreadid(con);
+        //newreadid = newreadid(con);
         
         String insertquery = "INSERT INTO COMBINED" + "(READ_ID,SEQUENCE,QUALITY_VALUES,READ_DIRECTION,HEADER,COLLECTION_ID,COLLECTION_TITLE,FILE_TITLE)" + " VALUES (?,?,?,?,?,?,?,?)";
         PreparedStatement prepStmt = con.prepareStatement(insertquery);
@@ -37,9 +37,12 @@ public class importData {
         prepStmt.setInt(6, collectionid);
         prepStmt.setString(7, selectedcollection);
         prepStmt.setString(8, originfile);
+        
+        //prepStmt.addBatch();
         prepStmt.executeUpdate();
+        
 
-        sta.close();
+        //sta.close();
     }
     
     public int newreadid(Connection con) throws SQLException{

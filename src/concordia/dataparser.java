@@ -115,23 +115,26 @@ public class dataparser {
                Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
             }
             sc = new Scanner(inputStream, "UTF-8");
-            while (sc.hasNextLine()) {
-            String line = sc.nextLine();
-               
-                try {             
-                    openConn();
-                    processline(line);
-                    closeConn(con);
-                } catch (SQLException ex) {
-                    Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                String format = df.format(done/total);
-                try {
-                GUIController.parserloadbar.setdone(Double.parseDouble(format));}
-                catch (NumberFormatException ex) {
-                GUIController.parserloadbar.setdone(Double.parseDouble(format.replace(",",".")));
-            }
-            }
+            
+            try {
+                openConn();
+                    while (sc.hasNextLine()) {
+                    String line = sc.nextLine();
+                        try {             
+                            processline(line);
+                        } catch (SQLException ex) {
+                            Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        String format = df.format(done/total);
+                        try {
+                        GUIController.parserloadbar.setdone(Double.parseDouble(format));}
+                        catch (NumberFormatException ex) {
+                        GUIController.parserloadbar.setdone(Double.parseDouble(format.replace(",",".")));
+                    }
+                    } closeConn(con); } catch (SQLException ex) {
+                       Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
+           }
+            
             try {
                inputStream.close();
             } catch (IOException ex) {
@@ -149,15 +152,18 @@ public class dataparser {
             }
                           
             }
-            for (String line : importstring){
-                try {
-                    openConn();
-                    processline(line);
-                    closeConn(con);
-                } catch (SQLException ex) {
-                    Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
-                }                              
-            }           
+            try {
+                openConn();
+                    for (String line : importstring){
+                        try {
+                            processline(line);
+                        } catch (SQLException ex) {
+                            Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
+                        }                              
+                    }
+            closeConn(con); } catch (SQLException ex) {
+               Logger.getLogger(dataparser.class.getName()).log(Level.SEVERE, null, ex);
+           }
        }
         try {
             //dbconnector.getdatabasecontents();
@@ -206,6 +212,7 @@ public class dataparser {
     }
     
     public void closeConn(Connection con) throws SQLException{
+        con.commit();
         con.close();
     }
     
