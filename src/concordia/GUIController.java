@@ -6,16 +6,8 @@
 package concordia;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.ResourceBundle;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -26,34 +18,33 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ProgressBar;
-import javafx.beans.value.ObservableValue;
-import javafx.beans.value.ChangeListener;
-import javafx.util.Duration;
+import javafx.stage.DirectoryChooser;
+import javax.swing.JFileChooser;
 
 /**
  *
  * @author emilvanamerongen
  */
 public class GUIController implements Initializable {
-   //// datasets page
+    //// files
     @FXML
     TabPane filespane;
     @FXML
-    ListView datasetlist;
+    ListView fileslist;
     @FXML
     ListView annotationlist;
+    @FXML
+    Button directorybutton;
     @FXML
     Label ngsdatalabel;
     //buttons
     @FXML
-    Button datasetdeletebutton;
+    Button deletefilebutton;
     @FXML
-    Button adddatabutton;
+    Button addfilesbutton;
     @FXML
     Button blastbutton;
     @FXML
@@ -113,6 +104,12 @@ public class GUIController implements Initializable {
         }
     }
     
+    @FXML
+    private void setdirectory(ActionEvent event){
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Concordia project folder");
+        File selectedDirectory = chooser.showDialog(directorybutton.getScene().getWindow());
+    }
     //init
     @Override
     public void initialize(URL url, ResourceBundle rb) {
