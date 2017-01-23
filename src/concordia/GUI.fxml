@@ -39,20 +39,20 @@
                                                       <Font name="System Bold" size="19.0" />
                                                    </font>
                                                 </Label>
-                                                <ListView fx:id="fileslist" maxWidth="270.0" prefHeight="134.0" prefWidth="270.0" />
-                                                <AnchorPane maxHeight="35.0" maxWidth="270.0" prefHeight="35.0" prefWidth="270.0">
+                                                <ListView fx:id="fileslist" maxWidth="200.0" prefHeight="134.0" prefWidth="100.0" />
+                                                <AnchorPane maxHeight="21.0" maxWidth="158.0" prefHeight="21.0" prefWidth="163.0">
                                                    <children>
-                                                      <Button fx:id="deletefilebutton" disable="true" layoutX="226.0" layoutY="2.0" mnemonicParsing="false" prefHeight="12.0" prefWidth="44.0" text="delete">
+                                                      <Button fx:id="deletefilebutton" disable="true" layoutX="155.0" layoutY="4.0" mnemonicParsing="false" prefHeight="12.0" prefWidth="44.0" text="delete">
                                                          <font>
                                                             <Font size="8.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button fx:id="directorybutton" layoutX="1.0" layoutY="2.0" mnemonicParsing="false" onAction="#setdirectory" text="set directory">
+                                                      <Button fx:id="directorybutton" layoutY="4.0" mnemonicParsing="false" onAction="#setdirectory" text="set directory">
                                                          <font>
-                                                            <Font name="System Italic" size="8.0" />
+                                                            <Font name="System Italic" size="9.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button fx:id="addfilesbutton" disable="true" layoutX="164.0" layoutY="2.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="59.0" text="add files">
+                                                      <Button fx:id="addfilesbutton" disable="true" layoutX="93.0" layoutY="4.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="59.0" text="add files">
                                                          <font>
                                                             <Font size="8.0" />
                                                          </font>
@@ -83,7 +83,7 @@
                                                 </ImageView>
                                              </children>
                                           </VBox>
-                                          <VBox alignment="CENTER" prefHeight="217.0" prefWidth="280.0" HBox.hgrow="ALWAYS">
+                                          <VBox alignment="CENTER" prefHeight="261.0" prefWidth="108.0" HBox.hgrow="ALWAYS">
                                              <children>
                                                 <Label alignment="CENTER" disable="true" text="Annotation data">
                                                    <VBox.margin>
