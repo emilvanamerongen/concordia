@@ -5,22 +5,9 @@
  */
 package concordia;
 
-import java.awt.Color;
-import java.awt.Desktop;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -95,10 +82,10 @@ public class GUIController implements Initializable {
     @FXML
     Label adddataprogresslabel;
     
-    File[] files;
-    ArrayList<String> filenames = new ArrayList<>();
-    Properties myproperties = new Properties();
-    File selectedDirectory;
+
+            
+    
+
     
     @FXML
     private void switchtab(ActionEvent event){
@@ -118,47 +105,16 @@ public class GUIController implements Initializable {
     }
     
     @FXML
-    private void setdirectory(ActionEvent event) throws FileNotFoundException, IOException{
+    private void setdirectory(ActionEvent event){
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Concordia project folder");
-        selectedDirectory = chooser.showDialog(directorybutton.getScene().getWindow());
-        if (selectedDirectory != null){
-        myproperties.setProperty("projectfolder", selectedDirectory.getAbsolutePath());
-        OutputStream out = new FileOutputStream("concordia.properties");
-        myproperties.store(out, "This is an optional header comment string");
-        out.close();
-        updatefilelist();
-        }
+        File selectedDirectory = chooser.showDialog(directorybutton.getScene().getWindow());
     }
-    @FXML
-    private void openexplorer(ActionEvent event) throws IOException{
-        Runtime rt = Runtime.getRuntime();
-        Process pr = rt.exec("nautilus "+selectedDirectory.getAbsolutePath());
-    }
-    public void updatefilelist(){
-        files = selectedDirectory.listFiles();
-        for (File file : files){
-            filenames.add(file.getName());
-        }
-        fileslist.setItems(FXCollections.observableArrayList(filenames));
-        fileslist.setDisable(false);
-    }
-    
     //init
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        try {
-            //TODO - get data from database and load into datasetlist
-            myproperties.load(new FileInputStream("concordia.properties"));
-            selectedDirectory = new File(myproperties.getProperty("projectfolder"));
-        } catch (Exception ex) {}
-        System.out.println(myproperties.getProperty("projectfolder"));
-        if (myproperties.getProperty("projectfolder").length() < 2){
-            System.out.println("project folder not found..");
-            fileslist.setItems(FXCollections.observableArrayList("project folder not found"));
-            fileslist.setDisable(true);
-        } else {
-            updatefilelist();
-        }
+        //TODO - get data from database and load into datasetlist
+        
     }    
+    
 }
