@@ -51,7 +51,7 @@ import javax.swing.JOptionPane;
  * @author emilvanamerongen
  */
 public class GUIController implements Initializable {
-    //// files
+    // files
     @FXML
     TabPane filespane;
     @FXML
@@ -71,38 +71,6 @@ public class GUIController implements Initializable {
     Button blastbutton;
     @FXML
     Button annotationaddbutton;
-    @FXML
-    Button annotationremovebutton;
-    //add dataset tab
-    @FXML
-    TextField datasettitle;
-    //add data tab
-    @FXML
-    TextArea addngstext;
-    @FXML
-    Label ngsfilelabel;
-    @FXML 
-    RadioButton fastaradiobutton;
-    @FXML
-    RadioButton fastqradiobutton;
-    @FXML
-    CheckBox directioncheckbox;
-    @FXML
-    ChoiceBox adddatachoicebox;
-    @FXML
-    TextField forwardfield;
-    @FXML
-    Label forwardtext;
-    @FXML
-    TextField reversefield;
-    @FXML
-    Label reversetext;
-    @FXML
-    TextField headidentifierfield;
-    @FXML 
-    ProgressBar adddataprogressbar;
-    @FXML
-    Label adddataprogresslabel;
     
     HashMap<String, File> files = new HashMap<>();
     ArrayList<String> filenames = new ArrayList<>();
