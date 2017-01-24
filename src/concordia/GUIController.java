@@ -204,6 +204,5 @@ public class GUIController implements Initializable {
     //init
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
     }    
 }
