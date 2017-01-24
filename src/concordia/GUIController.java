@@ -5,6 +5,7 @@
  */
 package concordia;
 
+import filemanager.filemanager;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;
@@ -72,10 +73,8 @@ public class GUIController implements Initializable {
     @FXML
     Button annotationaddbutton;
     
-    HashMap<String, File> files = new HashMap<>();
-    ArrayList<String> filenames = new ArrayList<>();
     Properties myproperties = new Properties();
-    File selectedDirectory;
+    filemanager filemanager = new filemanager();
     
     //gui manager
     @FXML
@@ -99,52 +98,66 @@ public class GUIController implements Initializable {
     private void setdirectory(ActionEvent event) throws FileNotFoundException, IOException{
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Concordia project folder");
-        File newselectedDirectory = chooser.showDialog(directorybutton.getScene().getWindow());
+        File newselectedDirectory = chooser.showDialog(filespane.getScene().getWindow());
         if (newselectedDirectory != null){
-            selectedDirectory = newselectedDirectory;
+            filemanager.setProjectdirectory(newselectedDirectory);
         }      
         if (newselectedDirectory != null){
-        myproperties.setProperty("projectfolder", selectedDirectory.getAbsolutePath());
+        myproperties.setProperty("projectfolder", filemanager.getProjectdirectory().getAbsolutePath());
         OutputStream out = new FileOutputStream("concordia.properties");
         myproperties.store(out, "This is an optional header comment string");
         out.close();
-        updatefilelist();
+        filemanager.annotationmanager.updatefiles();
+        filemanager.ngsmanager.updatefiles();
         }
     }
     @FXML
     private void openexplorer(ActionEvent event) throws IOException{
         Runtime rt = Runtime.getRuntime();
-        Process pr = rt.exec("nautilus "+selectedDirectory.getAbsolutePath());
+        try {
+            Process pr = rt.exec("nautilus "+filemanager.getProjectdirectory().getAbsolutePath());
+        } catch (Exception ex){
+            Process pr = rt.exec("explorer "+filemanager.getProjectdirectory().getAbsolutePath());
+        }
     }
     @FXML
-    public void updatefilelist(){
-        files.clear();
-        for (File file : selectedDirectory.listFiles()){
-            files.put(file.getName(), file);
-        }
-        filenames.clear();
-        for (File file : files.values()){
-            filenames.add(file.getName());
-        }
-        addfilesbutton.setDisable(false);
-        deletefilebutton.setDisable(false);
-        fileslist.setItems(FXCollections.observableArrayList(filenames));
+    public void updatengsfilelist(){
+        fileslist.setItems(FXCollections.observableArrayList(filemanager.ngsmanager.getFilenames()));
         fileslist.setDisable(false);
     }
     @FXML
-    public void addfiles(ActionEvent event){
+    public void updateannotationfilelist(){
+        fileslist.setItems(FXCollections.observableArrayList(filemanager.annotationmanager.getFilenames()));
+        fileslist.setDisable(false);
+    }  
+    @FXML
+    public void addngsfiles(ActionEvent event){
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Concordia project folder");
-        List<File> newfiles = chooser.showOpenMultipleDialog(directorybutton.getScene().getWindow());
+        chooser.setTitle("move files to ngs data in project folder");
+        List<File> newfiles = chooser.showOpenMultipleDialog(filespane.getScene().getWindow());
         if (newfiles != null){
             for (File file : newfiles){
-                file.renameTo(new File(selectedDirectory.getAbsolutePath()+File.separator+file.getName()));
+                file.renameTo(new File(filemanager.ngsmanager.getNgsdirectory().getAbsolutePath()+File.separator+file.getName()));
             }
-            updatefilelist();
-        }      
+            filemanager.ngsmanager.updatefiles();
+        }
+        updatengsfilelist();
     }
     @FXML
-    public void deletefile(){
+    public void addannotationfiles(ActionEvent event){
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("move files to annotation in project folder");
+        List<File> newfiles = chooser.showOpenMultipleDialog(filespane.getScene().getWindow());
+        if (newfiles != null){
+            for (File file : newfiles){
+                file.renameTo(new File(filemanager.annotationmanager.getAnnotationdirectory().getAbsolutePath()+File.separator+file.getName()));
+            }
+            filemanager.annotationmanager.updatefiles();
+        }
+        updateannotationfilelist();
+    }
+    @FXML
+    public void deletengsfile(){
         ObservableList selectedfile = fileslist.getSelectionModel().getSelectedItems();
         try{
         Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -154,30 +167,43 @@ public class GUIController implements Initializable {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK){
-            File markedfordelete = files.get(selectedfile.get(0));
+            File markedfordelete = filemanager.ngsmanager.getNgsfiles().get(selectedfile.get(0));
             Files.delete(markedfordelete.toPath());
-            updatefilelist();
+            filemanager.ngsmanager.updatefiles();
         } else {
             System.out.println("deletion canceled");
         }
         } catch (Exception ex){
             System.out.println("no files deleted");
         }
+        updatengsfilelist();
     }
+    @FXML
+    public void deleteannotationfile(){
+        ObservableList selectedfile = fileslist.getSelectionModel().getSelectedItems();
+        try{
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Delete file");
+        alert.setHeaderText(selectedfile.get(0)+" wil be permanently deleted");
+        alert.setContentText("Are you sure want to permanently delete this file?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            File markedfordelete = filemanager.annotationmanager.getAnnotationfiles().get(selectedfile.get(0));
+            Files.delete(markedfordelete.toPath());
+            filemanager.annotationmanager.updatefiles();
+        } else {
+            System.out.println("deletion canceled");
+        }
+        } catch (Exception ex){
+            System.out.println("no files deleted");
+        }
+        updateannotationfilelist();
+    }
+    
     //init
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        try {
-            //TODO - get data from database and load into datasetlist
-            myproperties.load(new FileInputStream("concordia.properties"));
-            selectedDirectory = new File(myproperties.getProperty("projectfolder"));
-        } catch (Exception ex) {}
-        System.out.println(myproperties.getProperty("projectfolder"));
-        if (myproperties.getProperty("projectfolder").length() < 2){
-            fileslist.setItems(FXCollections.observableArrayList("project folder not found"));
-            fileslist.setDisable(true);
-        } else {
-            updatefilelist();
-        }
+        
     }    
 }
