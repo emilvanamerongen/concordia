@@ -5,7 +5,7 @@
  */
 package concordia;
 
-import filemanager.filemanager;
+import FileManager.filemanager;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;
@@ -65,9 +65,9 @@ public class GUIController implements Initializable {
     Label ngsdatalabel;
     //buttons
     @FXML
-    Button deletefilebutton;
+    Button deletengsfilebutton;
     @FXML
-    Button addfilesbutton;
+    Button addngsfilesbutton;
     @FXML
     Button blastbutton;
     @FXML
@@ -122,13 +122,13 @@ public class GUIController implements Initializable {
     }
     @FXML
     public void updatengsfilelist(){
+        filemanager.ngsmanager.updatefiles();
         fileslist.setItems(FXCollections.observableArrayList(filemanager.ngsmanager.getFilenames()));
-        fileslist.setDisable(false);
     }
     @FXML
     public void updateannotationfilelist(){
         fileslist.setItems(FXCollections.observableArrayList(filemanager.annotationmanager.getFilenames()));
-        fileslist.setDisable(false);
+        filemanager.annotationmanager.updatefiles();
     }  
     @FXML
     public void addngsfiles(ActionEvent event){
@@ -204,5 +204,8 @@ public class GUIController implements Initializable {
     //init
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        updatengsfilelist();
+        updateannotationfilelist();
+        fileslist.setItems(FXCollections.observableArrayList(filemanager.ngsmanager.getFilenames()));
     }    
 }

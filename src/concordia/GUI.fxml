@@ -4,6 +4,9 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -15,11 +18,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" minHeight="600.0" minWidth="700.0" prefHeight="782.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="concordia.GUIController">
+<AnchorPane id="AnchorPane" minHeight="600.0" minWidth="1000.0" prefHeight="750.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="concordia.GUIController">
    <children>
-      <TabPane layoutX="-1.0" layoutY="35.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
+      <TabPane fx:id="filespane" layoutX="-1.0" layoutY="35.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
         <tabs>
-          <Tab text="Datasets">
+          <Tab text="annotation">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -31,7 +34,7 @@
                                        <children>
                                           <VBox alignment="CENTER" prefHeight="217.0" prefWidth="150.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Label text="Files">
+                                                <Label text="NGS data files">
                                                    <VBox.margin>
                                                       <Insets bottom="10.0" />
                                                    </VBox.margin>
@@ -39,53 +42,31 @@
                                                       <Font name="System Bold" size="19.0" />
                                                    </font>
                                                 </Label>
-                                                <ListView fx:id="fileslist" maxWidth="200.0" prefHeight="134.0" prefWidth="100.0" />
-                                                <AnchorPane maxHeight="21.0" maxWidth="158.0" prefHeight="21.0" prefWidth="163.0">
+                                                <ListView fx:id="fileslist" maxWidth="300.0" prefHeight="134.0" prefWidth="300.0" />
+                                                <AnchorPane maxHeight="37.0" maxWidth="267.0" prefHeight="37.0" prefWidth="267.0">
                                                    <children>
-                                                      <Button fx:id="deletefilebutton" disable="true" layoutX="155.0" layoutY="4.0" mnemonicParsing="false" prefHeight="12.0" prefWidth="44.0" text="delete">
+                                                      <Button fx:id="deletefilebutton" alignment="CENTER" layoutX="214.0" layoutY="4.0" mnemonicParsing="false" onAction="#deletengsfile" prefHeight="7.0" prefWidth="53.0" text="delete">
                                                          <font>
-                                                            <Font size="8.0" />
+                                                            <Font size="9.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button fx:id="directorybutton" layoutY="4.0" mnemonicParsing="false" onAction="#setdirectory" text="set directory">
+                                                      <Button fx:id="addfilesbutton" layoutX="151.0" layoutY="4.0" mnemonicParsing="false" onAction="#addngsfiles" prefHeight="17.0" prefWidth="59.0" text="add files">
                                                          <font>
-                                                            <Font name="System Italic" size="9.0" />
+                                                            <Font size="9.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button fx:id="addfilesbutton" disable="true" layoutX="93.0" layoutY="4.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="59.0" text="add files">
+                                                      <Button layoutY="4.0" mnemonicParsing="false" onAction="#updatengsfilelist" text="refresh">
                                                          <font>
-                                                            <Font size="8.0" />
-                                                         </font>
-                                                      </Button>
-                                                      <Button layoutX="67.0" layoutY="2.0" mnemonicParsing="false" onAction="#openexplorer" text="open directory">
-                                                         <font>
-                                                            <Font name="System Italic" size="8.0" />
-                                                         </font>
-                                                      </Button>
-                                                      <Button layoutX="1.0" layoutY="21.0" mnemonicParsing="false" onAction="#setdirectory" text="refresh">
-                                                         <font>
-                                                            <Font size="8.0" />
+                                                            <Font size="9.0" />
                                                          </font>
                                                       </Button>
                                                    </children>
                                                 </AnchorPane>
                                              </children>
                                           </VBox>
-                                          <VBox alignment="CENTER" prefHeight="261.0" prefWidth="24.0">
+                                          <VBox alignment="CENTER" prefHeight="256.0" prefWidth="290.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <ImageView fitHeight="79.0" fitWidth="58.0" preserveRatio="true">
-                                                   <image>
-                                                      <Image url="@../img/logo-concordia2.png" />
-                                                   </image>
-                                                   <VBox.margin>
-                                                      <Insets />
-                                                   </VBox.margin>
-                                                </ImageView>
-                                             </children>
-                                          </VBox>
-                                          <VBox alignment="CENTER" prefHeight="261.0" prefWidth="108.0" HBox.hgrow="ALWAYS">
-                                             <children>
-                                                <Label alignment="CENTER" disable="true" text="Annotation data">
+                                                <Label alignment="CENTER" text="BLAST output files">
                                                    <VBox.margin>
                                                       <Insets bottom="10.0" />
                                                    </VBox.margin>
@@ -93,20 +74,52 @@
                                                       <Font name="System Bold" size="19.0" />
                                                    </font>
                                                 </Label>
-                                                <ListView fx:id="annotationlist" disable="true" maxWidth="270.0" prefHeight="134.0" prefWidth="270.0" />
-                                                <AnchorPane maxHeight="21.0" maxWidth="163.0" prefHeight="21.0" prefWidth="163.0">
+                                                <ListView fx:id="annotationlist" maxWidth="300.0" prefHeight="134.0" prefWidth="300.0" />
+                                                <AnchorPane maxHeight="37.0" maxWidth="267.0" prefHeight="37.0" prefWidth="267.0">
                                                    <children>
-                                                      <Button fx:id="annotationaddbutton" layoutX="61.0" layoutY="4.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="90.0" text="add annotation" visible="false">
+                                                      <Button alignment="CENTER" layoutX="188.0" layoutY="4.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="79.0" text="delete source">
                                                          <font>
                                                             <Font size="9.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button fx:id="annotationremovebutton" layoutX="155.0" layoutY="4.0" mnemonicParsing="false" prefHeight="12.0" prefWidth="44.0" text="delete" visible="false">
+                                                      <Button layoutX="117.0" layoutY="4.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="68.0" text="add source">
                                                          <font>
                                                             <Font size="9.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button fx:id="blastbutton" disable="true" layoutX="154.0" layoutY="4.0" mnemonicParsing="false" prefHeight="12.0" prefWidth="44.0" text="BLAST" visible="false">
+                                                      <Button layoutY="4.0" mnemonicParsing="false" text="refresh">
+                                                         <font>
+                                                            <Font size="9.0" />
+                                                         </font>
+                                                      </Button>
+                                                   </children>
+                                                </AnchorPane>
+                                             </children>
+                                          </VBox>
+                                          <VBox alignment="CENTER" prefHeight="256.0" prefWidth="290.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Label alignment="CENTER" text="annotated files">
+                                                   <VBox.margin>
+                                                      <Insets bottom="10.0" />
+                                                   </VBox.margin>
+                                                   <font>
+                                                      <Font name="System Bold" size="19.0" />
+                                                   </font>
+                                                </Label>
+                                                <ListView fx:id="annotationlist1" maxWidth="300.0" prefHeight="134.0" prefWidth="300.0" />
+                                                <AnchorPane maxHeight="37.0" maxWidth="267.0" prefHeight="37.0" prefWidth="267.0">
+                                                   <children>
+                                                      <Button fx:id="deletefilebutton11" alignment="CENTER" layoutX="214.0" layoutY="4.0" mnemonicParsing="false" onAction="#deleteannotationfile" prefHeight="7.0" prefWidth="53.0" text="delete">
+                                                         <font>
+                                                            <Font size="9.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Button fx:id="addfilesbutton11" layoutX="151.0" layoutY="4.0" mnemonicParsing="false" onAction="#addannotationfiles" prefHeight="17.0" prefWidth="59.0" text="add files">
+                                                         <font>
+                                                            <Font size="9.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Button layoutY="4.0" mnemonicParsing="false" onAction="#updateannotationfilelist" text="refresh">
                                                          <font>
                                                             <Font size="9.0" />
                                                          </font>
@@ -130,7 +143,14 @@
                                         </Tab>
                                           <Tab text="1">
                                              <content>
-                                                <VBox alignment="CENTER" />
+                                                <VBox alignment="CENTER">
+                                                   <children>
+                                                      <ImageView fitHeight="79.0" fitWidth="58.0" preserveRatio="true">
+                                                         <image>
+                                                            <Image url="@../img/logo-concordia2.png" />
+                                                         </image>
+                                                      </ImageView>
+                                                   </children></VBox>
                                              </content>
                                           </Tab>
                                           <Tab text="2">
@@ -183,14 +203,28 @@
             </Tab>
         </tabs>
       </TabPane>
-      <ToolBar layoutX="-1.0" nodeOrientation="RIGHT_TO_LEFT" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-        <items>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="26.0" prefWidth="131.0" text="Concordia" textAlignment="CENTER">
-               <font>
-                  <Font size="22.0" />
-               </font>
-            </Label>
-        </items>
-      </ToolBar>
+      <HBox prefHeight="38.0" prefWidth="714.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <MenuBar prefHeight="45.0" prefWidth="187.0">
+              <menus>
+                <Menu mnemonicParsing="false" text="Storage location">
+                  <items>
+                    <MenuItem mnemonicParsing="false" onAction="#setdirectory" text="change concordia directory" />
+                        <MenuItem mnemonicParsing="false" onAction="#openexplorer" text="open concordia directory" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            <ToolBar nodeOrientation="RIGHT_TO_LEFT" HBox.hgrow="ALWAYS">
+              <items>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="26.0" prefWidth="131.0" text="Concordia" textAlignment="CENTER">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Label>
+              </items>
+            </ToolBar>
+         </children>
+      </HBox>
    </children>
 </AnchorPane>
