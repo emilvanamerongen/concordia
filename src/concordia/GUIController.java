@@ -1,5 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
+ * Tos change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -78,14 +78,14 @@ public class GUIController implements Initializable {
     Properties myproperties = new Properties();
     filemanager filemanager = new filemanager();
    
-    private Image IMAGE_empty  = new Image("file:src"+File.separator+"img"+File.separator+"empty.png");
-    private Image IMAGE_F  = new Image("file:src"+File.separator+"img"+File.separator+"filtered.png");
-    private Image IMAGE_C  = new Image("file:src"+File.separator+"img"+File.separator+"cazy.png");
-    private Image IMAGE_U  = new Image("file:src"+File.separator+"img"+File.separator+"uniprot.png");
-    private Image IMAGE_FC  = new Image("file:src"+File.separator+"img"+File.separator+"cazy+filtered.png");
-    private Image IMAGE_CU  = new Image("file:src"+File.separator+"img"+File.separator+"cazy+uniprot.png");
-    private Image IMAGE_FU  = new Image("file:src"+File.separator+"img"+File.separator+"uniprot+filtered.png");
-    private Image IMAGE_FUC  = new Image("file:src"+File.separator+"img"+File.separator+"cazy+uniprot+filtered.png");
+    private final Image IMAGE_empty  = new Image("file:src"+File.separator+"img"+File.separator+"empty.png");
+    private final Image IMAGE_F  = new Image("file:src"+File.separator+"img"+File.separator+"filtered.png");
+    private final Image IMAGE_C  = new Image("file:src"+File.separator+"img"+File.separator+"cazy.png");
+    private final Image IMAGE_U  = new Image("file:src"+File.separator+"img"+File.separator+"uniprot.png");
+    private final Image IMAGE_FC  = new Image("file:src"+File.separator+"img"+File.separator+"cazy+filtered.png");
+    private final Image IMAGE_CU  = new Image("file:src"+File.separator+"img"+File.separator+"cazy+uniprot.png");
+    private final Image IMAGE_FU  = new Image("file:src"+File.separator+"img"+File.separator+"uniprot+filtered.png");
+    private final Image IMAGE_FUC  = new Image("file:src"+File.separator+"img"+File.separator+"cazy+uniprot+filtered.png");
     
     //gui manager
     @FXML
@@ -172,7 +172,7 @@ public class GUIController implements Initializable {
                         imageView.setImage(IMAGE_FC);
                     if(name.contains("ᚒU") && name.contains("ᚒC") && name.contains("ᚒF"))
                         imageView.setImage(IMAGE_FUC);
-                    setText(name);
+                    setText(name.replace("ᚒC", "").replace("ᚒF", "").replace("ᚒU", ""));
                     setGraphic(imageView);
                 }
             }
