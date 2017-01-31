@@ -6,7 +6,8 @@
 package concordia;
 
 import CazyModule.CazyAnnotator;
-import FileManager.filemanager;
+import FileManager.Filemanager;
+import UniprotModule.UniprotAnnotator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -15,10 +16,13 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
@@ -34,11 +38,13 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 
 /**
  *
@@ -55,13 +61,6 @@ public class GUIController implements Initializable {
     @FXML
     Button directorybutton;
     @FXML
-    Label ngsdatalabel;
-    //buttons
-    @FXML
-    Button deletengsfilebutton;
-    @FXML
-    Button addngsfilesbutton;
-    @FXML
     Button blastbutton;
     @FXML
     Button annotationaddbutton;
@@ -74,10 +73,31 @@ public class GUIController implements Initializable {
     ListView uniprotlist;
     @FXML        
     ListView cazylist;
+    @FXML
+    ProgressBar mainprogressbar;
+    @FXML
+    Label progresslabel;
+    @FXML
+    Button activebutton1;
+    @FXML
+    Button activebutton2;
+    @FXML
+    Button activebutton3;
+    @FXML
+    Button activebutton4;
+    @FXML
+    Button activebutton5;
+    @FXML
+    Button activebutton6;
+    
+    Timeline timeline = new Timeline(Timeline.INDEFINITE, new KeyFrame(Duration.millis(1000), ae -> updateloop()));
+    public HashMap<String, HashMap<String, Double>> proceslist = new HashMap<>();
+    Boolean cazyqueue = false;
+    ArrayList<File> cazyqueueitems;
     
     Properties myproperties = new Properties();
-    filemanager filemanager = new filemanager();
-   
+    Filemanager filemanager = new Filemanager();
+    public static loadbar parserloadbar = new loadbar();
     private final Image IMAGE_empty  = new Image("file:src"+File.separator+"img"+File.separator+"empty.png");
     private final Image IMAGE_F  = new Image("file:src"+File.separator+"img"+File.separator+"filtered.png");
     private final Image IMAGE_C  = new Image("file:src"+File.separator+"img"+File.separator+"cazy.png");
@@ -92,11 +112,11 @@ public class GUIController implements Initializable {
     private void switchtab(ActionEvent event){
         try {
         String source = event.getSource().toString();
-        if (source.contains("BLAST")){
-            filespane.getSelectionModel().select(1);
+        if (source.contains("annotate")){
+            filespane.getSelectionModel().select(2);
         }
         else  if (source.contains("annotation")){
-            filespane.getSelectionModel().select(2);
+            filespane.getSelectionModel().select(3);
         }
         else if (source.contains("")){
             
@@ -110,6 +130,7 @@ public class GUIController implements Initializable {
             filespane.getSelectionModel().select(0);
         }
     }  
+    
     // file manager
     @FXML
     private void setdirectory(ActionEvent event) throws FileNotFoundException, IOException{
@@ -125,7 +146,7 @@ public class GUIController implements Initializable {
         myproperties.store(out, "This is an optional header comment string");
         out.close();
         filemanager.annotationmanager.updatefiles();
-        filemanager.ngsmanager.updatefiles();
+        filemanager.blastresultmanager.updatefiles();
         }
     }
     @FXML
@@ -138,10 +159,40 @@ public class GUIController implements Initializable {
         }
     }
     @FXML
-    public void updatengsfilelist(){
-        filemanager.ngsmanager.updatefiles();
-        fileslist.setItems(FXCollections.observableArrayList(filemanager.ngsmanager.getFilenames()));
-    }
+    public void updateblastresultfilelist(){
+        filemanager.blastresultmanager.updatefiles();
+        ObservableList<String> names = FXCollections.observableArrayList(filemanager.blastresultmanager.getFilenames());    
+        SortedList<String> sorted = names.sorted();
+        fileslist.setItems(sorted);     
+        fileslist.setCellFactory(param -> new ListCell<String>() {
+            private ImageView imageView2 = new ImageView();
+            @Override
+            public void updateItem(String name, boolean empty) {
+                super.updateItem(name, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    imageView2.setImage(IMAGE_empty);
+                    if(name.contains("ᚒF"))
+                        imageView2.setImage(IMAGE_F);
+                    else if(name.contains("ᚒC"))
+                        imageView2.setImage(IMAGE_C);
+                    else if(name.contains("ᚒU"))
+                        imageView2.setImage(IMAGE_U);
+                    if(name.contains("ᚒU") && name.contains("ᚒC"))
+                        imageView2.setImage(IMAGE_CU);
+                    if(name.contains("ᚒU") && name.contains("ᚒF"))
+                        imageView2.setImage(IMAGE_FU);
+                    if(name.contains("ᚒF") && name.contains("ᚒC"))
+                        imageView2.setImage(IMAGE_FC);
+                    if(name.contains("ᚒU") && name.contains("ᚒC") && name.contains("ᚒF"))
+                        imageView2.setImage(IMAGE_FUC);
+                    setText(name.replace("ᚒC", "").replace("ᚒF", "").replace("ᚒU", ""));
+                    setGraphic(imageView2);
+                }
+            }
+        });    }
     @FXML
     public void updateannotationfilelist(){
         filemanager.annotationmanager.updatefiles();
@@ -179,20 +230,20 @@ public class GUIController implements Initializable {
         });
     }  
     @FXML
-    public void addngsfiles(ActionEvent event){
+    public void addblastresultfiles(ActionEvent event){
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("move files to ngs data in project folder");
+        chooser.setTitle("move files to blastresult data in project folder");
         List<File> newfiles = chooser.showOpenMultipleDialog(filespane.getScene().getWindow());
         if (newfiles != null){
             for (File file : newfiles){
-                file.renameTo(new File(filemanager.ngsmanager.getNgsdirectory().getAbsolutePath()+File.separator+file.getName()));
+                file.renameTo(new File(filemanager.blastresultmanager.getblastresultdirectory().getAbsolutePath()+File.separator+file.getName()));
             }
-            filemanager.ngsmanager.updatefiles();
+            filemanager.blastresultmanager.updatefiles();
         }
-        updatengsfilelist();
+        updateblastresultfilelist();
     }
     @FXML
-    public void deletengsfile(){
+    public void deleteblastresultfile(){
         ObservableList selectedfile = fileslist.getSelectionModel().getSelectedItems();
         try{
         Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -202,16 +253,16 @@ public class GUIController implements Initializable {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK){
-            File markedfordelete = filemanager.ngsmanager.getNgsfiles().get(selectedfile.get(0));
+            File markedfordelete = filemanager.blastresultmanager.getblastresultfiles().get(selectedfile.get(0));
             Files.delete(markedfordelete.toPath());
-            filemanager.ngsmanager.updatefiles();
+            filemanager.blastresultmanager.updatefiles();
         } else {
             System.out.println("deletion canceled");
         }
         } catch (Exception ex){
             System.out.println("no files deleted");
         }
-        updatengsfilelist();
+        updateblastresultfilelist();
     }
     @FXML
     public void deleteannotationfile(){
@@ -235,7 +286,6 @@ public class GUIController implements Initializable {
         }
         updateannotationfilelist();
     }
-    
     //BLAST
     public void addreferencedatabasefiles(ActionEvent event){
         FileChooser chooser = new FileChooser();
@@ -249,19 +299,57 @@ public class GUIController implements Initializable {
     @FXML
     public void annotate(ActionEvent event){
         ArrayList<File> selectedfiles = new ArrayList<File>();
-        
-        ObservableList selecteditems = annotationlist.getSelectionModel().getSelectedItems();
+        ObservableList selecteditems;
+        if (event.getSource().toString().contains("GO")){
+        selecteditems = fileslist.getSelectionModel().getSelectedItems();
         for (Object item : selecteditems){
+            selectedfiles.add(filemanager.blastresultmanager.getblastresultfiles().get(item));
+        }
+        } else {
+            selecteditems = annotationlist.getSelectionModel().getSelectedItems();
+            for (Object item : selecteditems){
             selectedfiles.add(filemanager.annotationmanager.getAnnotationfiles().get(item));
         }
+        }
+        
         if (uniprotcheck.isSelected()){
-            
+            parserloadbar.setdone(0);
+            parserloadbar.settotal(0);
+            UniprotAnnotator uniprotannotator = new UniprotAnnotator(selectedfiles,filemanager.uniprotsources,filemanager.annotationmanager.getAnnotationdirectory());
+            uniprotannotator.annotate();
+            timeline.play();
         }
         if (cazycheck.isSelected()){
-            CazyAnnotator cazyannotator = new CazyAnnotator(selectedfiles,filemanager.cazysources,filemanager.annotationmanager.getAnnotationdirectory());
-            cazyannotator.annotate();     
+            cazyqueueitems = selectedfiles;
+            cazyqueue = true;
         }
         updateannotationfilelist();
+    }
+    
+    public void updateloop(){
+        if (parserloadbar.gettotal() != 0){
+            progresslabel.setText(parserloadbar.getcurrentprocess());
+            double total = Double.parseDouble(Integer.toString(parserloadbar.gettotal()));
+            double done = Double.parseDouble(Integer.toString(parserloadbar.getdone()));
+            try{            
+            double progresspercent = done/total;
+            mainprogressbar.setProgress(progresspercent);
+            if (progresspercent == 1.0){
+                parserloadbar.setdone(0);
+                parserloadbar.settotal(0);
+                if (cazyqueue){
+                    CazyAnnotator cazyannotator = new CazyAnnotator(cazyqueueitems,filemanager.cazysources,filemanager.annotationmanager.getAnnotationdirectory());
+                    cazyannotator.annotate();
+                    cazyqueue = false;
+                } else {
+                    timeline.stop();
+                    System.out.println("pipeline complete");
+                    parserloadbar.setcurrentprocess("");
+                    filespane.getSelectionModel().select(0);
+                }
+            }
+            } catch (Exception ex){}    
+        }
     }
     
     @FXML
@@ -313,10 +401,11 @@ public class GUIController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         fileslist.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         annotationlist.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        updatengsfilelist();
+        updateblastresultfilelist();
         updateannotationfilelist();
-        fileslist.setItems(FXCollections.observableArrayList(filemanager.ngsmanager.getFilenames()));
+        fileslist.setItems(FXCollections.observableArrayList(filemanager.blastresultmanager.getFilenames()));
         updatecazyfilelist();
         updateuniprotfilelist();
+        timeline.setCycleCount(Timeline.INDEFINITE);
     }    
 }
