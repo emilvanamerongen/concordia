@@ -1,0 +1,2 @@
+uniprot	testuni1	0	test	www.lol.nl
+tabdb	test2	4	test2	www.cazy.com
