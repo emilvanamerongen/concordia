@@ -5,24 +5,45 @@
  */
 package concordia;
 
+import Annotator.Searcher;
+import Annotator.AnnotationProcess;
+import Annotator.AnnotationFileInfo;
 import CazyModule.CazyAnnotator;
+
 import FileManager.Filemanager;
 import Refdbmanager.dbmanager;
+import Refdbmanager.header;
 import Refdbmanager.refdb;
+import TabDelimitedModule.TabDelimitedIndexer;
+import Tools.ByteArrayWrapper;
+import UniprotModule.IDMappingIndexer;
 import UniprotModule.UniprotAnnotator;
+import UniprotModule.uniprotindexer;
+import gnu.trove.map.hash.THashMap;
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
+import static javafx.animation.Animation.INDEFINITE;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
@@ -33,6 +54,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -41,22 +63,32 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
+import javafx.util.converter.NumberStringConverter;
 
 /**
  *
@@ -66,12 +98,43 @@ public class GUIController implements Initializable {
     // <editor-fold desc="main gui FXML">
     @FXML TabPane pages;
     @FXML ImageView logoview;
+    @FXML Button refdbbutton;
+    @FXML Button dblinkbutton;
+    @FXML Button runannotationbutton;
+    @FXML Button quicksearchbutton;
+    @FXML Button serverbutton;
+    @FXML Button settingsbutton;
+    public static ConcurrentHashMap<String, Searcher> indexstorage = new ConcurrentHashMap<>();
+    
     // </editor-fold>
     
     // <editor-fold desc="database manager FXML">
     @FXML TableView dbmanagertable;
     public static dbmanager dbmanager = new dbmanager();
-    @FXML Pane refdbaddpane;
+    @FXML VBox refdbaddpane;
+    @FXML Button adddatabutton;
+    @FXML Button closebutton;
+    @FXML ChoiceBox typebox;
+    @FXML TextField namefield;
+    @FXML Label headerindexlabel;
+    @FXML TextField headerindexfield;
+    @FXML TextField priorityfield;
+    @FXML TextField importfilepathfield;
+    private ObservableList<String> typelist = FXCollections.observableArrayList();
+    // </editor-fold>
+    
+    // <editor-fold desc="database linking FXML">
+    @FXML HBox linkingspace;
+    HBox emptylinkingspace;
+    ArrayList<LinkBox> mylinkboxes = new ArrayList<>();
+    File linkfile = new File("linkfile.txt");
+    @FXML Button indexbutton;
+    @FXML ScrollPane linkingspacescrollpane;
+    @FXML Button indexprogressbutton;
+    @FXML Label indexprogresslabel;
+    @FXML AnchorPane indexprogressanchorpane;
+    @FXML VBox indexprogressbox;
+    Image loadinggif = new Image("file:src"+File.separator+"img"+File.separator+"ajax-loader.gif");
     // </editor-fold>
     
     // <editor-fold desc="annotation page FXML">
@@ -98,11 +161,20 @@ public class GUIController implements Initializable {
     @FXML Button directorybutton;
     @FXML Button annotatebutton;
     @FXML Button annotationaddbutton;
+    @FXML VBox annotatorbox;
+    @FXML ChoiceBox templatechoicebox;
+    @FXML VBox annotationprogressbox;
+    @FXML VBox annotationdatabox;
+    @FXML AnchorPane annotationprogressanchorpane;
+    private AnnotationProcess annotationprocess = null;
+    
+    public static ArrayList<DBpane> dbpanes = new ArrayList();
     // </editor-fold>
     
     // <editor-fold desc="settings page FXML">
-    @FXML CheckBox lowrammode;
+    @FXML TextField ramfield;
     @FXML Label directorylabel;
+    public Integer availableRAM = 6;
     // </editor-fold>
     
 
@@ -122,40 +194,154 @@ public class GUIController implements Initializable {
     // <editor-fold desc="database manager">
     //-----------------------------------------------------------------------------------------------------------------------------------------
     public void dbmanagerinit(){
-        // checkbox column
-
-        
+        //adddatapane init
+        typelist.addAll("tab-delimited","template (tab)","uniprot","uniprot ID-mapping");
+        typebox.setItems(typelist);
+        closebutton.setVisible(false);
+        typebox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+        @Override
+        public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
+            Integer boxindex = number2.intValue();
+            if (boxindex == 0 || boxindex == 1){
+                headerindexlabel.setDisable(false);
+                headerindexfield.setDisable(false);
+            } else { 
+                headerindexlabel.setDisable(true);
+                headerindexfield.setDisable(true);
+                headerindexfield.setText("0");
+        }
+        }});
+        // checkbox column 
         TableColumn<refdb, Boolean> active = new TableColumn<>("");
         active.setCellValueFactory( f -> f.getValue().getSelect());
         active.setCellFactory( tc -> new CheckBoxTableCell<>());
+        active.setMaxWidth(500.0);
         //type column
         TableColumn<refdb, String> typecolumn = new TableColumn<>("type");
         typecolumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         //db name column
         TableColumn<refdb, String> namecolumn = new TableColumn<>("database name");
         namecolumn.setCellValueFactory(new PropertyValueFactory<>("dbname"));
+        namecolumn.setCellFactory(TextFieldTableCell.<refdb>forTableColumn());
+        namecolumn.setOnEditCommit(
+        (CellEditEvent<refdb, String> t) -> {
+        ((refdb) t.getTableView().getItems().get(
+            t.getTablePosition().getRow())
+            ).setDbname(t.getNewValue());
+            dbmanager.setchangetostoragelines();
+        });
         //headerindex column
-        TableColumn<refdb, Integer> headerindexcolumn = new TableColumn<>("header index");
+        TableColumn<refdb, String> headerindexcolumn = new TableColumn<>("header index");
         headerindexcolumn.setCellValueFactory(new PropertyValueFactory<>("headerindex"));
+        headerindexcolumn.setCellFactory(TextFieldTableCell.<refdb>forTableColumn());
+        headerindexcolumn.setOnEditCommit(
+        (CellEditEvent<refdb, String> t) -> {
+        ((refdb) t.getTableView().getItems().get(
+            t.getTablePosition().getRow())
+            ).setHeaderindex(t.getNewValue());
+            dbmanager.setchangetostoragelines();
+            
+        });
         //file location column
         TableColumn<refdb, String> locationcolumn = new TableColumn<>("file location");
         locationcolumn.setCellValueFactory(new PropertyValueFactory<>("filepath"));
+        locationcolumn.setCellFactory(TextFieldTableCell.<refdb>forTableColumn());
+        locationcolumn.setOnEditCommit(
+        (CellEditEvent<refdb, String> t) -> {
+        ((refdb) t.getTableView().getItems().get(
+            t.getTablePosition().getRow())
+            ).setFilepath(t.getNewValue());
+            dbmanager.setchangetostoragelines();
+        });
         //online location column
         TableColumn<refdb, String> urlcolumn = new TableColumn<>("source URL");
         urlcolumn.setCellValueFactory(new PropertyValueFactory<>("remotelocation"));
+        urlcolumn.setCellFactory(TextFieldTableCell.<refdb>forTableColumn());
+        urlcolumn.setOnEditCommit(
+        (CellEditEvent<refdb, String> t) -> {
+        ((refdb) t.getTableView().getItems().get(
+            t.getTablePosition().getRow())
+            ).setRemotelocation(t.getNewValue());
+            dbmanager.setchangetostoragelines();
+        });
+        //priority column
+        TableColumn<refdb, String> prioritycolumn = new TableColumn<>("priority");
+        prioritycolumn.setCellValueFactory(new PropertyValueFactory<>("priority"));
+        prioritycolumn.setCellFactory(TextFieldTableCell.<refdb>forTableColumn());
+        prioritycolumn.setOnEditCommit(
+        (CellEditEvent<refdb, String> t) -> {
+        ((refdb) t.getTableView().getItems().get(
+            t.getTablePosition().getRow())
+            ).setPriority(t.getNewValue());
+            dbmanager.setchangetostoragelines();
+            regeneratefilelinkingtables();
+        });
         
+        //status column
+        TableColumn<refdb, String> statuscolumn = new TableColumn<>("Status");
+        statuscolumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        
+        locationcolumn.setMaxWidth(400.0);
         dbmanagertable.setItems(dbmanager.getReferencedatabases());
-        dbmanagertable.getColumns().addAll(active, typecolumn,namecolumn,headerindexcolumn,locationcolumn,urlcolumn);
+        dbmanagertable.getColumns().addAll(active,namecolumn,typecolumn,headerindexcolumn,locationcolumn,statuscolumn,prioritycolumn);
+        dbmanagertable.setEditable(true);
+        generatefilelinkingtables();
+    }
+    public void updatetable(){
+        dbmanagertable.setItems(dbmanager.getReferencedatabases());
+        regeneratefilelinkingtables();
     }
     
-    
-    public void updatedbmanagertable(){
-        
-        
+    @FXML public void importrefdb(){
+        String type = typebox.getSelectionModel().getSelectedItem().toString();
+        String name = namefield.getText();
+        String headerindex = "0";
+        if (! headerindexfield.getText().isEmpty()){
+        headerindex = headerindexfield.getText();
+        }
+        String localpath = importfilepathfield.getText();
+        String priority = priorityfield.getText();
+        dbmanager.adddb(type,name,headerindex,localpath,priority); 
+        typebox.getSelectionModel().select(0);
+        namefield.setText("");
+        headerindexfield.setText("");
+        importfilepathfield.setText("");
+        priorityfield.setText("");
+        namefield.setText("");
+        regeneratefilelinkingtables();
+        closedbpanes();
     }
     
-    public void setRefdbPopupVisibility(Boolean vis){
+    @FXML public void importfilepicker(){
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("select your reference database file");
+        File newfile = chooser.showOpenDialog(typebox.getScene().getWindow());
+        if (newfile != null){
+            importfilepathfield.setText(newfile.getAbsolutePath());
+        }
+    }
+    
+    @FXML public void removedb(){
+        dbmanager.removeselected();
+        updatetable();
+    }
+    
+    @FXML public void closedbpanes(){
         refdbaddpane.setVisible(false);
+        adddatabutton.setOpacity(1.0);
+        closebutton.setVisible(false);
+    }
+    
+    @FXML public void togglerefdbaddpane(){
+        if (refdbaddpane.isVisible()){
+            refdbaddpane.setVisible(false);
+            adddatabutton.setOpacity(1.0);
+            closebutton.setVisible(false);
+        } else {
+            refdbaddpane.setVisible(true);
+            adddatabutton.setOpacity(0.7);
+            closebutton.setVisible(true);
+        }
     }
     
     public void addrow(ArrayList<String> data){
@@ -163,15 +349,148 @@ public class GUIController implements Initializable {
         dbmanagertable.getItems().add(data);
     }
     
+    @FXML public void forceheaderrescan(){
+        for (refdb db : dbmanager.getReferencedatabases()){
+            if (db.getSelect().getValue()){
+                db.forceheaderreset();
+            }
+        }
+        dbmanager = new dbmanager();
+        regeneratefilelinkingtables();
+    }
+    
     // </editor-fold>
     
+    // <editor-fold desc="database linking">
+    public void generatefilelinkingtables(){
+        ObservableList<refdb> referencedatabases = dbmanager.getReferencedatabases();
+        Integer counter = 0;
+        while (counter <= 100){
+            for (refdb database : referencedatabases){
+                if (database.getPriority().equals(counter.toString())){
+                        mylinkboxes.add(new LinkBox(database.getDbname(), database.getHeaderset()));  
+                }
+            }
+            counter++;
+        }
+        linkingspace.getChildren().addAll(mylinkboxes);
+    }
+
+    public void regeneratefilelinkingtables(){
+        linkingspace.getChildren().clear();
+        linkingspace = emptylinkingspace;
+        mylinkboxes.clear();
+        generatefilelinkingtables();
+        
+    }
+    
+    public void linksave(){
+        
+    }
+    
+    public void linkread(){
+        
+        
+    }
+    
+    @FXML public void indexupdate() throws InterruptedException{
+        System.out.println("requesting indexupdate");
+        System.out.println("----------------------");
+        dbmanager.updateallindices();
+        indexertimeline.play();
+
+    }
+    
+    @FXML public void toggleindexprogresspane(){
+        indexprogressanchorpane.setVisible(!indexprogressanchorpane.isVisible());   
+    }
+    
+    // <editor-fold desc="indexerloop">
+
+    
+    Timeline indexertimeline = new Timeline(Timeline.INDEFINITE, new KeyFrame(Duration.millis(1000), ae -> indexerupdateloop()));
+    private Boolean indexeractive = false;
+    private Integer inactiverunnumber = 0;
+    private Integer activethreads = 0;
+    private Boolean indexerupdateserviceactive = false;
+    private Integer updatedots = 0;
+    
+    private void indexerupdateloop(){
+        if (!indexerupdateserviceactive){
+            indexerupdateserviceactive = true;
+            System.out.println("indexer update service started"); 
+        }
+        
+        Integer newactivethreads = 0;
+        for (refdb db : dbmanager.getReferencedatabases()){
+            newactivethreads += db.getIDmappingindexerthreads().size();
+            newactivethreads += db.getTabindexerthreads().size();
+            newactivethreads += db.getUniprotindexerthreads().size();
+        }
+        if (!Objects.equals(newactivethreads, activethreads)){
+            //change in amount of active indexers
+            activethreads = newactivethreads;
+            indexprogressbox.getChildren().clear();
+            for (refdb db : dbmanager.getReferencedatabases()){
+                for (uniprotindexer thread : db.getUniprotindexerthreads().values()){
+                indexprogressbox.getChildren().add(new ActiveThreadElement(thread,"uniprot"));
+                }
+                for (TabDelimitedIndexer thread : db.getTabindexerthreads().values()){
+                indexprogressbox.getChildren().add(new ActiveThreadElement(thread,"tab"));
+                }
+                for (IDMappingIndexer thread : db.getIDmappingindexerthreads().values()){
+                indexprogressbox.getChildren().add(new ActiveThreadElement(thread,"idmapping"));
+                }
+        }
+            
+            regeneratefilelinkingtables();
+        }
+        
+        if (indexeractive == false && activethreads != 0){
+            indexprogressbutton.setGraphic(new ImageView(loadinggif));
+            indexprogressbutton.getGraphic().setVisible(true);
+            indexeractive = true;         
+        } else if (indexeractive && activethreads == 0) {
+            indexprogressbutton.getGraphic().setVisible(false);
+            indexeractive = false;   
+        }
+        if (indexeractive){
+            inactiverunnumber = 0;
+            if (updatedots == 3){
+                updatedots = 0;
+            } else { 
+                updatedots++;
+            }
+            
+            indexprogresslabel.setText(activethreads+" indexers active"+"...".substring(0,updatedots));
+        } else {
+            inactiverunnumber++;
+            indexprogresslabel.setText(activethreads+" indexers active"+"...".substring(0,updatedots));
+        }
+        
+        if (inactiverunnumber == 10){
+            inactiverunnumber = 0;
+            indexertimeline.stop();
+            indexeractive = false;
+            indexerupdateserviceactive = false;
+            System.out.println("indexer update service stoped"); 
+        }       
+    }
+    
+
+    
+    // </editor-fold>
+    
+    
+    
+    // </editor-fold>
+
     // <editor-fold desc="run annotation">
     //-----------------------------------------------------------------------------------------------------------------------------------------
     UniprotAnnotator uniprotannotator = null;
     ArrayList<Button> activebuttons = new ArrayList<>();
     File uniprotidfile;
     //pipeline code 
-    Timeline timeline = new Timeline(Timeline.INDEFINITE, new KeyFrame(Duration.millis(1000), ae -> updateloop()));
     Boolean cazyqueue = false;
     Boolean uniprotqueue = false;
     ArrayList<File> cazyqueueitems;
@@ -182,34 +501,6 @@ public class GUIController implements Initializable {
     long tTotal = 0l;
 
 
-    //gui manager
-    @FXML
-    private void switchtab(ActionEvent event){
-        try {
-        String source = event.getSource().toString();
-        if (source.contains("Reference databases")){
-            pages.getSelectionModel().select(1);
-        }
-        else  if (source.contains("Pipelines")){
-            pages.getSelectionModel().select(2);
-        }
-        else if (source.contains("Run annotation")){
-            pages.getSelectionModel().select(3);
-        }
-        else if (source.contains("Settings")){
-            pages.getSelectionModel().select(4);
-        } else{
-            pages.getSelectionModel().select(0);
-        }
-        } catch (Exception ex){
-            System.out.println("error switching to page");
-        }
-    }  
-    
-    @FXML
-    private void resettab(){
-        filespane.getSelectionModel().select(0);
-    }
 
     /**
      *
@@ -229,23 +520,7 @@ public class GUIController implements Initializable {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    imageView2.setImage(IMAGE_empty);
-                    if(name.contains("ᚒF"))
-                        imageView2.setImage(IMAGE_F);
-                    else if(name.contains("ᚒC"))
-                        imageView2.setImage(IMAGE_C);
-                    else if(name.contains("ᚒU"))
-                        imageView2.setImage(IMAGE_U);
-                    if(name.contains("ᚒU") && name.contains("ᚒC"))
-                        imageView2.setImage(IMAGE_CU);
-                    if(name.contains("ᚒU") && name.contains("ᚒF"))
-                        imageView2.setImage(IMAGE_FU);
-                    if(name.contains("ᚒF") && name.contains("ᚒC"))
-                        imageView2.setImage(IMAGE_FC);
-                    if(name.contains("ᚒU") && name.contains("ᚒC") && name.contains("ᚒF"))
-                        imageView2.setImage(IMAGE_FUC);
                     setText(name.replace("ᚒC", "").replace("ᚒF", "").replace("ᚒU", ""));
-                    setGraphic(imageView2);
                 }
             }
         });    }
@@ -359,239 +634,182 @@ public class GUIController implements Initializable {
         }
         updateannotationfilelist();
     }
-    //BLAST
 
-    /**
-     *
-     * @param event
-     */
-    public void addreferencedatabasefiles(ActionEvent event){
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("add BLAST database locations");
-        ArrayList<File> newfiles = (ArrayList<File>) chooser.showOpenMultipleDialog(filespane.getScene().getWindow());
-        if (newfiles != null){
-            filemanager.addreferencedatabaselocations(newfiles);
-        }
-    }
-    // annotation window
 
-    /**
-     *
-     * @param event
-     */
-    @FXML
-    public void annotate(ActionEvent event){
-        System.out.println(uniprotidfile.getAbsoluteFile());
-        for (Button button : activebuttons){
-            button.setDisable(true);
-        }
-        ArrayList<File> selectedfiles = new ArrayList<File>();
-        ArrayList<File> uniprotoutfiles = new ArrayList<File>();
-        ObservableList selecteditems;
-
-        selecteditems = fileslist.getSelectionModel().getSelectedItems();
-        
-        for (Object item : selecteditems){
-            selectedfiles.add(filemanager.blastresultmanager.getblastresultfiles().get(item));
-            uniprotoutfiles.add(new File(filemanager.annotationmanager.getAnnotationdirectory()+File.separator+item+".ᚒU"));
-        } 
-        
-        tStart = System.currentTimeMillis();
-        
-        if (uniprotcheck.isSelected()){
-            uniprotqueue = true;
-            uniprotannotator = new UniprotAnnotator(selectedfiles,uniprotidfile,filemanager.uniprotsources,filemanager.annotationmanager.getAnnotationdirectory(), lowrammode.isSelected());
-            uniprotannotator.annotate();
-            timeline.play();
-        }
-        if (cazycheck.isSelected()){
-            cazyqueueitems = uniprotoutfiles;
-            cazyqueue = true;
-        }
-        if (cazycheck.isSelected() && !uniprotcheck.isSelected()){
-            cazyqueue = false;
-            CazyAnnotator cazyannotator = new CazyAnnotator(cazyqueueitems,filemanager.cazysources,filemanager.annotationmanager.getAnnotationdirectory());
-            cazyannotator.annotate();
-            timeline.play();
-        }
-    }
-    
-    /**
-     *
-     * @param event
-     */
-    @FXML
-    public void addannotation(ActionEvent event){
-        ArrayList<File> selectedfiles = new ArrayList<File>();
-        ObservableList selecteditems;
-        selecteditems = annotationlist.getSelectionModel().getSelectedItems();
-        for (Object item : selecteditems){
-            selectedfiles.add(filemanager.annotationmanager.getAnnotationfiles().get(item));}
-        
-        tStart = System.currentTimeMillis();
-        if (event.getSource().toString().contains("UniProt")){
-            UniprotAnnotator uniprotannotator = new UniprotAnnotator(selectedfiles,uniprotidfile,filemanager.uniprotsources,filemanager.annotationmanager.getAnnotationdirectory(), lowrammode.isSelected());
-            uniprotannotator.annotate();
-            timeline.play();
-        } else if (event.getSource().toString().contains("Cazy")){
-            CazyAnnotator cazyannotator = new CazyAnnotator(selectedfiles,filemanager.cazysources,filemanager.annotationmanager.getAnnotationdirectory());
-            cazyannotator.annotate();
-            timeline.play();
-        }
-    }
-
-    /**
-     *
-     */
-    public void updateloop(){
-        if (!uniprotannotator.mainthread.getComplete()){
-            progresslabel.setText(uniprotannotator.mainthread.getProcess()+" "+uniprotannotator.mainthread.getDone());
-            long total = uniprotannotator.mainthread.getTotal();
-            long done = uniprotannotator.mainthread.getDone();
-            double tDelta = System.currentTimeMillis() - tStart;
-            double elapsedSeconds = (tDelta / 1000.000000); 
-            double timeremaining = (elapsedSeconds/done)*(total-done);
-            if (timeremaining < 60.0){
-                int rounded = (int) Math.ceil(timeremaining);
-                timeremaininglabel.setText(rounded+" seconds remaining");
-            } else if (timeremaining < 360.0){
-                int remainingminutes = (int) Math.ceil(timeremaining / 60);
-                timeremaininglabel.setText(remainingminutes+" minutes remaining");
-            } else {
-                int remaininghours = (int) Math.ceil(timeremaining / 360);
-                timeremaininglabel.setText(remaininghours+" hours remaining");
-            }
-            try{            
-            double progresspercent = done/total;
-            
-            mainprogressbar.setProgress(progresspercent);
-//            //animation update
-//            if (uniprotannotator.mainthread.getProcess().contains("UniProt")){
-//                cazygif.setVisible(false);
-//                uniprotgif.setVisible(true);
-//            } else if (uniprotannotator.mainthread.getProcess().contains("Cazy")){
-//                uniprotgif.setVisible(false);
-//                cazygif.setVisible(true);
-//            } else {
-//                cazygif.setVisible(false);
-//                uniprotgif.setVisible(false);
-//            }
-            
-            if (progresspercent >= 1.0){
-                tTotal += elapsedSeconds;
-                tStart = System.currentTimeMillis();
-                updateannotationfilelist();
-            }
-            } catch (Exception ex){}    
-        }
-        else if (cazyqueue){
-                    CazyAnnotator cazyannotator = new CazyAnnotator(cazyqueueitems,filemanager.cazysources,filemanager.annotationmanager.getAnnotationdirectory());
-                    cazyannotator.annotate();
-                    cazyqueue = false;
-                    
-        } else {
-            timeline.stop();
-                System.out.println("complete");
-                progresslabel.setText("completed in: "+(tTotal/60)+" minutes");
-                tTotal = 0l;
-                mainprogressbar.setProgress(0.00);
-                filespane.getSelectionModel().select(0);
-                for (Button button : activebuttons){
-                    button.setDisable(false);
-                }
-        }
-    }
-
-    /**
-     *
-     * @param event
-     */
-    @FXML
-    public void addcazyfiles(ActionEvent event){
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("add cazy file locations");
-        List<File> newfiles = chooser.showOpenMultipleDialog(filespane.getScene().getWindow());
-        ArrayList<File> newfilesarray = new ArrayList<>();
-        newfilesarray.addAll(newfiles);
-        if (newfiles != null){
-            filemanager.addcazyfilelocations(newfilesarray);
-        }
-        updatecazyfilelist();
-    }
-
-    /**
-     *
-     * @param event
-     */
-    @FXML
-    public void adduniprotfiles(ActionEvent event){
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("add uniprot file locations");
-        List<File> newfiles = chooser.showOpenMultipleDialog(filespane.getScene().getWindow());
-        ArrayList<File> newfilesarray = new ArrayList<>();
-        newfilesarray.addAll(newfiles);
-        if (newfiles != null){
-            filemanager.adduniprotfilelocations(newfilesarray);
-        }
-        updateuniprotfilelist();
-    }
-
-    /**
-     *
-     * @param ex
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
-    @FXML 
-    public void setidmappingfile(ActionEvent ex) throws FileNotFoundException, IOException{
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("set uniprot idmapping file location");
-        File file = chooser.showOpenDialog(filespane.getScene().getWindow());
-        if (file != null){
-            uniprotidfile = new File(file.getAbsolutePath());
-            myproperties.setProperty("idmappinglocation", file.getAbsolutePath());
-            FileOutputStream out = new FileOutputStream("concordia.properties");
-            myproperties.store(out, "This is an optional header comment string");
-            idmappinglabel.setText(uniprotidfile.getAbsolutePath());
-        }
-    }
-    
-    /**
-     *
-     */
-    public void updatecazyfilelist(){
-        ArrayList<String> names = new ArrayList<>();
-        for (File file : filemanager.cazysources){
-            names.add(file.getName());
-        }
-        cazylist.setItems(FXCollections.observableArrayList(names));
-        cazylist1.setItems(FXCollections.observableArrayList(names));
-    }
-    
-    /**
-     *
-     */
-    public void updateuniprotfilelist(){
-        ArrayList<String> names = new ArrayList<>();
-        for (File file : filemanager.uniprotsources){
-            names.add(file.getName());
-        }
-        uniprotlist.setItems(FXCollections.observableArrayList(names));
-        uniprotlist1.setItems(FXCollections.observableArrayList(names));
-    }
-    
-    /**
-     *
-     */
-    @FXML
-    public void shrinkidfile(){
-        ShrinkIDfile shrinker = new ShrinkIDfile(uniprotidfile);
-        shrinker.shrink();
-        System.out.println("COMPLETE");
-    }
-    
     //-----------------------------------------------------------------------------------------------------------------------------------------------
     // </editor-fold>
+    
+    // <editor-fold desc="run annotation 2">
+    private void annotatorinit(){
+        ObservableList<refdb> referencedatabases = dbmanager.getReferencedatabases();
+        Integer counter = 0;
+        while (counter <= 100){
+            for (refdb database : referencedatabases){
+                if (database.getPriority().equals(counter.toString())){
+                    if (! database.getType().equals("template (tab)"))
+                        dbpanes.add(new DBpane(database));  
+                }
+            }
+            counter++;
+        }
+        annotatorbox.getChildren().addAll(dbpanes);
+        templatechoicebox.getItems().clear();
+        for (refdb database : dbmanager.getReferencedatabases()){
+            if (database.getType().equals("template (tab)")){
+            templatechoicebox.getItems().add(database.getDbname());}
+        }
+    }
+    
+    
+    @FXML public void startannotator(){
+        ArrayList<File> selecteddata = new ArrayList<File>();
+        ObservableList selecteditems;
+        selecteditems = fileslist.getSelectionModel().getSelectedItems();
+        for (Object item : selecteditems){
+            selecteddata.add(filemanager.blastresultmanager.getblastresultfiles().get(item));
+        }
+        ArrayList<refdb> annotationsources = new ArrayList<refdb>();
+        for (DBpane dbpane : GUIController.dbpanes){
+            refdb database = dbpane.getDatabase();
+            if (dbpane.checkbox.isSelected()){
+                annotationsources.add(database);
+            }
+        }
+        refdb template = null;
+        String choiceboxselection = templatechoicebox.getSelectionModel().getSelectedItem().toString();
+        for (refdb mydb : dbmanager.getReferencedatabases()){
+            if (mydb.getDbname().equals(choiceboxselection)){
+                template = mydb;
+                break;
+            }
+        }
+        
+        if (template!=null && selecteddata.size()!=0 && annotationsources.size()!=0){
+        annotationprocess = new AnnotationProcess(selecteddata,template,annotationsources);
+        annotationprocess.start();
+        } else {
+            System.out.println("Annotation not started!");
+        }
+        for (refdb annotationsource : annotationsources){
+            for (header myheader : annotationsource.getHeaderset()){
+                if (myheader.getIndexed()){
+                    annotationdatabox.getChildren().add(new IndexSourceElement(myheader));
+                }
+            }
+        }
+        annotatortimeline.play();
+    }
+    
+    @FXML public void preloaddata(){
+        ArrayList<refdb> annotationsources = new ArrayList<refdb>();
+        for (DBpane dbpane : GUIController.dbpanes){
+            refdb database = dbpane.getDatabase();
+            if (dbpane.checkbox.isSelected()){
+                annotationsources.add(database);
+            }
+        }
+        for (refdb mydb : annotationsources){
+                
+                for (header myheader : mydb.getHeaderset()){
+                    if (myheader.getIndexed()){
+                        boolean alreadyloaded = false;
+                        try{
+                            alreadyloaded = GUIController.indexstorage.get(myheader.getSourcedb()).getData().containsKey(myheader.getHeaderstring());
+                        } catch (Exception ex){}
+                        
+                        if (! alreadyloaded){
+                            loadindex(myheader, mydb);
+                        } 
+                    }
+                }
+            }
+    }
+    
+    public void loadindex(header myheader, refdb db){ 
+            THashMap<ByteArrayWrapper, long[]> index = new THashMap<>(1,0.75f);
+                System.out.println("loading: "+filemanager.getIndexdirectory()+File.separator+myheader.getSourcedb()+"."+myheader.getHeaderstring()+".ser");
+                try
+                {
+                   FileInputStream fis = new FileInputStream(filemanager.getIndexdirectory()+File.separator+myheader.getSourcedb()+"."+myheader.getHeaderstring()+".ser");
+                   ObjectInput ois = new ObjectInputStream(fis);
+
+                   index = (THashMap) ois.readObject();
+                   System.out.println(index.size());
+
+                   GUIController.indexstorage.putIfAbsent(myheader.getSourcedb(), new Searcher(db));
+                   GUIController.indexstorage.get(myheader.getSourcedb()).adddata(index, myheader);
+                   ois.close();
+                   fis.close();
+                   
+                }catch(IOException ioe)
+                {
+                   ioe.printStackTrace();
+                   return;
+                }catch(ClassNotFoundException c)
+                {
+                   System.out.println("Class not found");
+                   c.printStackTrace();
+                   return;
+                }
+                System.out.println("Index loaded");
+                
+                
+        }
+    
+    // <editor-fold desc="annotatorloop">
+
+    
+    Timeline annotatortimeline = new Timeline(Timeline.INDEFINITE, new KeyFrame(Duration.millis(1000), ae -> annotatorupdateloop()));
+
+    private Boolean annotatorupdateserviceactive = false;
+    private Integer annotatorupdatedots = 0;
+    private Integer prevactivefiles = 0;
+    
+    private void annotatorupdateloop(){
+        if (!annotatorupdateserviceactive){
+            annotatorupdateserviceactive = true;
+            System.out.println("annotator update service started"); 
+            annotationprogressanchorpane.setVisible(true);
+            for (AnnotationFileInfo infodata : annotationprocess.getProgressset().values()){
+                annotationprogressbox.getChildren().add(new AnnotatorFileElement(infodata));
+            }
+        }
+        int activefiles = annotationprocess.getProgressset().size();
+        if (prevactivefiles != activefiles){
+            prevactivefiles = activefiles;
+            annotationprogressbox.getChildren().clear();
+            for (AnnotationFileInfo infodata : annotationprocess.getProgressset().values()){
+                annotationprogressbox.getChildren().add(new AnnotatorFileElement(infodata));
+            }
+        }
+        
+        Boolean done = false;
+        try {
+            done = annotationprocess.getDone();
+            
+            
+        } catch (Exception ex){}
+
+
+        
+        if (done){
+            inactiverunnumber = 0;
+            annotatorupdateserviceactive = false;
+            annotationdatabox.getChildren().clear();
+            System.out.println("indexer update service stoped"); 
+            annotatortimeline.stop();
+            
+        }       
+    }
+    
+
+    
+    // </editor-fold>
+    
+    // </editor-fold>
+    
+
+    
     
     // <editor-fold desc="settings">
     //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -628,10 +846,92 @@ public class GUIController implements Initializable {
     private void setdirectorylabel(){
         directorylabel.setText(filemanager.getProjectdirectory().getAbsolutePath());
     }
+    
+    @FXML
+    private void changeAvailableRAM(){
+        try{
+        availableRAM = Integer.parseInt(ramfield.getText());
+        myproperties.setProperty("availableRAM", availableRAM.toString());
+        myproperties.store(new FileOutputStream("concordia.properties"), "");       
+        }catch (Exception ex){}
+    }
+    
     // </editor-fold>
     
     // <editor-fold desc="main gui">
     //-----------------------------------------------------------------------------------------------------------------------------------------
+        //gui manager
+    @FXML
+    private void switchtab(ActionEvent event){
+        try {
+        String source = event.getSource().toString();
+        if (source.contains("Reference databases")){
+            pages.getSelectionModel().select(1);
+            refdbbutton.setDisable(true);
+            dblinkbutton.setDisable(false);
+            runannotationbutton.setDisable(false);
+            settingsbutton.setDisable(false);
+            serverbutton.setDisable(false);
+            quicksearchbutton.setDisable(false);
+        }
+        else  if (source.contains("Database linking")){
+            pages.getSelectionModel().select(2);
+            refdbbutton.setDisable(false);
+            dblinkbutton.setDisable(true);
+            runannotationbutton.setDisable(false);
+            settingsbutton.setDisable(false);
+            serverbutton.setDisable(false);
+            quicksearchbutton.setDisable(false);
+        }
+        else if (source.contains("Run annotation")){
+            pages.getSelectionModel().select(3);
+            refdbbutton.setDisable(false);
+            dblinkbutton.setDisable(false);
+            runannotationbutton.setDisable(true);
+            settingsbutton.setDisable(false);
+            serverbutton.setDisable(false);
+            quicksearchbutton.setDisable(false);
+        }
+        else if (source.contains("Quick search")){
+            pages.getSelectionModel().select(4);
+            refdbbutton.setDisable(false);
+            dblinkbutton.setDisable(false);
+            runannotationbutton.setDisable(false);
+            quicksearchbutton.setDisable(true);
+            serverbutton.setDisable(false);
+            settingsbutton.setDisable(false);
+        }
+        else if (source.contains("Server")){
+            pages.getSelectionModel().select(5);
+            refdbbutton.setDisable(false);
+            dblinkbutton.setDisable(false);
+            serverbutton.setDisable(true);
+            runannotationbutton.setDisable(false);
+            settingsbutton.setDisable(false);
+            quicksearchbutton.setDisable(false);
+        }
+        else if (source.contains("Settings")){
+            pages.getSelectionModel().select(6);
+            refdbbutton.setDisable(false);
+            dblinkbutton.setDisable(false);
+            runannotationbutton.setDisable(false);
+            settingsbutton.setDisable(true);
+            serverbutton.setDisable(false);
+            quicksearchbutton.setDisable(false);
+        } else{
+            pages.getSelectionModel().select(0);
+            refdbbutton.setDisable(false);
+            dblinkbutton.setDisable(false);
+            runannotationbutton.setDisable(false);
+            settingsbutton.setDisable(false);
+            serverbutton.setDisable(false);
+            quicksearchbutton.setDisable(false);
+            
+        }
+        } catch (Exception ex){
+            System.out.println("error switching to page");
+        }
+    }  
     
     
     // </editor-fold>
@@ -643,12 +943,10 @@ public class GUIController implements Initializable {
         logoview.setImage(logo1);
         fileslist.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         annotationlist.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        emptylinkingspace = linkingspace;
         updateblastresultfilelist();
         updateannotationfilelist();
         fileslist.setItems(FXCollections.observableArrayList(filemanager.blastresultmanager.getFilenames()));
-        updatecazyfilelist();
-        updateuniprotfilelist();
-        timeline.setCycleCount(Timeline.INDEFINITE);
         activebuttons.add(activebutton1);
         activebuttons.add(activebutton2);
         activebuttons.add(activebutton3);
@@ -660,15 +958,19 @@ public class GUIController implements Initializable {
         activebuttons.add(adduniprotbutton);
         try {
             myproperties.load(new FileInputStream("concordia.properties"));
-            uniprotidfile = new File(myproperties.getProperty("idmappinglocation"));
-            idmappinglabel.setText(uniprotidfile.getAbsolutePath());
+            availableRAM = Integer.parseInt(myproperties.getProperty("availableRAM"));
+            ramfield.setText(availableRAM.toString());
         } catch (Exception ex) {       
         }
         //settings
         setdirectorylabel();
         //database manager
         dbmanagerinit();
-        updatedbmanagertable();
+        //annotator
+        annotatorinit();
+        //timelines
+        indexertimeline.setCycleCount(INDEFINITE);
+        annotatortimeline.setCycleCount(INDEFINITE);
         
     }    
     // </editor-fold>

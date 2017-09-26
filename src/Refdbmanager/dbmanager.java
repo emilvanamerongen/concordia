@@ -71,8 +71,10 @@ public class dbmanager {
             FileWriter writer = new FileWriter(locationstorage);
             for (String line : locationstoragelines){
                 writer.write(line);
+                writer.write("\n");
             }
             writer.close();
+            System.out.println("dbmanager: saved");
             
         } catch (IOException ex) {
             Logger.getLogger(dbmanager.class.getName()).log(Level.SEVERE, null, ex);
@@ -80,8 +82,55 @@ public class dbmanager {
         
     }
     
-    public void adddb(String type, String name, String headerindex, String filelocation, String remoteurl){
-        locationstoragelines.add(type+"\t"+name+"\t"+headerindex+"\t"+filelocation+"\t"+remoteurl);  
+    public void adddb(String type, String name, String headerindex, String filelocation,String priority){
+        locationstoragelines.add(type+"\t"+name+"\t"+headerindex+"\t"+filelocation+"\t"+" "+"\t"+priority);  
+        rewrite();
+        read();
+    }
+    
+    public void setchangetostoragelines(){
+        for (refdb db : referencedatabases){
+            String writestring = db.getType()+"\t"+db.getDbname()+"\t"+db.getHeaderindex()+"\t"+db.getFilepath()+"\t"+db.getRemotelocation()+"\t"+db.getPriority();
+            locationstoragelines.set(db.getStorefileindex(), writestring);
+        }
+        rewrite();
+        read();
+             
+    }
+    public void updateallindices(){
+        for (refdb database : referencedatabases){
+            database.scanindexrequests();
+        }
+    }
+    
+    
+    public void removedb(String filelocation){
+        int removeindex = -1;
+        for (refdb db : referencedatabases){
+            if (db.getFilepath() == filelocation){
+                removeindex = db.getStorefileindex();
+            }
+        }
+        if (removeindex != -1){
+            locationstoragelines.remove(removeindex);
+            rewrite();
+            read();
+        } else {
+            System.out.println("ERROR unable to remove db from location file");
+        }
+    }
+    
+    
+    public void removeselected(){
+        int removeindex = -1;
+        for (refdb db : referencedatabases){
+            if (db.getSelect().getValue()){
+                System.out.println(db.getStorefileindex());
+                removeindex = db.getStorefileindex();
+                String remove = locationstoragelines.remove(removeindex);
+                System.out.println(remove);
+            }
+        }
         rewrite();
         read();
     }

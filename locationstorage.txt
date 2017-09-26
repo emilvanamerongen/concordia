@@ -1,2 +1,5 @@
-uniprot	testuni1	0	test	www.lol.nl
-tabdb	test2	4	test2	www.cazy.com
+uniprot ID-mapping	UniProt idmapping	0	D:\idmapping.dat	4	2
+template (tab)	RAPSearch result	4	C:\Users\emil3\Documents\concordia\blastresultdata\f2_compost_t_5_exp_1_TACGCT_L001_R2_001_000000000-ACNW4.filt.fastq rapsearch.m8		0
+tab-delimited	Cazy	0	C:\Users\emil3\Documents\concordia\annotatiedata\CAZy-file-done.txt	 	9
+uniprot	Swiss-Prot	0	C:\Users\emil3\Documents\concordia\annotatiedata\uniprot_sprot.dat	 	3
+uniprot	TrEMBL	0	D:\uniprot_trembl.dat	 	4

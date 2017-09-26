@@ -37,26 +37,11 @@ public class Filemanager {
      *
      */
     public Annotationmanager annotationmanager = new Annotationmanager();
-    //databases
-    private File cazyfilelocations;
-    private File uniprotfilelocations;
-    private File referencedatabaselocations;
 
-    /**
-     *
-     */
-    public ArrayList<File> cazysources = new ArrayList<>();
+    private File headerdirectory;
+    private File indexdirectory;
 
-    /**
-     *
-     */
-    public ArrayList<File> uniprotsources = new ArrayList<>();
 
-    /**
-     *
-     */
-    public ArrayList<File> referencedatabasefiles = new ArrayList<>();
-    
     //properties file
     private Properties myproperties = new Properties();
     /**
@@ -66,12 +51,18 @@ public class Filemanager {
         try {
         myproperties.load(new FileInputStream("concordia.properties"));
         projectdirectory = new File(myproperties.getProperty("projectfolder"));
+        headerdirectory = new File(myproperties.getProperty("projectfolder")+File.separator+"headers");
+        indexdirectory = new File(myproperties.getProperty("projectfolder")+File.separator+"indexstorage");
         if (! projectdirectory.exists()){
             errorinlocation = true;
+        } else if (!headerdirectory.exists() || !indexdirectory.exists()){
+            headerdirectory.mkdir();
+            indexdirectory.mkdir();
         }
-        }catch (Exception ex){System.out.println("error");}
         
-        if (myproperties.getProperty("projectfolder").length() < 2 || errorinlocation){
+        }catch (Exception ex){System.out.println("error");errorinlocation = true;}
+        
+        if (errorinlocation){
            
             OutputStream out = null;
             try {
@@ -80,6 +71,11 @@ public class Filemanager {
                 System.out.println(newpath);
                 projectdirectory = new File(newpath);
                 projectdirectory.mkdirs();
+                headerdirectory = new File(newpath+File.separator+"headers");
+                headerdirectory.mkdir();
+                indexdirectory = new File(newpath+File.separator+"headers");
+                indexdirectory.mkdir();
+                
                 if (!projectdirectory.exists()){System.out.println("ERROR generating project directory at: "+newpath);}
                 myproperties.setProperty("projectfolder", projectdirectory.getAbsolutePath());
                 out = new FileOutputStream("concordia.properties");
@@ -97,7 +93,6 @@ public class Filemanager {
         }
         blastresultmanager.setblastresultdirectory(new File(projectdirectory.getAbsolutePath()+File.separator+"blastresultdata"));
         annotationmanager.setAnnotationdirectory(new File(projectdirectory.getAbsolutePath()+File.separator+"annotation")); 
-        updatelocationfiles();
     }
     
     /**
@@ -111,138 +106,8 @@ public class Filemanager {
     /**
      *
      */
-    public void updatelocationfiles(){
-        // location files
-        cazysources.clear();
-        uniprotsources.clear();
-        referencedatabasefiles.clear();
-        referencedatabaselocations = new File(projectdirectory.getAbsolutePath()+File.separator+"referencedatabaselocations.txt");
-        if (referencedatabaselocations.exists()){
-            try {
-                for (String line : Files.readAllLines(Paths.get(referencedatabaselocations.getAbsolutePath()))){
-                    referencedatabasefiles.add(new File(line.replace("\n", "")));
-                }     
-            } catch (IOException ex) {Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);}
-        } else {
-            try {
-                referencedatabaselocations.createNewFile();
-            } catch (IOException ex) {
-                Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        cazyfilelocations = new File(projectdirectory.getAbsolutePath()+File.separator+"cazyfilelocations.txt");
-        if (cazyfilelocations.exists()){
-            try {
-                for (String line : Files.readAllLines(Paths.get(cazyfilelocations.getAbsolutePath()))){
-                    cazysources.add(new File(line.replace("\n", "")));
-                }     
-            } catch (IOException ex) {Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);}
-        } else {
-            try {
-                cazyfilelocations.createNewFile();
-            } catch (IOException ex) {
-                Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        uniprotfilelocations = new File(projectdirectory.getAbsolutePath()+File.separator+"uniprotfilelocations.txt");
-        if (uniprotfilelocations.exists()){
-            try {
-                for (String line : Files.readAllLines(Paths.get(uniprotfilelocations.getAbsolutePath()))){
-                    uniprotsources.add(new File(line.replace("\n", "")));
-                }     
-            } catch (IOException ex) {Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);}
-        } else {
-            try {
-                uniprotfilelocations.createNewFile();
-            } catch (IOException ex) {
-                Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-    
-    /**
-     *
-     * @param newcazylocationfiles
-     */
-    public void addcazyfilelocations(ArrayList<File> newcazylocationfiles){
-        String outputstring = "";
-        BufferedWriter writer = null;
-        try {
-            writer = new BufferedWriter(new FileWriter(cazyfilelocations.getAbsolutePath()));
-        } catch (IOException ex) {
-            Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        for (File file : newcazylocationfiles){
-            try {
-                writer.append(file.getAbsolutePath());
-                writer.newLine();
-            } catch (IOException ex) {
-                Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        try {
-            writer.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        updatelocationfiles();
-    }
-    
-    /**
-     *
-     * @param newuniprotlocationfiles
-     */
-    public void adduniprotfilelocations(ArrayList<File> newuniprotlocationfiles){
-        String outputstring = "";
-        BufferedWriter writer = null;
-        try {
-            writer = new BufferedWriter(new FileWriter(uniprotfilelocations.getAbsolutePath()));
-        } catch (IOException ex) {
-            Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        for (File file : newuniprotlocationfiles){
-            try {
-                writer.append(file.getAbsolutePath());
-                writer.newLine();
-            } catch (IOException ex) {
-                Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        try {
-            writer.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        updatelocationfiles();
-    }
-    
-    /**
-     *
-     * @param newreferencedatabaselocations
-     */
-    public void addreferencedatabaselocations(ArrayList<File> newreferencedatabaselocations){
-        String outputstring = "";
-        BufferedWriter writer = null;
-        try {
-            writer = new BufferedWriter(new FileWriter(referencedatabaselocations.getAbsolutePath()));
-        } catch (IOException ex) {
-            Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        for (File file : newreferencedatabaselocations){
-            try {
-                writer.append(file.getAbsolutePath());
-                writer.newLine();
-            } catch (IOException ex) {
-                Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        try {
-            writer.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Filemanager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        updatelocationfiles();
-    }
+
+   
     /**
      * @param projectdirectory the projectdirectory to set
      * @throws java.io.FileNotFoundException
@@ -255,10 +120,35 @@ public class Filemanager {
         myproperties.store(out, "This is an optional header comment string");
         blastresultmanager.setblastresultdirectory(new File(projectdirectory.getAbsolutePath()+File.separator+"blastresultdata"));
         annotationmanager.setAnnotationdirectory(new File(projectdirectory.getAbsolutePath()+File.separator+"annotation"));
-        cazyfilelocations = new File(projectdirectory.getAbsolutePath()+File.separator+"cazyfilelocations.txt");
-        uniprotfilelocations = new File(projectdirectory.getAbsolutePath()+File.separator+"uniprotfilelocations.txt");
-        referencedatabaselocations = new File(projectdirectory.getAbsolutePath()+File.separator+"referencedatabaselocations.txt");
-        updatelocationfiles();
+
         out.close();
     }  
+
+    /**
+     * @return the headerdirectory
+     */
+    public File getHeaderdirectory() {
+        return headerdirectory;
+    }
+
+    /**
+     * @param headerdirectory the headerdirectory to set
+     */
+    public void setHeaderdirectory(File headerdirectory) {
+        this.headerdirectory = headerdirectory;
+    }
+
+    /**
+     * @return the indexdirectory
+     */
+    public File getIndexdirectory() {
+        return indexdirectory;
+    }
+
+    /**
+     * @param indexdirectory the indexdirectory to set
+     */
+    public void setIndexdirectory(File indexdirectory) {
+        this.indexdirectory = indexdirectory;
+    }
 }
