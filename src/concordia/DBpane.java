@@ -38,10 +38,10 @@ public class DBpane extends StackPane{
 
         this.database = database;
         checkbox.setText(database.getDbname());
-        if (database.getType().equals("template (tab)")){
-           checkbox.setDisable(true);
-           checkbox.setSelected(true);
-        }
+//        if (database.getType().equals("template")){
+//           checkbox.setDisable(true);
+//           checkbox.setSelected(true);
+//        }
         this.getChildren().addAll(loadingbar,checkbox);
         
     }

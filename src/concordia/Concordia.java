@@ -7,6 +7,8 @@ package concordia;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,8 +22,8 @@ import server.ConcordiaServer;
  */
 
 public class Concordia extends Application {
-    
-    static Boolean server = false;
+    //public static ConcordiaQueue queue = new ConcordiaQueue();
+    static Boolean local = true;
     static Boolean remote = false;
     public static Boolean serveractive = false;
     
@@ -30,7 +32,7 @@ public class Concordia extends Application {
     public void start(Stage stage) throws Exception {
         Thread.currentThread().setName("CONCORDIA");
         System.out.println("-------------------------");
-        if (!server && !remote){
+        if (local && !remote){
             System.out.println("STARTING CONCORDIA IN LOCAL MODE");
             Parent root = FXMLLoader.load(Concordia.class.getResource("localGUI.fxml"));   
             Scene scene = new Scene(root);
@@ -51,21 +53,20 @@ public class Concordia extends Application {
     public static void main(String[] args) {
         // check command line arguments and set server/remote booleans accordingly
         try{
-            if (args[0].contains("SERVER")||args[0].contains("server")){
-                server = true;
+            if (args[0].contains("LOCAL")||args[0].contains("local")){
+                local = true;
             } else if (args[0].contains("REMOTE")||args[0].contains("remote")){
                 remote = true;
             }
         } catch (Exception ex){}
-        if (server){
+        if (!local && !remote){
             System.out.println("STARTING CONCORDIA IN SERVER MODE");
             serveractive = true;
             ConcordiaServer concordiaserverthread = new ConcordiaServer();
             concordiaserverthread.start();
-        } else{
+        } else {
             launch(args);
         }
-        
     }
     
 }

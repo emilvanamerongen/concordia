@@ -1,0 +1,604 @@
+impaired liver function
+abdominal discomfort	<	abdominal bloating
+abdominal discomfort	<	abdominal cramps
+abdominal discomfort
+abdominal distension
+abdominal pain
+abnormal behavior
+abnormal body conformation
+abnormal reflexes
+dyspnea
+abscess formation
+abscess formation	<	abscesses around the anus
+abscess formation	<	abscesses in the groin area
+acalculia
+accumulation of fluid in the abdomen
+acute respiratory distress
+acute shock
+adenopathy
+agitation
+agraphia
+alterations in sensorium
+altered consciousness
+altered mental status
+anal warts
+anemia
+anogenital warts
+anorexia
+anxiety
+arthralgia
+ascending regional lymphadenopathy
+asthma
+hay fever
+ataxia
+dysautonomia	<	autonomic instability
+PTSD
+azotemia
+back pain
+back pain	<	backache
+bad breath
+bad dreams
+becomes pigmented
+behavioral abnormalities
+behavioral abnormalities	<	behavioral change
+behavioral abnormalities	<	behavioral changes
+behavioral abnormalities	<	behaviour disturbances
+bilateral corneal opacity
+bleeding
+bleeding	<	bleeding from the bronchopulmonary
+bleeding	<	bleeding from the mouth
+bleeding	<	bleeding from the nose or gums
+bleeding	<	bleeding from the oral
+bleeding	<	bleeding from venepuncture sites
+bleeding	<	bleeding gums
+bleeding	<	bleeding in the eyes
+bleeding	<	bleeding into skin
+bleeding	<	bleeding under the skin
+blisters
+bloated abdomens
+bleeding	<	blood in the feces
+bleeding	<	blood in the semen
+bleeding	<	blood in the sputum
+bleeding	<	blood in the urine
+bleeding	<	blood spots
+bleeding	<	blood-stained nasal discharge
+bleeding	<	bloody diarrhea
+bleeding	<	bloody sputum
+blueness around the mouth
+bluish skin due to lack of oxygen
+blurred vision
+blurred vision	<	blurres vision
+body ache
+bone lesions
+bone pain
+bradycardia
+breathing difficulties
+breathing difficulties	<	breathing distress
+breathing difficulties	<	breathing problems
+bronchial exudate
+bronchospasm
+bulging eyes
+burning pain
+burning pain	<	burning sensation during urination
+hemolytic anemia
+causing bones to be deformed
+cavitations of the lungs
+cellulitis
+cerebellar ataxia
+cerebellar syndrome
+cerebral hemorrhage
+cervical lymphadenopathy
+cervical rigidity
+cervical warts
+cessation of rumination
+change in bowel habits
+changes in personality
+chest discomfort
+chest pain
+chest tightness
+chills
+choroiditis
+clay-colored bowel movements
+clay-colored stools
+cognitive deterioration
+cognitive disturbances
+cognitive impairment
+cold sores
+coma
+complete paralysis
+confusion
+confusional syndrome
+congestion of ocular conjunctivae
+congestive heart failure
+conjunctival congestion
+conjunctival suffusion
+conjunctivitis
+constipation
+convulsions
+coryza
+coughing	<	cough
+coughing	<	cough with mucus
+coughing	<	cough with sputum
+coughing
+cracking
+cramps	<	cramping
+cramps
+cranial nerve deficits
+cranial nerve palsies
+crumbly nail 
+cyanosis
+cyanosis	<	cyanosis of the tongue
+dark urine
+decreased appetite
+decreased fetal growth
+placental abruption
+decreased level of consciousness
+decreased weight
+defective judgment
+degeneration of neuronal tissue
+dehydration
+delirium
+dementia
+dental deformities
+depression
+dermatitis
+descending muscle paralysis
+desquamation
+deterioration of memory
+diaphoresis
+diarrhea
+difficulty breathing
+difficulty chewing
+difficulty concentrating
+difficulty feeding
+difficulty breathing	<	difficulty in breathing
+difficulty in walking
+difficulty speaking
+difficulty swallowing
+digestive disturbances
+diplopia
+discharge from the penis	<	discharge from penis
+discharge from the penis
+discharge of pus
+disorientation
+distention	<	distension
+distention
+disturbance of heart rate
+disturbances in sleep
+dizziness
+draining of sinuses
+drowsiness
+dry cough
+dysarthria
+dyspepsia
+dysphagia
+dysphasia
+dysphonia
+dyspnea
+ear discharge
+ecchymoses
+ecchymoses	<	ecchymoses on the tongue
+edema of extremities
+emaciation
+emotional anxiety
+enlarged abdomen
+enlarged spleen
+enlargement of heart
+epigastric pain
+epistaxis
+erectile dysfunction
+eroded areas between the toes
+eruption of rose-colored spots
+erythematous rash
+eschars	<	eschar
+eschars
+excessive salivation
+exhaustion
+external bleeding
+eye damage
+eye redness
+eyelid edema
+facial pain
+facial swelling
+failure to thrive
+falling blood pressure
+fat loss in face
+fatigue
+feeding difficulties
+fever
+fever	<	fevers
+hortness of breath
+fibrosis
+finger agnosia
+fissures
+fistulas
+flashbacks
+fluid-filled blister formation
+flushed face
+flushing of the face
+focal neurological signs
+followed by collapse
+formation of fistulas
+formation of tubercles
+formation of ulcers
+foul breath
+shock
+frightening thoughts
+frothy sputum
+gait ataxia
+gangrene
+gas production
+gasping
+gastrointestinal bleeding	<	gastointestinal bleeding
+gastrointestinal bleeding
+genitourinary tracts
+groin pain
+growth retardation
+gummatous ulcers
+hairy fleece in lambs
+hallucinations
+mouth breathing
+head tilt
+headaches	<	headache
+headaches
+heart failure
+hematemesis
+hemiparesis
+hemiplagia
+hemoptysis
+hemorrhages
+hemorrhages < hemorrhagic
+hepatomegaly
+hepatosplenomegaly
+herpetic lesions
+hiccups
+fever
+highly repetitive behavior
+hindlimb weakness
+hoof inflammation
+huddling
+hydrocephalus
+hydrophobia
+hyperesthesia
+Hyperkeratosis 	<	hyperkeratotic
+hyperlipidemia
+hypoalbuminemia
+hyponasality
+hypotension
+hypoxemia
+hypoxia
+impaired speech
+incoordination
+increased vaginal discharge
+indigestion
+inflammatory infiltrations
+inguinal lymphadenitis
+insomnia
+intellectual disability
+hemorrhages < hemorrhage
+interstitial keratitis
+intestinal bleeding
+involuntary movements
+irregular heartbeat
+irritability
+irritation
+itching
+itching	<	itchy
+jaundice
+joint pains	<	joint aches
+joint pain
+joint pains
+keratotic plantar surface
+lack of appetite
+lacrimation
+lameness
+blisters
+large joints
+lassitude
+lesions
+lethargy
+leukopenia
+limb pain
+liver enlargement
+loss of appetite
+loss of bladder sensation
+urine retention
+loss of conjugate eye movements
+loss of head control
+loss of reflexes
+loss of strength
+loss of the voice
+low blood pressure
+lumbosacral region
+lumps in long bones
+lung lesions
+lymphadenitis
+lymphadenopathy
+lymphangitis
+maceration
+maculopapular rash	<	maculopapular
+maculopapular rash	<	maculopapular or petechial rash
+maculopapular rash
+malaise
+malnutrition
+marked leukocytosis
+mediastinal lymphadenopathy
+melena
+memory loss
+meningeal irritation
+meningism
+meningitis
+menorrhagia
+microaneurysms
+mild bleeding
+mobile swelling in the skin
+moist patches in the mouth
+mood disturbances
+most common on h
+motor dysfunction
+motor impairment
+motor loss
+mouth sores
+movement impairment
+mucopurulent discharge from the eye
+mucopurulent nasal discharge
+mucosal bleeding
+mucus
+mucus production
+organ failure	<	multiorgan failure
+mummified fetuses
+murmur
+murmurs
+muscle ache
+muscle aches
+muscle pain
+muscle pains
+muscle rigidity
+muscle spasms
+muscle stiffness
+muscle tightness
+muscle tremors
+muscle weakness
+muscular atrophy
+muscular hypotonia (weak muscle tone)
+myalgia
+myonecrosis
+myositis
+nasal discharge
+nasal flaring
+nasal mucosa
+nausea
+neck pain
+neck stiffness
+necrosis
+necrotic lesions
+neurologic changes
+neurologic disturbances
+neuropathy
+sweating	<	night sweats
+nodules	<	nodular lesions
+nodules
+non-productive cough
+nonfocal neurologic abnormalities
+non-productive cough	<	nonproductive cough
+nosebleeds
+numbness
+nystagmus
+obstructive hydrocephalus	<	obstructing hydrocephalus
+ocular discharge
+ocular muscle palsies
+oculonasal discharge
+odynophagia
+oligohydramnios
+oliguria
+omasum
+opaque nail
+optic atrophy
+lesions	<	oral lesions
+orbital cellulitis
+osteochondritis
+otalgia
+otitis media with effusion
+pain
+pain	<	pain in lower
+pain	<	pain in the chest
+pain	<	pain in the ear
+pain	<	pain in the eye
+pain	<	pain in the infected area
+pain	<	pain in the outer ear
+pain	<	painful
+pain	<	painful sores in the mouth
+pain	<	painful swallowing
+painless genital ulcers
+palate
+pallor
+papules
+papulovesicular rash
+paralysis
+paraplegia
+paresis
+paresthesia
+partial paralysis
+hair loss
+perioral fissures
+periosteal lesions
+peripheral edema
+persistent headaches
+persistent vomiting
+petechiae	<	petechia
+petechiae
+photophobia
+physical weakness
+pleural effusions	<	pleural effusion
+pleural effusions
+pleural thickening
+pleuretic chest pain
+pleuretic chest pain	<	pleuritic chest pain
+pleuritis
+pneumonia
+poor appetite
+poor concentration
+premature farrowings
+premature labor
+prickling
+productive cough
+profound depression
+profuse sweating
+proptosis
+prostration
+proteinuria
+protuberance
+pruritic plaque
+pseudoparalysis
+psychosis
+ptosis
+pulmonary edema
+pulmonary rales
+pus discharg
+pus filled lesions
+raised papules
+raised wart with roughened surface
+rapid respiration
+rashes	<	rash
+blisters
+rectal bleeding
+rectal prolapse
+vomiting
+wheezing
+skin rash
+red eyes	<	red eye
+red eyes
+rashes	<	red rash
+red throat
+reddening	<	redness
+reduced consciousness
+reduced egg production
+reduced level of consciousness
+reduction in the fluid part of the blood
+reflux disease
+regional adenopathy
+regional lymphadenopathy
+relapsing fever
+renal failure
+respiratory problems	<	respiratory distress
+respiratory problems	<	respiratory infections
+respiratory problems	<	respiratory problems
+respiratory problems	<	respiratory signs
+respiratory problems	<	respiratory tracts
+hemorrhages
+retrosternal pain
+rigors	<	rigidity of limbs
+rigors	<	rigor
+rigors
+rosy spots
+rough nail
+round flat face
+rounded nose
+rumen
+runny nose
+scaling
+scarring
+scrotal swelling
+seizures	<	seizure
+seizures
+sensitivity to light
+sensitivity to light touch
+sensorineural deafness
+sensory disturbances	<	sensory disturbance
+sensory disturbances
+sensory loss
+sepsis
+diarrhea
+headaches
+headaches	<	headache
+shin pain
+shivers
+shock
+shortness of breath
+rapid breathing
+skin itching
+skin lesions
+skin rash
+skin ulcer
+sleep apnea
+sleepiness
+leg weakness
+incontinence
+slurred speech
+sneezing
+snoring
+soft ulcers
+tissue swelling
+somnolence
+sore throat
+soreness
+sores
+sparse scalp hair
+spasmodic coughing
+spasms
+spasms	<	spastic paralysis
+spasms	<	spastic weakness
+speech problems
+splenomegaly
+spontaneous abortion
+stabbing pain
+staggering gait
+stiffness	<	stiff body
+stiffness	<	stiff neck
+stiffness
+stillbirth
+stillbirth	<	stillborn piglets
+pain	<	stomach pain
+stress
+stupor
+sweating	<	sweat
+sweating
+sweating	<	sweats
+swelling
+swelling	<	swollen
+tabes
+tachycardia
+tachypnea
+tearing
+tenderness	<	tender lymph nodes
+tenderness	<	tender salivary gl
+tenderness of skin
+thickening of nails
+thickening of subungueal area
+thin upper lip
+thrombocytopenia
+tinnitus
+tiredness
+tissues around the mouth
+tremors
+twisting of head
+twitching
+ulcer formation
+ulcer formation	<	ulcers of the tongue
+urethral warts
+urine
+vaginal bleeding between periods
+vaginal warts
+vaginal yeast infection
+vascular dilation
+vascular leakage
+vertigo
+vesicles in the ear canal
+vesicular rash of the ear or mouth
+vision loss
+vomiting
+vomiting of blood	<	vomiting blood
+vomiting of blood
+vulvar warts
+warts
+warmth of skin
+watering of the eye
+watery blisters
+watery diarrhea
+watery eyes
+weak pulse
+weakness
+weight loss
+wheezing
+wide set eyes
+yellow-brown nail

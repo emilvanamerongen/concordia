@@ -12,6 +12,7 @@ import UniprotModule.IDMappingIndexer;
 import UniprotModule.IDMappingParser;
 import UniprotModule.UniprotParser;
 import UniprotModule.uniprotindexer;
+import com.carrotsearch.hppc.cursors.ObjectCursor;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,12 +20,16 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -34,12 +39,28 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.index.query.QueryBuilders;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.elasticsearch.index.query.QueryBuilders.wildcardQuery;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHitField;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 /**
  *
  * @author emil3
  */
 public class refdb {
+
     private ObservableValue<Boolean> select = new SimpleBooleanProperty();
     private String type;
     private Integer storefileindex;
@@ -49,130 +70,102 @@ public class refdb {
     private SimpleStringProperty filepath = new SimpleStringProperty();
     private File datafile;
     private SimpleStringProperty remotelocation = new SimpleStringProperty();
-    private SimpleStringProperty status = new SimpleStringProperty();
+    private SimpleStringProperty entries = new SimpleStringProperty();
     private SimpleStringProperty priority = new SimpleStringProperty();
     private LinkedHashSet<header> headerset = new LinkedHashSet<>();
+    private String fulldbname = "";
     private HashMap<String, HashMap<String, Integer>> indexmaps = new HashMap<>();
     private ConcurrentHashMap<String, uniprotindexer> uniprotindexerthreads = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, IDMappingIndexer> IDmappingindexerthreads = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, TabDelimitedIndexer> tabindexerthreads = new ConcurrentHashMap<>();
     Filemanager filemanager = new Filemanager();
-    
+    TransportClient elasticsearchclient = null;
     
     public refdb(){}
     
-    public refdb(Integer storefileindex, String locationline){
+    public refdb(Integer storefileindex, String fulldbname, String entries,TransportClient elasticsearchclient) throws InterruptedException, ExecutionException{
+        this.elasticsearchclient = elasticsearchclient;
         this.storefileindex = storefileindex;
-        this.locationline = locationline;
+        setFulldbname(fulldbname);
         priority.set("0");
-        String[] linesplit = locationline.split("\t");
-        
+        String[] split = fulldbname.split("\\.");
+
         int index = 0;
-        for (String item : linesplit){
-            if (index == 0){      
-                type = item;
-            } else if (index == 1){
-                dbname.set(item);
-            } else if (index == 2) {
-                headerindex.set(item); 
-            } else if (index == 3){
-                datafile = (new File(item));
-                filepath.set(item);
-            } else if (index == 4){
-                remotelocation.set(item);
-            } else if (index == 5){
-                priority.set(item);
+        for (String item : split){
+            switch (index) {
+                case 0:
+                    type = item;
+                    break;
+                case 1:
+                    dbname.set(item); 
+                    break;
+                case 2:
+                    headerindex.set(item);
+                    break;
+                default:
+                    break;
             }
-            
             index++;
         }
-        
-        if (!datafile.exists()){
-            status.set("FILE unavailable");
-        } else {
-        status.set("Processing header..");
-        headerinit();
-        status.set("available");
-        }
+
+        this.entries.set(entries);
+        setheaders();
+ 
     }
     
-    private void headerinit(){
-        File headerfile = new File(filemanager.getHeaderdirectory()+File.separator+dbname.getValue()+".headers.txt");
-        Boolean sort = true;
-        if (headerfile.exists()){
-            try {
-                List<String> headerlines = Files.readAllLines(Paths.get(headerfile.getAbsolutePath()));
-                for (String line : headerlines){
-                    String headerstring = line.split("\t")[0];
-                    String examplestring = line.split("\t")[1];
-                    String[] examplelist = examplestring.split(";");
-                    LinkedHashSet<String> exampleset = new LinkedHashSet<>();
-                    for (String example : examplelist){
-                        exampleset.add(example);
+    public void setheaders() throws InterruptedException, ExecutionException{
+        IndexMetaData index = elasticsearchclient.admin().cluster().prepareState().get().getState().getMetaData().getIndices().get(getFulldbname());
+        Collection<Object> values = index.getMappings().get("entry").getSourceAsMap().values();
+        String valuestring = "";
+                for (Object value : values){
+            valuestring += value;
+        }
+        valuestring = valuestring.substring(1);
+        String[] valuesplit = valuestring.split("}, "); 
+
+        for (String value : valuesplit){
+            value = value.substring(0,value.indexOf("="));
+            header header = new header(value,true);
+           
+            //header.setExamples(retrieveexample(value,getFulldbname()));
+            headerset.add(header);
+        }
+        
+    }
+
+    private LinkedHashSet<String> retrieveexample(String field, String dbname){ 
+        LinkedHashSet<String> examples = new LinkedHashSet<>();
+        //example search
+        SearchResponse response = elasticsearchclient.prepareSearch(dbname)
+        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+        .setQuery(wildcardQuery(field,"*"))                 // Query
+        .setFrom(0).setSize(10).setExplain(false)
+        .get();
+        // MatchAll on the whole cluster with all default options
+        SearchResponse someentries = elasticsearchclient.prepareSearch().get();
+        System.out.println(someentries.getHits().internalHits().length);
+        for (SearchHit hit : someentries.getHits()){
+            try{
+                Map<String, Object> thesource = hit.getSource();
+                String example = "";
+                if (thesource.containsKey(field)){
+                    String get = ""+thesource.get(field);
+                    if (!get.equals("null")){
+                        System.out.println(get);
                     }
-                     LinkedHashSet<String> parameterset = new LinkedHashSet<>();
-                    try{
-                    String parameterstring = line.split("\t")[6];
-                    String[] parameterlist = parameterstring.split(";");
-                   
-                    for (String parameter : parameterlist){
-                        parameterset.add(parameter);
-                    }} catch (Exception ex){}
-                    
-                    
-                    String enabled = line.split("\t")[2];
-                    Boolean enabledbool = true;
-                    if (enabled.equals("false")){
-                        enabledbool = false;
-                    }
-                    String linkcolor = "0";
-                    Integer indexable = 1;
-                    Integer tabindex = -1;
-                    try{
-                        linkcolor = line.split("\t")[3];
-                        indexable = Integer.parseInt(line.split("\t")[4]);
-                        tabindex = Integer.parseInt(line.split("\t")[5]);
-                    } catch (Exception ex){                
-                    }
-                     
-                    headerset.add(new header(headerstring,exampleset,enabledbool,linkcolor,indexable,tabindex,parameterset));
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(refdb.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            if (type.equals("uniprot")){
-                UniprotParser uniprotparser = new UniprotParser();
-                headerset.addAll(uniprotparser.headerscan(datafile));
-            } else if (type.equals("uniprot ID-mapping")){
-                IDMappingParser idmappingparser = new IDMappingParser();
-                headerset.addAll(idmappingparser.headerscan(datafile));
-            } else if (type.equals("tab-delimited")){
-                sort = false;
-                TabDelimitedParser tabdelimitedparser = new TabDelimitedParser();
-                tabdelimitedparser.setHeaderindex(Integer.parseInt(headerindex.getValue()));
-                for (header myheader : tabdelimitedparser.headerscan(datafile,false)){
-                    headerset.add(myheader);
+                    examples.add(""+thesource.get(field));
                 }
                 
-            } else if (type.equals("template (tab)")){
-                sort = false;
-                TabDelimitedParser tabdelimitedparser = new TabDelimitedParser();
-                tabdelimitedparser.setHeaderindex(Integer.parseInt(headerindex.getValue()));
-                for (header myheader : tabdelimitedparser.headerscan(datafile,true)){
-                    headerset.add(myheader);
-                }
-            }
-            
-            for (header myheader : headerset){
-                myheader.setSourcedb(dbname.getValue());
-            }
-            
-            writeheaders(headerfile, sort);
+                
 
+                }catch (Exception ex){System.out.println(ex);}
+            }
+        if (examples.size()  < 2){
+            System.out.println(field);
         }
-
+        return examples;
     }
+        
     
     public void headerupdate(){
         File headerfile = new File(filemanager.getHeaderdirectory()+File.separator+dbname.getValue()+".headers.txt");
@@ -183,11 +176,12 @@ public class refdb {
         File headerfile = new File(filemanager.getHeaderdirectory()+File.separator+dbname.getValue()+".headers.txt");
         headerfile.delete();
         headerset.clear();
-        headerinit();
+
     }
     
     
     private void writeheaders(File headerfile, Boolean sort){
+        System.out.println("writing headers");
         headerfile.delete();
         try {
             headerfile.createNewFile();
@@ -196,7 +190,7 @@ public class refdb {
         }
         try { 
             FileWriter writer = new FileWriter(headerfile);
-            ArrayList<String> linestowrite = new ArrayList<String>();
+            ArrayList<String> linestowrite = new ArrayList<>();
             for (header myheader : headerset){            
                 String examplestring = "";
                 for (String example : myheader.getExamples()){
@@ -325,19 +319,7 @@ public class refdb {
     }
 
 
-    /**
-     * @return the locationline
-     */
-    public String getLocationline() {
-        return locationline;
-    }
 
-    /**
-     * @param locationline the locationline to set
-     */
-    public void setLocationline(String locationline) {
-        this.locationline = locationline;
-    }
 
     /**
      * @return the select
@@ -427,14 +409,14 @@ public class refdb {
      * @return the status
      */
     public String getStatus() {
-        return status.getValue();
+        return entries.getValue();
     }
 
     /**
      * @param status the status to set
      */
     public void setStatus(String status) {
-        this.status.set(status);
+        this.entries.set(status);
     }
 
     /**
@@ -507,8 +489,17 @@ public class refdb {
         this.tabindexerthreads = tabindexerthreads;
     }
 
-    /**
-     * @return the indexerprogress
+        /**
+     * @return the fulldbname
      */
+    public String getFulldbname() {
+        return fulldbname;
+    }
 
+    /**
+     * @param fulldbname the fulldbname to set
+     */
+    public void setFulldbname(String fulldbname) {
+        this.fulldbname = fulldbname;
+    }
 }

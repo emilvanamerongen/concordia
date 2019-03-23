@@ -77,13 +77,15 @@ public class LinkBox extends VBox{
             headerlist.add(myheader);
         }
         
-        boxlistview.maxHeight(10000.0);
-        boxlistview.maxHeightProperty().set(10000.0);
-        boxlistview.prefHeightProperty().set(headers.size()*35);
-        boxlistview.setItems(headerlist);     
+        //boxlistview.maxHeight(10000.0);
+        //boxlistview.maxHeightProperty().set(10000.0);
+        //boxlistview.prefHeightProperty().set(headers.size()*35);
+        boxlistview.setItems(headerlist);  
+
         scrollpane.setMaxWidth(10000.0);
         scrollpane.setHbarPolicy(NEVER);
         scrollpane.setFitToWidth(true);
+        scrollpane.setFitToHeight(true);
         VBox.setVgrow(scrollpane, Priority.ALWAYS);
 
         boxlistview.setCellFactory(new Callback<ListView<String>, ListCell<header>>() {
@@ -126,8 +128,8 @@ public class LinkBox extends VBox{
                             expContent.setMaxWidth(Double.MAX_VALUE);
                             Label explabel = new Label();
                             explabel.setText("Indexing options:");
-                            expContent.add(explabel, 0, 0);
-                            expContent.add(removeversioncheckbox, 0, 1);
+                            //expContent.add(explabel, 0, 0);
+                            //expContent.add(removeversioncheckbox, 0, 1);
                             //expContent.add(trimcheckbox, 0, 2);
                             
                             alert.getDialogPane().setExpandableContent(expContent);

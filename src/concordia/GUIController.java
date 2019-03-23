@@ -9,6 +9,8 @@ import Annotator.Searcher;
 import Annotator.AnnotationProcess;
 import Annotator.AnnotationFileInfo;
 import CazyModule.CazyAnnotator;
+import ElasticImport.Parser;
+import ElasticImport.Rawdataprocesthread;
 
 import FileManager.Filemanager;
 import Refdbmanager.dbmanager;
@@ -29,6 +31,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -43,6 +46,8 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static javafx.animation.Animation.INDEFINITE;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -89,6 +94,15 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import server.ConcordiaServer;
+import static server.ConcordiaServer.ANSI_BLUE;
+import static server.ConcordiaServer.ANSI_RESET;
+import static server.ConcordiaServer.BLUE_BOLD;
+import static server.ConcordiaServer.serverproperties;
 
 /**
  *
@@ -109,6 +123,8 @@ public class GUIController implements Initializable {
     // </editor-fold>
     
     // <editor-fold desc="database manager FXML">
+    public static final String ANSI_RESET = "\u001B[0m";
+    TransportClient elasticsearchclient = null;
     @FXML TableView dbmanagertable;
     public static dbmanager dbmanager = new dbmanager();
     @FXML VBox refdbaddpane;
@@ -118,9 +134,15 @@ public class GUIController implements Initializable {
     @FXML TextField namefield;
     @FXML Label headerindexlabel;
     @FXML TextField headerindexfield;
-    @FXML TextField priorityfield;
+    @FXML TextField numworkersfield;
     @FXML TextField importfilepathfield;
+    @FXML TextField entrydelimiterfield;
+    @FXML ProgressBar importprogressbar;
+    @FXML Label importprogressbarlabel;
+    @FXML Label importprogresslabel;
+    @FXML Label importbytepslabel;
     private ObservableList<String> typelist = FXCollections.observableArrayList();
+    private commandlinechecker guicommandlinechecker;
     // </editor-fold>
     
     // <editor-fold desc="database linking FXML">
@@ -157,10 +179,8 @@ public class GUIController implements Initializable {
     @FXML Label idmappinglabel;
     @FXML TabPane filespane;
     @FXML ListView fileslist;
-    @FXML ListView annotationlist;
     @FXML Button directorybutton;
     @FXML Button annotatebutton;
-    @FXML Button annotationaddbutton;
     @FXML VBox annotatorbox;
     @FXML ChoiceBox templatechoicebox;
     @FXML VBox annotationprogressbox;
@@ -193,11 +213,34 @@ public class GUIController implements Initializable {
     
     // <editor-fold desc="database manager">
     //-----------------------------------------------------------------------------------------------------------------------------------------
+    public void elasticconnect(){
+        //load properties from server.properties file
+        serverproperties.loadproperties();
+        
+        //prepare elasticsearch client
+        System.out.println(ANSI_BLUE+"preparing elasticsearch client..");
+        
+        Settings settings = Settings.builder().put("cluster.name", serverproperties.getElasticCLUSTERNAME()).build();
+        elasticsearchclient = new PreBuiltTransportClient(settings);
+        try {
+            elasticsearchclient.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(serverproperties.getElasticIP()), serverproperties.getElasticPORT()));   
+            System.out.println("connected to: "+elasticsearchclient.transportAddresses().get(0).getHost());
+            dbmanager.giveclient(elasticsearchclient);
+        } catch (Exception ex){
+            System.out.println("ERROR while preparing elasticsearch client: "+ex);
+        }
+        System.out.println(ANSI_RESET);
+    }
+    
     public void dbmanagerinit(){
+        //elasticsearch init 
+        elasticconnect();
+        dbmanager.read();
         //adddatapane init
-        typelist.addAll("tab-delimited","template (tab)","uniprot","uniprot ID-mapping");
+        typelist.addAll("tab-delimited","template","uniprot","uniprot ID-mapping xml");
         typebox.setItems(typelist);
         closebutton.setVisible(false);
+        
         typebox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
         @Override
         public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
@@ -222,47 +265,24 @@ public class GUIController implements Initializable {
         //db name column
         TableColumn<refdb, String> namecolumn = new TableColumn<>("database name");
         namecolumn.setCellValueFactory(new PropertyValueFactory<>("dbname"));
+        namecolumn.setMinWidth(300);
         namecolumn.setCellFactory(TextFieldTableCell.<refdb>forTableColumn());
         namecolumn.setOnEditCommit(
         (CellEditEvent<refdb, String> t) -> {
         ((refdb) t.getTableView().getItems().get(
             t.getTablePosition().getRow())
-            ).setDbname(t.getNewValue());
-            dbmanager.setchangetostoragelines();
+            ).setDbname(t.getNewValue());    
         });
         //headerindex column
         TableColumn<refdb, String> headerindexcolumn = new TableColumn<>("header index");
         headerindexcolumn.setCellValueFactory(new PropertyValueFactory<>("headerindex"));
+        headerindexcolumn.setMinWidth(150);
         headerindexcolumn.setCellFactory(TextFieldTableCell.<refdb>forTableColumn());
         headerindexcolumn.setOnEditCommit(
         (CellEditEvent<refdb, String> t) -> {
         ((refdb) t.getTableView().getItems().get(
             t.getTablePosition().getRow())
             ).setHeaderindex(t.getNewValue());
-            dbmanager.setchangetostoragelines();
-            
-        });
-        //file location column
-        TableColumn<refdb, String> locationcolumn = new TableColumn<>("file location");
-        locationcolumn.setCellValueFactory(new PropertyValueFactory<>("filepath"));
-        locationcolumn.setCellFactory(TextFieldTableCell.<refdb>forTableColumn());
-        locationcolumn.setOnEditCommit(
-        (CellEditEvent<refdb, String> t) -> {
-        ((refdb) t.getTableView().getItems().get(
-            t.getTablePosition().getRow())
-            ).setFilepath(t.getNewValue());
-            dbmanager.setchangetostoragelines();
-        });
-        //online location column
-        TableColumn<refdb, String> urlcolumn = new TableColumn<>("source URL");
-        urlcolumn.setCellValueFactory(new PropertyValueFactory<>("remotelocation"));
-        urlcolumn.setCellFactory(TextFieldTableCell.<refdb>forTableColumn());
-        urlcolumn.setOnEditCommit(
-        (CellEditEvent<refdb, String> t) -> {
-        ((refdb) t.getTableView().getItems().get(
-            t.getTablePosition().getRow())
-            ).setRemotelocation(t.getNewValue());
-            dbmanager.setchangetostoragelines();
         });
         //priority column
         TableColumn<refdb, String> prioritycolumn = new TableColumn<>("priority");
@@ -273,17 +293,17 @@ public class GUIController implements Initializable {
         ((refdb) t.getTableView().getItems().get(
             t.getTablePosition().getRow())
             ).setPriority(t.getNewValue());
-            dbmanager.setchangetostoragelines();
+   
             regeneratefilelinkingtables();
         });
         
         //status column
-        TableColumn<refdb, String> statuscolumn = new TableColumn<>("Status");
+        TableColumn<refdb, String> statuscolumn = new TableColumn<>("Number of docs");
         statuscolumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        statuscolumn.setMinWidth(150);
         
-        locationcolumn.setMaxWidth(400.0);
         dbmanagertable.setItems(dbmanager.getReferencedatabases());
-        dbmanagertable.getColumns().addAll(active,namecolumn,typecolumn,headerindexcolumn,locationcolumn,statuscolumn,prioritycolumn);
+        dbmanagertable.getColumns().addAll(active,namecolumn,typecolumn,headerindexcolumn,statuscolumn,prioritycolumn);
         dbmanagertable.setEditable(true);
         generatefilelinkingtables();
     }
@@ -292,24 +312,102 @@ public class GUIController implements Initializable {
         regeneratefilelinkingtables();
     }
     
+    Parser parser = null;
+    
+    Timeline importtimeline = new Timeline(Timeline.INDEFINITE, new KeyFrame(Duration.millis(1000), ae -> importchecker(parser)));
+    
     @FXML public void importrefdb(){
         String type = typebox.getSelectionModel().getSelectedItem().toString();
-        String name = namefield.getText();
+        String indexname = namefield.getText();
         String headerindex = "0";
         if (! headerindexfield.getText().isEmpty()){
         headerindex = headerindexfield.getText();
         }
-        String localpath = importfilepathfield.getText();
-        String priority = priorityfield.getText();
-        dbmanager.adddb(type,name,headerindex,localpath,priority); 
-        typebox.getSelectionModel().select(0);
-        namefield.setText("");
-        headerindexfield.setText("");
-        importfilepathfield.setText("");
-        priorityfield.setText("");
-        namefield.setText("");
-        regeneratefilelinkingtables();
-        closedbpanes();
+        String filepath = importfilepathfield.getText();
+        File importfile = new File(filepath);
+        Integer num_workers = 1;
+        if (!numworkersfield.getText().isEmpty()){
+            num_workers = Integer.parseInt(numworkersfield.getText());
+        }
+        String entrydelimiter = entrydelimiterfield.getText();
+        String custom_types = null;
+        
+        //open progressgui
+        indexprogressanchorpane.setVisible(true);
+        
+        if (importfile != null && entrydelimiter != null){
+            parser = new Parser(importfile,indexname,entrydelimiter,type,num_workers,custom_types,elasticsearchclient);
+            System.out.println("Starting parser for: ");
+            System.out.println(BLUE_BOLD +"inputfile: \t"+ANSI_RESET+importfile.getAbsolutePath());
+            System.out.println(BLUE_BOLD +"indexname: \t"+ANSI_RESET+indexname);
+            if (!entrydelimiter.equals("")){ System.out.println(BLUE_BOLD +"custom entrydelimiter: \t"+ANSI_RESET+entrydelimiter);}
+            System.out.println(BLUE_BOLD +"type: \t"+ANSI_RESET+type);
+            System.out.println(BLUE_BOLD +"num_workers: \t"+ANSI_RESET+num_workers);
+            System.out.println(BLUE_BOLD +"custom_types: \t"+ANSI_RESET+custom_types);
+            parser.start();
+
+        }
+        importtimeline.setCycleCount(Timeline.INDEFINITE);
+        importtimeline.play();
+        guicommandlinechecker = new commandlinechecker(this);
+        guicommandlinechecker.start();
+        importprogressbarlabel.setText("indexing");
+        importprogresslabel.setText("importing...");
+        previousposition = Rawdataprocesthread.getLineposition();
+    }
+    
+    
+    private Long previousposition;
+    private Long previoustime = System.currentTimeMillis();
+    
+    public void importchecker(Parser parser){
+        if (!parser.done){
+            //bar
+            Long position = Rawdataprocesthread.getLineposition();
+            Long filesize = parser.getFilesize();
+            
+            Double partdone = (double)position/(double)filesize;
+            //System.out.println((double)filesize+"/"+(double)position+"="+partdone);
+            importprogressbar.setProgress(partdone);
+            
+            Long currenttime = System.currentTimeMillis();
+            Long elapsedtime = currenttime - previoustime;
+            if (elapsedtime > 600000L){
+                previoustime = System.currentTimeMillis();
+                previousposition = position;
+            } else {
+                try{
+                Long elapsedseconds = elapsedtime / 1000L;
+                Long elapsedbytes = position - previousposition;
+                Long bytespersecond = elapsedbytes/elapsedseconds;
+                Long secondsremaining = (filesize-position)/bytespersecond;
+                Long minutesremaining = secondsremaining/60L;
+                String progressstring = importprogressbar.getProgress()+"";
+                importbytepslabel.setText(progressstring.substring(2,4)+"\t"+minutesremaining+" minutes remaining");
+                }catch(Exception ex){}
+            }
+                    
+            
+        } else{
+            System.out.println("closing importchecker");
+            //reset
+            typebox.getSelectionModel().select(0);
+            namefield.setText("");
+            headerindexfield.setText("");
+            importfilepathfield.setText("");
+            numworkersfield.setText("1");
+            namefield.setText("");
+            entrydelimiterfield.setText("");
+            closedbpanes();
+            indexprogressanchorpane.setVisible(false);
+            importtimeline.stop();
+            guicommandlinechecker.active = false;
+        }
+    }
+
+    @FXML public void resumelater(){
+        importprogressbarlabel.setText("pausing..");
+        parser.pause = true;
     }
     
     @FXML public void importfilepicker(){
@@ -322,8 +420,19 @@ public class GUIController implements Initializable {
     }
     
     @FXML public void removedb(){
-        dbmanager.removeselected();
-        updatetable();
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation Dialog");
+        alert.setHeaderText("Confirm deletion");
+        alert.setContentText("Are you sure you want to delete these databases from elasticsearch?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            dbmanager.removeselected();
+            updatetable();
+        } else {
+        // ... user chose CANCEL or closed the dialog
+        }
+        
     }
     
     @FXML public void closedbpanes(){
@@ -398,7 +507,6 @@ public class GUIController implements Initializable {
         System.out.println("----------------------");
         dbmanager.updateallindices();
         indexertimeline.play();
-
     }
     
     @FXML public void toggleindexprogresspane(){
@@ -525,46 +633,7 @@ public class GUIController implements Initializable {
             }
         });    }
 
-    /**
-     *
-     */
-    @FXML
-    public void updateannotationfilelist(){
-        filemanager.annotationmanager.updatefiles();
-        ObservableList<String> names = FXCollections.observableArrayList(filemanager.annotationmanager.getFilenames());    
-        SortedList<String> sorted = names.sorted();
-        annotationlist.setItems(sorted);     
-        annotationlist.setCellFactory(param -> new ListCell<String>() {
-            private ImageView imageView = new ImageView();
-            @Override
-            public void updateItem(String name, boolean empty) {
-                super.updateItem(name, empty);
-                if (empty) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    imageView.setImage(IMAGE_empty);
-                    if(name.contains("ᚒF"))
-                        imageView.setImage(IMAGE_F);
-                    else if(name.contains("ᚒC"))
-                        imageView.setImage(IMAGE_C);
-                    else if(name.contains("ᚒU"))
-                        imageView.setImage(IMAGE_U);
-                    if(name.contains("ᚒU") && name.contains("ᚒC"))
-                        imageView.setImage(IMAGE_CU);
-                    if(name.contains("ᚒU") && name.contains("ᚒF"))
-                        imageView.setImage(IMAGE_FU);
-                    if(name.contains("ᚒF") && name.contains("ᚒC"))
-                        imageView.setImage(IMAGE_FC);
-                    if(name.contains("ᚒU") && name.contains("ᚒC") && name.contains("ᚒF"))
-                        imageView.setImage(IMAGE_FUC);
-                    setText(name.replace("ᚒC", "").replace("ᚒF", "").replace("ᚒU", ""));
-                    setGraphic(imageView);
-                }
-            }
-        });
-    }  
-
+   
     /**
      *
      * @param event
@@ -609,32 +678,7 @@ public class GUIController implements Initializable {
         updateblastresultfilelist();
     }
 
-    /**
-     *
-     */
-    @FXML
-    public void deleteannotationfile(){
-        ObservableList selectedfile = annotationlist.getSelectionModel().getSelectedItems();
-        try{
-        Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle("Delete file");
-        alert.setHeaderText(selectedfile.get(0)+" wil be permanently deleted");
-        alert.setContentText("Are you sure want to permanently delete this file?");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK){
-            File markedfordelete = filemanager.annotationmanager.getAnnotationfiles().get(selectedfile.get(0));
-            Files.delete(markedfordelete.toPath());
-            filemanager.annotationmanager.updatefiles();
-        } else {
-            System.out.println("deletion canceled");
-        }
-        } catch (Exception ex){
-            System.out.println("no files deleted");
-        }
-        updateannotationfilelist();
-    }
-
+    
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------
     // </editor-fold>
@@ -646,8 +690,8 @@ public class GUIController implements Initializable {
         while (counter <= 100){
             for (refdb database : referencedatabases){
                 if (database.getPriority().equals(counter.toString())){
-                    if (! database.getType().equals("template (tab)"))
-                        dbpanes.add(new DBpane(database));  
+                    //if (! database.getType().equals("template (tab)"))
+                    dbpanes.add(new DBpane(database));  
                 }
             }
             counter++;
@@ -655,7 +699,8 @@ public class GUIController implements Initializable {
         annotatorbox.getChildren().addAll(dbpanes);
         templatechoicebox.getItems().clear();
         for (refdb database : dbmanager.getReferencedatabases()){
-            if (database.getType().equals("template (tab)")){
+            database.getType();
+            if (database.getType().equals("template")){
             templatechoicebox.getItems().add(database.getDbname());}
         }
     }
@@ -942,10 +987,9 @@ public class GUIController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         logoview.setImage(logo1);
         fileslist.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        annotationlist.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         emptylinkingspace = linkingspace;
         updateblastresultfilelist();
-        updateannotationfilelist();
+
         fileslist.setItems(FXCollections.observableArrayList(filemanager.blastresultmanager.getFilenames()));
         activebuttons.add(activebutton1);
         activebuttons.add(activebutton2);
@@ -953,13 +997,10 @@ public class GUIController implements Initializable {
         activebuttons.add(activebutton4);
         activebuttons.add(activebutton5);
         activebuttons.add(annotatebutton);
-        activebuttons.add(annotationaddbutton);
         activebuttons.add(addcazybutton);
         activebuttons.add(adduniprotbutton);
         try {
             myproperties.load(new FileInputStream("concordia.properties"));
-            availableRAM = Integer.parseInt(myproperties.getProperty("availableRAM"));
-            ramfield.setText(availableRAM.toString());
         } catch (Exception ex) {       
         }
         //settings
