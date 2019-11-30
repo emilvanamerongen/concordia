@@ -8,6 +8,7 @@ package ElasticImport;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,13 +28,14 @@ import org.json.XML;
  * @author emil
  */
 public class ParseWorker extends Thread{
-    public ArrayBlockingQueue<ArrayList<String>> queue = new ArrayBlockingQueue<>(10000, true);
-    public ArrayBlockingQueue<LinkedHashMap<String, ArrayList<String>>> complete = new ArrayBlockingQueue<>(1000, true);
+    public ArrayBlockingQueue<ArrayList<String>> queue = new ArrayBlockingQueue<>(100, true);
+    public ArrayBlockingQueue<LinkedHashMap<String, ArrayList<String>>> complete = new ArrayBlockingQueue<>(100, true);
     public ArrayList<String> customtypes = new ArrayList<>();
     public Boolean active = true;
     public Boolean mapmode = false;
     private String type = "universal";
     private LinkedHashMap<String, ArrayList<String>> fixedtemplate = new LinkedHashMap<>();
+    private HashMap<Integer, String> tabtemplate = new HashMap<>();
     private String subtype;
     private String sourcefile;
     
@@ -89,11 +91,14 @@ public class ParseWorker extends Thread{
                 while (!complete.offer(parseresult)){
                 }
         }
-        }else if ("tabdelimited".equals(type)){
+        }else if ("tab-delimited".equals(type)){
+            
             LinkedHashMap<String, ArrayList<String>> parseresult = new LinkedHashMap<>(tabparse(request));
+            if (request.get(0).substring(1).contains("\t")){
             if (!mapmode){
                 while (!complete.offer(parseresult)){
                 }
+            }
         }
         } else {
             System.out.println("TYPE NOT RECOGNIZED");
@@ -432,30 +437,26 @@ public class ParseWorker extends Thread{
     }
     
     private LinkedHashMap<String, ArrayList<String>> tabparse(ArrayList<String> request){
-        
         ArrayList<String> lines = request;
-       
-        LinkedHashMap<String, ArrayList<String>> parseresult = new LinkedHashMap<>(fixedtemplate);
+        String line = request.get(0).substring(1);
+        LinkedHashMap<String, ArrayList<String>> parseresult = new LinkedHashMap<>();
         //generate new map from template
         String datatype = "";
         String text = "";
-        for (String key : parseresult.keySet()){
-            parseresult.put(key, new ArrayList<>());
+        try{
+        String[] linesplit = line.split("\t");
+        int index = 0;
+        for (String item : linesplit){
+            String key = tabtemplate.get(index);
+            parseresult.putIfAbsent(key, new ArrayList<>());
+            parseresult.get(key).add(item);  
+            index++;
         }
-        for (String line : lines){
-            try {
-            if (line.startsWith("#=GF ")){
-                line = line.substring(5);
-                datatype  = line.substring(0,2);
-                text = line.substring(5);
-                addtomap(datatype,text,parseresult);
-            } 
-            
         
         }catch (Exception ex){
                 
-                }
         }
+        
         return parseresult;
     }
     
@@ -493,4 +494,20 @@ public class ParseWorker extends Thread{
             }   
     return a;
 }
+    
+    
+    
+        /**
+     * @return the tabtemplate
+     */
+    public HashMap<Integer, String> getTabtemplate() {
+        return tabtemplate;
+    }
+
+    /**
+     * @param tabtemplate the tabtemplate to set
+     */
+    public void setTabtemplate(HashMap<Integer, String> tabtemplate) {
+        this.tabtemplate = tabtemplate;
+    }
 }

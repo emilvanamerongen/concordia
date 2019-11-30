@@ -5,6 +5,7 @@
  */
 package ElasticImport;
 
+import Refdbmanager.refdb;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +17,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -24,17 +26,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
+import org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.elasticsearch.action.bulk.BackoffPolicy;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
-import org.elasticsearch.common.collect.ImmutableOpenMap;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
@@ -49,10 +47,10 @@ public class Parser extends Thread{
     //public ConcurrentLinkedQueue<LinkedHashMap<String, ArrayList<String>>> complete = new ConcurrentLinkedQueue();
     public ArrayBlockingQueue<ArrayList<String>> queue = new ArrayBlockingQueue<>(100, true);
     public ArrayBlockingQueue<LinkedHashMap<String, ArrayList<String>>> complete = new ArrayBlockingQueue<>(100, true);
-    public ArrayBlockingQueue<String> rawdataqueue = new ArrayBlockingQueue<>(10000, true);
+    public ArrayBlockingQueue<String> rawdataqueue = new ArrayBlockingQueue<>(100, true);
     File inputfile;
     String entrydelimiter;
-    String entryenddelimiter;
+    String entrystartdelimiter;
     Integer num_workers;
     public ArrayList<ParseWorker> workers = new ArrayList<>();
     public ArrayList<Rawdataprocesthread> splitters = new ArrayList<>();
@@ -65,17 +63,18 @@ public class Parser extends Thread{
     private String type = "universal";
     private Long filesize = 0L;
     private String indexname = "";
-    private TransportClient client;
+    private RestHighLevelClient client;
     private Long tabheaderlineindex = 0L;
+    private HashMap<Integer, String> tabtemplate = new HashMap<>();
     //resume
     private Boolean resume = false;
     public Boolean pause = false;
     private Long resumelocation = 0L;
     private Long resumelineposition = 0L;
     private Long linesdone = 0L;
-    private BulkProcessor bulkProcessor;
+    public static BulkProcessor bulkProcessor;
     
-    public Parser(File inputfile, String indexname, String entrydelimiter, String type, Integer num_workers, String customtypes,TransportClient client){
+    public Parser(File inputfile, String indexname, String entrydelimiter, String type, Integer num_workers, String customtypes,RestHighLevelClient client){
         this.inputfile = inputfile;
         this.entrydelimiter = entrydelimiter;
         this.num_workers = num_workers;
@@ -94,7 +93,7 @@ public class Parser extends Thread{
     }
     
     
-    public Parser(File inputfile, String indexname, String entrydelimiter, String type, Integer num_workers, String customtypes,TransportClient client,Long tabheaderlineindex){
+    public Parser(File inputfile, String indexname, String entrydelimiter, String type, Integer num_workers, String customtypes,RestHighLevelClient client,Long tabheaderlineindex){
         this.inputfile = inputfile;
         this.entrydelimiter = entrydelimiter;
         this.num_workers = num_workers;
@@ -118,7 +117,13 @@ public class Parser extends Thread{
             if (type.equals("uniprot")){
                 entrydelimiter = "<entry ";
                 skipone = true;
-            }
+            } else if (type.equals("tab-delimited")){
+                entrydelimiter = "\n";
+            } else if (type.equals("pfam")){
+                entrydelimiter = "#=GF ID";
+            } else if (type.equals("pfampositionmap")){
+                entrydelimiter = "#=GF ID";
+            } 
             
         }
     }
@@ -129,9 +134,53 @@ public class Parser extends Thread{
     
     @Override
     public void run(){
+        
+            
         checkentrydelimiter();
         namemodifications();
+        ElasticIndexGenerator indexgenerator = new ElasticIndexGenerator();
+        indexgenerator.generateindex(null, indexname, client);
         
+        BulkProcessor.Listener listener = new BulkProcessor.Listener() { 
+            @Override
+            public void beforeBulk(long executionId, BulkRequest request) {
+
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request,
+                    BulkResponse response) {
+
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request,
+                    Throwable failure) {
+
+            }
+        };
+
+        bulkProcessor = BulkProcessor.builder(
+                (request, bulkListener) ->client.bulkAsync(request, RequestOptions.DEFAULT, bulkListener),listener)
+                .setBulkActions(100) 
+                .setBulkSize(new ByteSizeValue(1L, ByteSizeUnit.MB)) 
+                .setFlushInterval(TimeValue.timeValueSeconds(10L)) 
+                .setConcurrentRequests(50) 
+                .build();
+
+        refresh(false);
+        
+        if (type.equals("template")){
+            System.out.println("generating template map");
+            templateparse();
+            try{
+            bulkProcessor.close();
+            }catch (Exception ex){}
+            //refresh(true);
+            System.out.println("COMPLETE");
+            done = true;
+            return;
+        }
         File mapfile = new File(inputfile.getName()+".MAP");
         File resumefile = new File(inputfile.getName()+".resume");
         File linepositionfile = new File(inputfile.getName()+".lineposition");
@@ -144,14 +193,20 @@ public class Parser extends Thread{
             resumelineposition = ReadResumeLocation(linepositionfile.getAbsolutePath());
         }
         
-        if (type.equals("tab")){
+        if (type.equals("tab-delimited")){
             System.out.println("generating header map");
+            tabtemplate();
+            
         }
 
         System.out.println("parse start");
         if (inputfile.isDirectory()){
             for (File subfile : inputfile.listFiles()){
                 startworkers(num_workers,false,fixedmap,subfile);
+                for (ParseWorker aworker : workers){
+                    aworker.setTabtemplate(tabtemplate);
+                    tabheaderlineindex++;
+                }
                 parse(subfile,tabheaderlineindex);
                 //wait for queue to empty
                 while (!queue.isEmpty() || !complete.isEmpty()){try {Thread.sleep(10);} catch (InterruptedException ex) {}}
@@ -160,6 +215,10 @@ public class Parser extends Thread{
             }
         } else {
             startworkers(num_workers,false,fixedmap,inputfile);
+            for (ParseWorker aworker : workers){
+                aworker.setTabtemplate(tabtemplate);
+                tabheaderlineindex++;
+            }
             parse(inputfile,tabheaderlineindex);
             //wait for queue to empty
             while (!queue.isEmpty() || !complete.isEmpty()){try {Thread.sleep(10);} catch (InterruptedException ex) {}}
@@ -171,7 +230,7 @@ public class Parser extends Thread{
             stopworkers();
         }
         bulkProcessor.close();
-        //refresh(true);
+        refresh(true);
         System.out.println("COMPLETE");
         done = true;
         
@@ -193,15 +252,14 @@ public class Parser extends Thread{
 
         FileReader myreader = new FileReader(inputfile2.getAbsolutePath());
         br = new BufferedReader(myreader,81920);
-        
-        
         int i;
         char c;
         int charindex = 0;
         StringBuilder sb = new StringBuilder();
+        
+        
         String text = "";
-        int entrydelimiterlastindex = entrydelimiter.length()-1;
-        try{
+        int entrydelimiterlastindex = entrydelimiter.length();
         while ((i = br.read()) != -1) {
             // convert i to char
             linesdone++;
@@ -209,10 +267,12 @@ public class Parser extends Thread{
                 skiplines--;
                 if (skiplines.equals(0L)){
                     started = true;
+            }   
             }
-            }
+           
             c = (char) i;
             sb.append(c);
+            
             if (c  == entrydelimiter.charAt(charindex)){
                 charindex++;
                 if (charindex == entrydelimiterlastindex){
@@ -236,7 +296,7 @@ public class Parser extends Thread{
             }
             
         }
-        }catch (Exception ex){System.out.println(ex);}
+        
 
             try {
                 br.close();
@@ -249,10 +309,99 @@ public class Parser extends Thread{
 
     }   catch (FileNotFoundException ex) {
             Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
 
+    private void templateparse(){
+        System.out.println("tabline:"+tabheaderlineindex);
+//        BulkProcessor.Listener listener = new BulkProcessor.Listener() { 
+//                @Override
+//                public void beforeBulk(long executionId,
+//                                       BulkRequest request) {  } 
+//
+//                @Override
+//                public void afterBulk(long executionId,
+//                                      BulkRequest request,
+//                                      BulkResponse response) {  } 
+//
+//                @Override
+//                public void afterBulk(long executionId,
+//                                      BulkRequest request,
+//                                      Throwable failure) {  } 
+//            })
+//            .setBulkActions(10000) 
+//            .setBulkSize(new ByteSizeValue(10, ByteSizeUnit.MB)) 
+//            .setFlushInterval(TimeValue.timeValueSeconds(5)) 
+//            .setConcurrentRequests(20) 
+//            .setBackoffPolicy(
+//            BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)) 
+//            .build();
+            
+        
+        importers.add(new ElasticImportThread(complete,indexname,client,this));
+        for (ElasticImportThread importer : importers){
+            importer.start();
+        }  
+            try (BufferedReader br = new BufferedReader(new FileReader(inputfile))) {
+                String line;
+                Long index = 1l;
+                while ((line = br.readLine()) != null) {
+                    if (index.equals(tabheaderlineindex)){
+                        LinkedHashMap<String, ArrayList<String>> data = new LinkedHashMap<>();
+                        String[] splitline = line.split("\t");
+                        int splitindex = 0;
+                        for (String splititem : splitline){
+                            splititem = splititem.replace(".", "_");
+                            data.put(splititem, new ArrayList<>());
+                            data.get(splititem).add(splitindex+"");
+                            splitindex++;
+                        }
+                        complete.add(data);
+                        break;
+                    }
+                    
+                    index++;
+                }
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(refdb.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(refdb.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        try {Thread.sleep(2000);} catch (InterruptedException ex) {}
+        while (!complete.isEmpty()){try {Thread.sleep(10);} catch (InterruptedException ex) {}}
+        for (ElasticImportThread importer : importers){
+            importer.active = false;
+        }  
+    }
+    
+    private void tabtemplate(){
+         try (BufferedReader br = new BufferedReader(new FileReader(inputfile))) {
+                String line;
+                Long index = 1l;
+                while ((line = br.readLine()) != null) {
+                    if (index.equals(tabheaderlineindex)){
+                        String[] splitline = line.split("\t");
+                        int splitindex = 0;
+                        for (String splititem : splitline){
+                            splititem = splititem.replace(".", "_");
+                            tabtemplate.put(splitindex, splititem);
+                            splitindex++;
+                        }
+                        break;
+                    }
+                    index++;
+                }
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(refdb.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(refdb.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }
     
     
     public void startworkers(Integer amountofthreads,Boolean mapmode, LinkedHashMap<String, Boolean> fixedmap,File sourcefile){
@@ -276,32 +425,7 @@ public class Parser extends Thread{
         for (ParseWorker worker : workers){
             worker.start();
         }
-        if (!mapmode){
-            bulkProcessor = BulkProcessor.builder(
-            client,  
-            new BulkProcessor.Listener() {
-                @Override
-                public void beforeBulk(long executionId,
-                                       BulkRequest request) {  } 
-
-                @Override
-                public void afterBulk(long executionId,
-                                      BulkRequest request,
-                                      BulkResponse response) {  } 
-
-                @Override
-                public void afterBulk(long executionId,
-                                      BulkRequest request,
-                                      Throwable failure) {  } 
-            })
-            .setBulkActions(10000) 
-            .setBulkSize(new ByteSizeValue(10, ByteSizeUnit.MB)) 
-            .setFlushInterval(TimeValue.timeValueSeconds(5)) 
-            .setConcurrentRequests(20) 
-            .setBackoffPolicy(
-            BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)) 
-            .build();
-            
+        if (!mapmode){       
             Integer importercounter = 0;
             while (importercounter < (amountofthreads/2)){
                 importercounter++;
@@ -378,18 +502,19 @@ public class Parser extends Thread{
         }
     }
     public void refresh(Boolean yes){
+        ClusterUpdateSettingsRequest request = new ClusterUpdateSettingsRequest();
         if (yes){
             //re-enable refresh
-            client.admin().indices().prepareUpdateSettings(indexname)   
-            .setSettings(Settings.builder()                     
-                    .put("index.refresh_interval", 1)
-            ).get();
+            Settings.Builder transientSettingsBuilder =
+                    Settings.builder()
+                    .put("index.refresh_interval", "1s");
+            request.persistentSettings(transientSettingsBuilder);
         } else {
-            //disable refresh for import speed
-            client.admin().indices().prepareUpdateSettings(indexname)   
-            .setSettings(Settings.builder()                     
-                    .put("index.refresh_interval", -1)
-            ).get();
+            //re-enable refresh
+            Settings.Builder transientSettingsBuilder =
+                    Settings.builder()
+                    .put("index.refresh_interval", "10s");
+            request.persistentSettings(transientSettingsBuilder);
         }
     }
     /**

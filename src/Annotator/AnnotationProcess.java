@@ -125,11 +125,6 @@ public class AnnotationProcess extends Thread{
                 }
             }
 
-
-                
-                
-                
-                
                 
             Integer tabindex = 0;
             for (LinkedHashMap<header, LinkedHashSet<String>> headerset : outputheaders.values()){

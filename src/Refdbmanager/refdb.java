@@ -7,27 +7,20 @@ package Refdbmanager;
 
 import FileManager.Filemanager;
 import TabDelimitedModule.TabDelimitedIndexer;
-import TabDelimitedModule.TabDelimitedParser;
 import UniprotModule.IDMappingIndexer;
-import UniprotModule.IDMappingParser;
-import UniprotModule.UniprotParser;
 import UniprotModule.uniprotindexer;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -36,23 +29,16 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.CheckBox;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
-import org.elasticsearch.common.collect.ImmutableOpenMap;
+import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
+import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.index.query.QueryBuilders;
-import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
-import static org.elasticsearch.index.query.QueryBuilders.wildcardQuery;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHitField;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 /**
@@ -71,7 +57,7 @@ public class refdb {
     private File datafile;
     private SimpleStringProperty remotelocation = new SimpleStringProperty();
     private SimpleStringProperty entries = new SimpleStringProperty();
-    private SimpleStringProperty priority = new SimpleStringProperty();
+    private SimpleIntegerProperty priority = new SimpleIntegerProperty();
     private LinkedHashSet<header> headerset = new LinkedHashSet<>();
     private String fulldbname = "";
     private HashMap<String, HashMap<String, Integer>> indexmaps = new HashMap<>();
@@ -79,15 +65,15 @@ public class refdb {
     private ConcurrentHashMap<String, IDMappingIndexer> IDmappingindexerthreads = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, TabDelimitedIndexer> tabindexerthreads = new ConcurrentHashMap<>();
     Filemanager filemanager = new Filemanager();
-    TransportClient elasticsearchclient = null;
+    RestHighLevelClient elasticsearchclient = null;
     
     public refdb(){}
     
-    public refdb(Integer storefileindex, String fulldbname, String entries,TransportClient elasticsearchclient) throws InterruptedException, ExecutionException{
+    public refdb(Integer storefileindex, String fulldbname, String entries,RestHighLevelClient elasticsearchclient) throws InterruptedException, ExecutionException{
         this.elasticsearchclient = elasticsearchclient;
         this.storefileindex = storefileindex;
         setFulldbname(fulldbname);
-        priority.set("0");
+        priority.set(0);
         String[] split = fulldbname.split("\\.");
 
         int index = 0;
@@ -114,52 +100,112 @@ public class refdb {
     }
     
     public void setheaders() throws InterruptedException, ExecutionException{
-        IndexMetaData index = elasticsearchclient.admin().cluster().prepareState().get().getState().getMetaData().getIndices().get(getFulldbname());
-        Collection<Object> values = index.getMappings().get("entry").getSourceAsMap().values();
-        String valuestring = "";
-                for (Object value : values){
-            valuestring += value;
-        }
-        valuestring = valuestring.substring(1);
-        String[] valuesplit = valuestring.split("}, "); 
+        try {
+            GetMappingsRequest request = new GetMappingsRequest(); 
+            request.indices(getFulldbname()); 
+            
+            GetMappingsResponse getMappingResponse = elasticsearchclient.indices().getMapping(request, RequestOptions.DEFAULT);
+            ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> allMappings = getMappingResponse.mappings();
+            
 
-        for (String value : valuesplit){
-            value = value.substring(0,value.indexOf("="));
-            header header = new header(value,true);
-           
-            //header.setExamples(retrieveexample(value,getFulldbname()));
-            headerset.add(header);
+            ImmutableOpenMap<String, MappingMetaData> indexMapping = allMappings.get(getFulldbname()); 
+            
+            ArrayList<String> values = new ArrayList<>();
+            for (ObjectCursor<MappingMetaData> amap : indexMapping.values()){
+      
+                Map<String, Object> map = amap.value.getSourceAsMap();
+                
+                for (Object key : map.values()){
+                    
+                    String keystring = key.toString();
+                    try{
+                    keystring = keystring.substring(1);
+                    for (String field : keystring.split("}}, ")){
+                        values.add(field);
+                    }
+                    } catch (Exception ex){
+                        System.out.println(ex);
+                    }
+                }
+            }
+
+
+            
+            for (String value : values){
+                value = value.substring(0,value.indexOf("="));
+                header header = new header(value,true);
+                
+                //header.setExamples(retrieveexample(value,getFulldbname()));
+                headerset.add(header);
+            }
+            File headerfile = new File(filemanager.getHeaderdirectory()+File.separator+dbname.getValue()+".headers.txt");
+            if (headerfile.exists()){
+                HashMap<String, ArrayList<String>> fileheaders = new HashMap<>();
+                try (BufferedReader br = new BufferedReader(new FileReader(headerfile))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        String[] splitline = line.split("\t");
+                        ArrayList<String> data = new ArrayList<>();
+                        data.add(splitline[1]);
+                        data.add(splitline[2]);
+                        data.add(splitline[3]);
+                        data.add(splitline[4]);
+                        data.add(splitline[5]);
+                        data.add(splitline[6]);
+                        fileheaders.put(splitline[0], data);
+                    }
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(refdb.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(refdb.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                Boolean applied = false;
+                for (header aheader : headerset){
+                    try{
+                        ArrayList<String> get = fileheaders.get(aheader.getHeaderstring());
+                        aheader.setColorindex(Integer.parseInt(get.get(2)));
+                        if (!applied){
+                            setPriority(Integer.parseInt(get.get(5)));
+                            applied = true;
+                        }
+                    } catch (Exception ex){}
+                }
+            } else {
+                System.out.println("no file found");
+            }
+            headerupdate();
+        } catch (IOException ex) {
+            Logger.getLogger(refdb.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
-    private LinkedHashSet<String> retrieveexample(String field, String dbname){ 
+    public LinkedHashSet<String> retrieveexample(String field){ 
         LinkedHashSet<String> examples = new LinkedHashSet<>();
         //example search
-        SearchResponse response = elasticsearchclient.prepareSearch(dbname)
-        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-        .setQuery(wildcardQuery(field,"*"))                 // Query
-        .setFrom(0).setSize(10).setExplain(false)
-        .get();
-        // MatchAll on the whole cluster with all default options
-        SearchResponse someentries = elasticsearchclient.prepareSearch().get();
-        System.out.println(someentries.getHits().internalHits().length);
-        for (SearchHit hit : someentries.getHits()){
-            try{
-                Map<String, Object> thesource = hit.getSource();
-                String example = "";
-                if (thesource.containsKey(field)){
-                    String get = ""+thesource.get(field);
+        SearchRequest searchRequest = new SearchRequest(); 
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder(); 
+        searchSourceBuilder.query(QueryBuilders.existsQuery(field)); 
+        searchSourceBuilder.size(20);
+        searchRequest.indices(getFulldbname());
+        searchRequest.source(searchSourceBuilder);
+        try {
+            SearchResponse searchResponse = elasticsearchclient.search(searchRequest, RequestOptions.DEFAULT);
+            for (SearchHit hit : searchResponse.getHits()){
+                Map<String, Object> hits = hit.getSourceAsMap();
+                if (hits.containsKey(field)){
+                    String get = ""+hits.get(field);
                     if (!get.equals("null")){
-                        System.out.println(get);
                     }
-                    examples.add(""+thesource.get(field));
+                    examples.add(get);
                 }
-                
-                
-
-                }catch (Exception ex){System.out.println(ex);}
             }
+            
+            
+        } catch (IOException ex) {
+            Logger.getLogger(refdb.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         if (examples.size()  < 2){
             System.out.println(field);
         }
@@ -181,7 +227,7 @@ public class refdb {
     
     
     private void writeheaders(File headerfile, Boolean sort){
-        System.out.println("writing headers");
+        //System.out.println("writing headers");
         headerfile.delete();
         try {
             headerfile.createNewFile();
@@ -210,10 +256,13 @@ public class refdb {
                 if (!myheader.getIndexable()){
                     indexable = "0";
                 }
-                linestowrite.add(myheader.getHeaderstring()+"\t"+examplestring+"\t"+myheader.getEnabled()+"\t"+myheader.getColorindex().toString()+"\t"+indexable+"\t"+myheader.getTabindex()+"\t"+parameterstring);
+
+               
+                
+                linestowrite.add(myheader.getHeaderstring()+"\t"+examplestring+"\t"+myheader.getEnabled()+"\t"+myheader.getColorindex().toString()+"\t"+indexable+"\t"+myheader.getTabindex()+"\t"+priority.getValue()+"\t"+parameterstring);
             }
             if (sort){
-            Collections.sort(linestowrite);
+                Collections.sort(linestowrite);
             }
 
             for (String line : linestowrite){
@@ -436,15 +485,16 @@ public class refdb {
     /**
      * @return the priority
      */
-    public String getPriority() {
+    public Integer getPriority() {
         return priority.getValue();
     }
 
     /**
      * @param priority the priority to set
      */
-    public void setPriority(String priority) {
+    public void setPriority(Integer priority) {
         this.priority.setValue(priority);
+        headerupdate();
     }
 
     /**

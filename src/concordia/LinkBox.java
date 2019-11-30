@@ -9,6 +9,7 @@ import Refdbmanager.header;
 import Refdbmanager.refdb;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import javafx.beans.property.SimpleStringProperty;
@@ -76,11 +77,11 @@ public class LinkBox extends VBox{
             myheader.setSourcedb(dbname);
             headerlist.add(myheader);
         }
-        
+        SortedList<header> sorted = headerlist.sorted(headerComparator);
         //boxlistview.maxHeight(10000.0);
         //boxlistview.maxHeightProperty().set(10000.0);
         //boxlistview.prefHeightProperty().set(headers.size()*35);
-        boxlistview.setItems(headerlist);  
+        boxlistview.setItems(sorted);  
 
         scrollpane.setMaxWidth(10000.0);
         scrollpane.setHbarPolicy(NEVER);
@@ -101,60 +102,71 @@ public class LinkBox extends VBox{
             header selecteditem = (header) boxlistview.getSelectionModel().getSelectedItem();
             if (event.getButton() == MouseButton.SECONDARY) {
                     String selectedname = selecteditem.getHeaderstring();
+                    System.out.println(selectedname);
+                    LinkedHashSet<String> examples = new LinkedHashSet<>();
+                    header myheader = null;
+                    for (refdb adb : GUIController.dbmanager.getReferencedatabases()){
+                        if (adb.getDbname().equals(dbname)){
+                            examples = adb.retrieveexample(selectedname);
+                            for (header aheader : adb.getHeaderset()){
+                                if (aheader.equals(selecteditem)){
+                                    myheader = aheader;
+                                }
+                                break;
+                            }
+                            break;
+                        }
+                    }
+                    
                     Alert alert = new Alert(AlertType.INFORMATION);
                     alert.setTitle("Examples:");
                     alert.setHeaderText(selectedname);
                     String contenttext = "";
-                    for (header myheader : headers){
-                        if (myheader.getHeaderstring().equals(selectedname)){
-                            for (String example : myheader.getExamples()){
-                                contenttext += example+"\n";
-                            }
-                            alert.setContentText(contenttext);
-                            CheckBox removeversioncheckbox = new CheckBox();
-                            removeversioncheckbox.setText("Remove version (.1 , .2 etc.)");
-                            if (myheader.getParameters().contains("removeversion")){
-                                removeversioncheckbox.setSelected(true);
-                            }
-                            
-                            CheckBox trimcheckbox = new CheckBox();
-                            trimcheckbox.setText("trim");
-                            if (myheader.getParameters().contains("trimcheckbox")){
-                                trimcheckbox.setSelected(true);
-                            }
-                            
-                            
-                            GridPane expContent = new GridPane();
-                            expContent.setMaxWidth(Double.MAX_VALUE);
-                            Label explabel = new Label();
-                            explabel.setText("Indexing options:");
-                            //expContent.add(explabel, 0, 0);
-                            //expContent.add(removeversioncheckbox, 0, 1);
-                            //expContent.add(trimcheckbox, 0, 2);
-                            
-                            alert.getDialogPane().setExpandableContent(expContent);
-                            alert.showAndWait();
-                            
-                            if (removeversioncheckbox.isSelected()){
-                                myheader.getParameters().add("removeversion");
-                            } else {
-                                myheader.getParameters().remove("removeversion");
-                            }
-                            
-                        }
+
+                    for (String example : examples){
+                        contenttext += example+"\n";
                     }
+                    alert.setContentText(contenttext);
+//                    CheckBox removeversioncheckbox = new CheckBox();
+//                    removeversioncheckbox.setText("Remove version (.1 , .2 etc.)");
+//                    if (!myheader.getParameters().contains("removeversion")){
+//                    } else {
+//                        removeversioncheckbox.setSelected(true);
+//                    }
+//
+//                    CheckBox trimcheckbox = new CheckBox();
+//                    trimcheckbox.setText("trim");
+//                    if (myheader.getParameters().contains("trimcheckbox")){
+//                        trimcheckbox.setSelected(true);
+//                    }
+
+
+                    GridPane expContent = new GridPane();
+                    expContent.setMaxWidth(Double.MAX_VALUE);
+                    Label explabel = new Label();
+                    explabel.setText("Indexing options:");
+                    //expContent.add(explabel, 0, 0);
+                    //expContent.add(removeversioncheckbox, 0, 1);
+                    //expContent.add(trimcheckbox, 0, 2);
+
+                    alert.getDialogPane().setExpandableContent(expContent);
+                    alert.showAndWait();
+
+//                    if (removeversioncheckbox.isSelected()){
+//                        myheader.getParameters().add("removeversion");
+//                    } else {
+//                        myheader.getParameters().remove("removeversion");
+//                    }
+                            
+                        
+                    
                     for (refdb db : GUIController.dbmanager.getReferencedatabases()){
                         if (db.getDbname().equals(dbname)){
                             db.headerupdate();
                         }
                     }
-                    
-                    
-            } 
-            
+            }
         }
-        
-        
     });
         
         this.getChildren().add(boxlabel);
@@ -272,4 +284,22 @@ public class LinkBox extends VBox{
                 }
             }
         }
-    }}
+    }
+        public static Comparator<header> headerComparator = new Comparator<header>() {
+
+	    public int compare(header header1, header header2) {
+
+	      String headername1 = header1.getHeaderstring().toLowerCase();
+	      String headername2 = header2.getHeaderstring().toLowerCase();
+
+	      //ascending order
+	      return headername1.compareToIgnoreCase(headername2);
+
+	      //descending order
+	      //return fruitName2.compareTo(fruitName1);
+	    }
+
+	};
+
+
+}

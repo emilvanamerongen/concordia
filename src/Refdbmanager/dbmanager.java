@@ -13,18 +13,22 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
-import org.elasticsearch.common.collect.ImmutableOpenMap;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.client.IndicesClient;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.GetIndexResponse;
+
 
 /**
  *
@@ -35,31 +39,32 @@ public class dbmanager {
 
     private File locationstorage;
     private ObservableList<refdb> referencedatabases = FXCollections.observableArrayList();
-    TransportClient elasticsearchclient = null;
+    RestHighLevelClient elasticsearchclient = null;
     
-    public dbmanager(){
-        read();
+    public dbmanager(RestHighLevelClient elasticsearchclient){
+        this.elasticsearchclient = elasticsearchclient;
+        if (elasticsearchclient != null){
+            read();
+        }
     }
     
     public void read(){
-        referencedatabases.clear();
-        if (elasticsearchclient != null){
+        if (elasticsearchclient == null){
+            return;
+        }
         try{
-        ImmutableOpenMap<String, IndexMetaData> indices = elasticsearchclient.admin().cluster()
-        .prepareState().get().getState()
-        .getMetaData().getIndices();
-        
+        referencedatabases.clear(); 
+            GetIndexRequest request = new GetIndexRequest("*");
+            GetIndexResponse getIndexResponse = elasticsearchclient.indices().get(request, RequestOptions.DEFAULT);         
 
         Integer index = 1;
-        for (ObjectCursor<String> indexname : indices.keys()){
-            String indexnamestring = indexname.value;
+        for (String indexname : getIndexResponse.getIndices()){
+            String indexnamestring = indexname;
 //            get number of documents
-            long totalHits = elasticsearchclient.prepareSearch(indexnamestring)
-                    .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                    .setTypes("entry")
-                    .setSize(0)
-                    .setQuery(QueryBuilders.queryStringQuery("*")).get().getHits().getTotalHits();
-            
+            CountRequest countRequest = new CountRequest(indexname); 
+
+            CountResponse countresponse = elasticsearchclient.count(countRequest, RequestOptions.DEFAULT);
+            Long totalHits = countresponse.getCount();
             if (!indexnamestring.startsWith(".")){
                 referencedatabases.add(new refdb(index,indexnamestring,""+totalHits,elasticsearchclient));
                 index ++; 
@@ -87,12 +92,12 @@ public class dbmanager {
 //            } catch (IOException ex) {
 //                Logger.getLogger(dbmanager.class.getName()).log(Level.SEVERE, null, ex);
 //            }
-//        }
-        } catch (Exception ex){
+        
+        } catch (IOException | InterruptedException | ExecutionException ex){
             System.out.println("ERROR unable to access elasticsearch indices");
             System.out.println(ex);
         }
-        }
+        
     }
     
 
@@ -110,10 +115,17 @@ public class dbmanager {
         int removeindex = -1;
         for (refdb db : referencedatabases){
             if (db.getSelect().getValue()){
-                elasticsearchclient.admin().indices().delete(new DeleteIndexRequest(db.getFulldbname())).actionGet();
+                DeleteIndexRequest request = new DeleteIndexRequest(db.getFulldbname());
+                try {
+                    AcknowledgedResponse deleteIndexResponse = elasticsearchclient.indices().delete(request, RequestOptions.DEFAULT);
+                } catch (IOException ex) {
+                    Logger.getLogger(dbmanager.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
-        read();
+
+            read();
+
     }
     
         /**
@@ -123,7 +135,7 @@ public class dbmanager {
         return referencedatabases;
     }
 
-    public void giveclient(TransportClient elasticsearchclient) {
+    public void giveclient(RestHighLevelClient elasticsearchclient) {
         this.elasticsearchclient = elasticsearchclient;
     }
 

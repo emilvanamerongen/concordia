@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.TransportClient;
 
 /**
@@ -32,11 +33,11 @@ public class ListenSocket extends Thread{
     private Integer num_workers = 1;
     private Boolean started = false;
     private Boolean active = true;
-    private TransportClient client;
+    private RestHighLevelClient client;
     private ArrayList<Client> clients = new ArrayList<>();
     private Client primaryclient = new Client();
     
-    public ListenSocket(Integer port, Integer num_workers, TransportClient client) throws IOException{
+    public ListenSocket(Integer port, Integer num_workers, RestHighLevelClient client) throws IOException{
         this.port = port;
         this.server = new ServerSocket(port);
         System.out.println("ListenSocket$ Listening for requests on: "+server+" "+server.getLocalSocketAddress()+" "+server.getLocalPort());
@@ -61,9 +62,9 @@ public class ListenSocket extends Thread{
                 }
             }
             if (!freesocket){
-                Client newclient = new Client(this.client, getServer(),ip,port,requestqueue,false);
-                newclient.start();
-                clients.add(newclient);
+//                Client newclient = new Client(this.client, getServer(),ip,port,requestqueue,false);
+//                newclient.start();
+//                clients.add(newclient);
             }
             try {
                 Thread.sleep(10);

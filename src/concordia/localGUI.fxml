@@ -59,7 +59,7 @@
                         <Font name="Raleway" size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="quicksearchbutton" maxWidth="320.0" mnemonicParsing="false" onAction="#switchtab" prefWidth="320.0" text="Quick search" textFill="#909090">
+                  <Button fx:id="quicksearchbutton" maxWidth="320.0" mnemonicParsing="false" onAction="#switchtab" prefWidth="320.0" text="Quick search" textFill="#909090" visible="false">
                      <font>
                         <Font name="Raleway" size="13.0" />
                      </font>
@@ -67,7 +67,7 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="serverbutton" maxWidth="320.0" mnemonicParsing="false" onAction="#switchtab" prefWidth="320.0" text="Server" textFill="#838383">
+                  <Button fx:id="serverbutton" maxWidth="320.0" mnemonicParsing="false" onAction="#switchtab" prefWidth="320.0" text="Server" textFill="#838383" visible="false">
                      <font>
                         <Font name="Raleway" size="13.0" />
                      </font>
@@ -75,7 +75,7 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="settingsbutton" disable="true" maxWidth="320.0" mnemonicParsing="false" onAction="#switchtab" prefWidth="320.0" text="Settings">
+                  <Button fx:id="settingsbutton" maxWidth="320.0" mnemonicParsing="false" onAction="#switchtab" prefWidth="320.0" text="Settings">
                      <font>
                         <Font name="Raleway" size="13.0" />
                      </font></Button>
@@ -390,7 +390,7 @@
                                                    <children>
                                                       <VBox alignment="CENTER" prefHeight="217.0" prefWidth="150.0" HBox.hgrow="ALWAYS">
                                                          <children>
-                                                            <Label alignment="CENTER" maxWidth="350.0" prefHeight="28.0" prefWidth="350.0" text="blastresult data files">
+                                                            <Label alignment="CENTER" maxWidth="350.0" prefHeight="28.0" prefWidth="350.0" text="Files to annotate">
                                                                <VBox.margin>
                                                                   <Insets bottom="10.0" />
                                                                </VBox.margin>
@@ -401,31 +401,21 @@
                                                                   <Insets top="50.0" />
                                                                </padding>
                                                             </Label>
-                                                            <ListView fx:id="fileslist" maxHeight="2000.0" maxWidth="2000.0" prefHeight="505.0" prefWidth="350.0" VBox.vgrow="ALWAYS">
+                                                            <ListView fx:id="annotatefilespane" prefHeight="300.0" prefWidth="433.0">
                                                                <VBox.margin>
-                                                                  <Insets left="40.0" right="40.0" />
+                                                                  <Insets left="10.0" right="10.0" />
                                                                </VBox.margin>
                                                             </ListView>
                                                             <AnchorPane maxHeight="37.0" maxWidth="350.0" prefHeight="37.0" prefWidth="302.0">
                                                                <children>
-                                                                  <Button fx:id="deletefilebutton" alignment="CENTER" layoutX="295.0" layoutY="23.0" mnemonicParsing="false" onAction="#deleteblastresultfile" prefHeight="7.0" prefWidth="53.0" text="delete">
+                                                                  <Button fx:id="deletefilebutton" alignment="CENTER" layoutX="175.0" layoutY="5.0" mnemonicParsing="false" onAction="#clearfiles" prefHeight="25.0" prefWidth="69.0" text="clear">
                                                                      <font>
                                                                         <Font size="9.0" />
                                                                      </font>
                                                                   </Button>
-                                                                  <Button fx:id="addfilesbutton" layoutX="290.0" layoutY="2.0" mnemonicParsing="false" onAction="#addblastresultfiles" prefHeight="17.0" prefWidth="59.0" text="add files">
+                                                                  <Button fx:id="addfilesbutton" layoutX="104.0" layoutY="5.0" mnemonicParsing="false" onAction="#addfiles" prefHeight="25.0" prefWidth="71.0" text="add files">
                                                                      <font>
                                                                         <Font size="9.0" />
-                                                                     </font>
-                                                                  </Button>
-                                                                  <Button layoutY="2.0" mnemonicParsing="false" onAction="#updateblastresultfilelist" text="refresh">
-                                                                     <font>
-                                                                        <Font size="9.0" />
-                                                                     </font>
-                                                                  </Button>
-                                                                  <Button fx:id="annotatebutton" layoutX="125.0" layoutY="3.0" mnemonicParsing="false" onAction="#switchtab" prefHeight="19.0" prefWidth="55.0" text="annotate" AnchorPane.leftAnchor="122.0" AnchorPane.rightAnchor="122.0">
-                                                                     <font>
-                                                                        <Font name="System Bold" size="9.0" />
                                                                      </font>
                                                                   </Button>
                                                                </children>
@@ -483,11 +473,11 @@
                                                             <Insets top="-7.0" />
                                                          </HBox.margin>
                                                       </TabPane>
-                                                      <VBox alignment="TOP_CENTER" prefHeight="256.0" prefWidth="290.0" HBox.hgrow="ALWAYS">
+                                                      <VBox alignment="CENTER" prefHeight="256.0" prefWidth="290.0" HBox.hgrow="ALWAYS">
                                                          <children>
                                                             <Label alignment="CENTER" prefHeight="28.0" prefWidth="350.0" text="save as:">
                                                                <VBox.margin>
-                                                                  <Insets bottom="200.0" />
+                                                                  <Insets bottom="10.0" />
                                                                </VBox.margin>
                                                                <font>
                                                                   <Font name="Raleway Bold" size="19.0" />
@@ -517,7 +507,7 @@
                                                             <RadioButton mnemonicParsing="false" text="File" />
                                                             <Button mnemonicParsing="false" onAction="#startannotator" text="GO">
                                                                <VBox.margin>
-                                                                  <Insets top="20.0" />
+                                                                  <Insets bottom="295.0" top="20.0" />
                                                                </VBox.margin>
                                                             </Button>
                                                          </children>
@@ -626,38 +616,9 @@
                                           <Insets bottom="10.0" right="5.0" />
                                        </padding>
                                        <VBox.margin>
-                                          <Insets bottom="50.0" top="30.0" />
+                                          <Insets bottom="20.0" top="30.0" />
                                        </VBox.margin>
                                     </Label>
-                                    <Label text="Concordia directory" textAlignment="CENTER">
-                                       <font>
-                                          <Font name="Raleway" size="17.0" />
-                                       </font>
-                                       <VBox.margin>
-                                          <Insets bottom="5.0" />
-                                       </VBox.margin>
-                                    </Label>
-                                    <Label fx:id="directorylabel" alignment="CENTER" prefHeight="17.0" prefWidth="322.0" text="-----" textAlignment="CENTER">
-                                       <font>
-                                          <Font name="Arial Italic" size="12.0" />
-                                       </font></Label>
-                                    <HBox alignment="CENTER" prefHeight="42.0" prefWidth="711.0">
-                                       <VBox.margin>
-                                          <Insets left="200.0" right="200.0" />
-                                       </VBox.margin>
-                                       <children>
-                                          <Button mnemonicParsing="false" onAction="#setdirectory" text="change location">
-                                             <HBox.margin>
-                                                <Insets right="5.0" />
-                                             </HBox.margin>
-                                          </Button>
-                                          <Button mnemonicParsing="false" onAction="#openexplorer" text="open in explorer">
-                                             <HBox.margin>
-                                                <Insets left="5.0" />
-                                             </HBox.margin>
-                                          </Button>
-                                       </children>
-                                    </HBox>
                                     <Label text="Performance" textAlignment="CENTER">
                                        <font>
                                           <Font name="Raleway" size="17.0" />
@@ -666,8 +627,6 @@
                                           <Insets bottom="10.0" top="40.0" />
                                        </VBox.margin>
                                     </Label>
-                                    <Label text="Available RAM (GB):" />
-                                    <TextField fx:id="ramfield" maxWidth="50.0" onAction="#changeAvailableRAM" onKeyReleased="#changeAvailableRAM" prefWidth="50.0" text="6" />
                                  </children>
                               </VBox>
                            </content>

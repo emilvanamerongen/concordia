@@ -16,8 +16,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 
 /**
@@ -25,16 +29,16 @@ import org.elasticsearch.common.xcontent.XContentType;
  * @author emil3
  */
 public class ElasticImportThread extends Thread{
-    public ArrayBlockingQueue<LinkedHashMap<String, ArrayList<String>>> complete = new ArrayBlockingQueue<>(1000, true);
+    public ArrayBlockingQueue<LinkedHashMap<String, ArrayList<String>>> complete = new ArrayBlockingQueue<>(100, true);
     public Boolean active = true;
     public FileWriter outputstream = null;
     private Integer elasticport = 9200;
     private String indexname;
     private Integer id = 0;
-    private TransportClient client;
+    private RestHighLevelClient client;
     private Parser parent;
     
-    public ElasticImportThread(ArrayBlockingQueue<LinkedHashMap<String, ArrayList<String>>> complete, String indexname, TransportClient client, Parser parent){
+    public ElasticImportThread(ArrayBlockingQueue<LinkedHashMap<String, ArrayList<String>>> complete, String indexname, RestHighLevelClient client, Parser parent){
         this.complete = complete;
         this.indexname = indexname;
         this.client = client;
@@ -73,7 +77,7 @@ public class ElasticImportThread extends Thread{
     
     }
     
-    public void importdata(LinkedHashMap<String, ArrayList<String>> request, TransportClient client) throws java.io.IOException{
+    public void importdata(LinkedHashMap<String, ArrayList<String>> request, RestHighLevelClient client) throws java.io.IOException{
         id ++;
         Map<String, Object> json = new HashMap<>();
         for (String item : request.keySet()){
@@ -89,11 +93,9 @@ public class ElasticImportThread extends Thread{
             
         }
         
-        
 //            System.out.println("-----------------------------------");
 //        System.out.println(curl);
-        parent.getBulkProcessor().add(new IndexRequest(indexname.toLowerCase(), "entry").source(json, XContentType.JSON));
-        
+        Parser.bulkProcessor.add(new IndexRequest(indexname.toLowerCase()).source(json, XContentType.JSON));
 
 //        Process p = new ProcessBuilder(
 //                "/bin/sh",
@@ -131,4 +133,16 @@ public class ElasticImportThread extends Thread{
 
         
     }
+    
+    ActionListener<BulkResponse> listener = new ActionListener<BulkResponse>() {
+    @Override
+    public void onResponse(BulkResponse bulkResponse) {
+        
+    }
+
+    @Override
+    public void onFailure(Exception e) {
+        
+    }
+};
 }

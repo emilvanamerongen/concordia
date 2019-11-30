@@ -5,15 +5,15 @@
  */
 package concordia;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import server.ConcordiaServer;
 
 /**
@@ -27,9 +27,11 @@ public class Concordia extends Application {
     static Boolean remote = false;
     public static Boolean serveractive = false;
     
-            
+
     @Override
     public void start(Stage stage) throws Exception {
+        
+        
         Thread.currentThread().setName("CONCORDIA");
         System.out.println("-------------------------");
         if (local && !remote){
@@ -52,6 +54,7 @@ public class Concordia extends Application {
      */
     public static void main(String[] args) {
         // check command line arguments and set server/remote booleans accordingly
+        setloglevel("error");
         try{
             if (args[0].contains("LOCAL")||args[0].contains("local")){
                 local = true;
@@ -68,5 +71,24 @@ public class Concordia extends Application {
             launch(args);
         }
     }
+    
+    public static void setloglevel(String level){
+        switch(level) {
+            case "error":
+              Logger.getRootLogger().setLevel(Level.ERROR);
+              break;
+            case "warning":
+              Logger.getRootLogger().setLevel(Level.WARN);
+              break;
+            case "debug":
+              Logger.getRootLogger().setLevel(Level.DEBUG);
+              break;
+            default:
+              // code block
+        }
+        
+    }
+    
+    
     
 }

@@ -27,6 +27,7 @@ import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
@@ -45,10 +46,10 @@ public class RequestWorker extends Thread{
     private ConcurrentLinkedQueue<ElasticRequest> requestqueue = new ConcurrentLinkedQueue();
     private HashMap<String,ArrayList<HashMap<String,String[]>>> instructionsets = new HashMap<>();
     private File instructionsetfolder = new File("instructionsets"+File.separator);
-    private TransportClient client;
+    private RestHighLevelClient client;
     private JSONObject jsonoutput = new JSONObject();
     
-    public RequestWorker(ConcurrentLinkedQueue<ElasticRequest> requestqueue, TransportClient client){
+    public RequestWorker(ConcurrentLinkedQueue<ElasticRequest> requestqueue, RestHighLevelClient client){
         this.requestqueue = requestqueue;
         this.client = client;
     }
@@ -138,7 +139,7 @@ public class RequestWorker extends Thread{
                 whitelist.clear();
                 whitelist.add("htox_signs_and_symptoms");
                 whitelist.add("htox");
-                jsonoutput = search(jsonoutput, "hsdb", request.getQuery().get("drug"),columns,whitelist);
+//                jsonoutput = search(jsonoutput, "hsdb", request.getQuery().get("drug"),columns,whitelist);
                 
             } else if (querystring.contains("overdose")){
                 System.out.println("OD");
@@ -149,7 +150,7 @@ public class RequestWorker extends Thread{
                 whitelist.add("actn");
                 //whitelist.add("htox_signs_and_symptoms");
                 //whitelist.add("htox");
-                jsonoutput = search(jsonoutput, "hsdb", request.getQuery().get("drug"),columns,whitelist);
+//                jsonoutput = search(jsonoutput, "hsdb", request.getQuery().get("drug"),columns,whitelist);
                 
               
             }
@@ -170,39 +171,39 @@ public class RequestWorker extends Thread{
     
     
 
-    private JSONObject search(JSONObject jsonoutput, String db, ArrayList<String> values, ArrayList<String> columns, HashSet<String> whitelist){
-        String[] columnsarr = new String[columns.size()];
-        columnsarr = columns.toArray(columnsarr);
-        String valuesstring = values.toString().replace("[","").replace("]", "").replace(",", "");
-        SearchRequestBuilder prepareSearch = client.prepareSearch(db);  
-        prepareSearch.setQuery(QueryBuilders.multiMatchQuery(valuesstring,columnsarr));
-        SearchResponse response = prepareSearch.get();  
-        //System.out.println("searching: values:"+valuesstring+"columns: "+columnsarr.toString());
-        if (response!=null){
-            
-                if (response.getHits().totalHits > 0){  
-                    
-                    Map<String, Object> firsthit = response.getHits().getAt(0).getSource();
-                    for (String field : firsthit.keySet()){
-                        try{
-                            System.out.println("found something");
-                        if (whitelist.isEmpty() || whitelist.contains(field)){
-                        if (!firsthit.get(field).toString().equals("null")){
-                           ArrayList<String> data =   (ArrayList<String>) firsthit.get(field);
-                           ArrayList<String> datalist = new ArrayList<>();
-                           for (String dataitem : data){
-                               datalist.add(dataitem.replace("&amp;", ""));
-                           }
-                           jsonoutput.put(field, datalist);
-                           
-                        }
-                        }
-                        }catch (Exception ex){System.out.println(ex);}
-                    }
-                }
-        } 
-        return jsonoutput;
-    }
+//    private JSONObject search(JSONObject jsonoutput, String db, ArrayList<String> values, ArrayList<String> columns, HashSet<String> whitelist){
+//        String[] columnsarr = new String[columns.size()];
+//        columnsarr = columns.toArray(columnsarr);
+//        String valuesstring = values.toString().replace("[","").replace("]", "").replace(",", "");
+//        SearchRequestBuilder prepareSearch = client.prepareSearch(db);  
+//        prepareSearch.setQuery(QueryBuilders.multiMatchQuery(valuesstring,columnsarr));
+//        SearchResponse response = prepareSearch.get();  
+//        //System.out.println("searching: values:"+valuesstring+"columns: "+columnsarr.toString());
+//        if (response!=null){
+//            
+//                if (response.getHits().totalHits > 0){  
+//                    
+//                    Map<String, Object> firsthit = response.getHits().getAt(0).getSource();
+//                    for (String field : firsthit.keySet()){
+//                        try{
+//                            System.out.println("found something");
+//                        if (whitelist.isEmpty() || whitelist.contains(field)){
+//                        if (!firsthit.get(field).toString().equals("null")){
+//                           ArrayList<String> data =   (ArrayList<String>) firsthit.get(field);
+//                           ArrayList<String> datalist = new ArrayList<>();
+//                           for (String dataitem : data){
+//                               datalist.add(dataitem.replace("&amp;", ""));
+//                           }
+//                           jsonoutput.put(field, datalist);
+//                           
+//                        }
+//                        }
+//                        }catch (Exception ex){System.out.println(ex);}
+//                    }
+//                }
+//        } 
+//        return jsonoutput;
+//    }
     
     
     

@@ -31,8 +31,8 @@ public class Rawdataprocesthread extends Thread{
 
     //private ConcurrentLinkedQueue<ArrayList<String>> queue = new ConcurrentLinkedQueue();
     //public ConcurrentLinkedQueue<String> rawdataqueue = new ConcurrentLinkedQueue();
-    public ArrayBlockingQueue<ArrayList<String>> queue = new ArrayBlockingQueue<>(1000, true);
-    public ArrayBlockingQueue<String> rawdataqueue = new ArrayBlockingQueue<>(100000, true);
+    public ArrayBlockingQueue<ArrayList<String>> queue = new ArrayBlockingQueue<>(100, true);
+    public ArrayBlockingQueue<String> rawdataqueue = new ArrayBlockingQueue<>(100, true);
     private Boolean active = false;
     public Boolean threadactive = true;
     private ArrayList<String> linetemp = new ArrayList<>();

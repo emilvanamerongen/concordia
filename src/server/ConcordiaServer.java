@@ -16,11 +16,13 @@ import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.node.DiscoveryNode;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
+
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -62,15 +64,11 @@ public class ConcordiaServer extends Thread{
         //prepare elasticsearch client
         System.out.println(ANSI_BLUE+"preparing elasticsearch client..");
         
-        Settings settings = Settings.builder().put("cluster.name", serverproperties.getElasticCLUSTERNAME()).build();
-        TransportClient client = new PreBuiltTransportClient(settings);
-        try {
-            client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(serverproperties.getElasticIP()), serverproperties.getElasticPORT()));   
-            System.out.println("connected to: "+client.transportAddresses().get(0).getHost());
-        } catch (Exception ex){
-            System.out.println("ERROR while preparing elasticsearch client: "+ex);
-            
-        }
+        //Settings settings = Settings.builder().put("cluster.name", serverproperties.getElasticCLUSTERNAME()).build();
+        System.out.println(ANSI_BLUE+"preparing elasticsearch client..");
+        RestHighLevelClient client = new RestHighLevelClient(
+                RestClient.builder(
+                        new HttpHost(serverproperties.getElasticIP(), serverproperties.getElasticPORT(), "http")));
         //prepare neo4j client
         neo4juri = serverproperties.getNeo4jURI();
         neo4juser = serverproperties.getNeo4jUSER();
@@ -96,7 +94,7 @@ public class ConcordiaServer extends Thread{
     }
     
     
-    private void process(String task, TransportClient client){
+    private void process(String task, RestHighLevelClient client){
         String input = task;
             if (input.equals("quit")){
                 active = false;
@@ -282,7 +280,7 @@ public class ConcordiaServer extends Thread{
     }
     
     
-    public void startremoteserver(TransportClient client){
+    public void startremoteserver(RestHighLevelClient client){
         //start socket listener  
         System.out.println(ANSI_RESET+"-------------------------");
         ListenSocket serverlistener;

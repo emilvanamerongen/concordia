@@ -29,8 +29,7 @@ public class ServerProperties {
     private String username = "";
     private String elasticIP = "";
     private String elasticCLUSTERNAME = "";
-    private Integer elasticPORT = 9300;
-    private Integer elasticRESTPORT = 9200;
+    private Integer elasticPORT = 9200;
     private String instructionsetfolder = "";
     private String neo4jURI = "bolt://localhost:7687";
     private String neo4jUSER = "java";
@@ -78,10 +77,6 @@ public class ServerProperties {
                             case "elasticPORT":
                                 setElasticPORT((Integer) Integer.parseInt(linesplit[1].trim()));
                                 System.out.println("elasticPORT:"+getElasticPORT());
-                                break;
-                            case "elasticRESTPORT":
-                                setElasticRESTPORT((Integer) Integer.parseInt(linesplit[1].trim()));
-                                System.out.println("elasticRESTPORT:"+getElasticRESTPORT());
                                 break;
                             case "instructionsetfolder":
                                 setInstructionsetfolder(linesplit[1]);
@@ -131,9 +126,7 @@ public class ServerProperties {
             setInstructionsetfolder("instructionsets");
             lines.add("elasticIP=localhost");
             setElasticIP("localhost");
-            lines.add("elasticPORT=9300");
-            setElasticPORT((Integer) 9300);
-            lines.add("elasticRESTPORT=9200");
+            lines.add("elasticPORT=9200");
             setElasticPORT((Integer) 9200);
             lines.add("elasticCLUSTERNAME=elasticsearch");
             setElasticCLUSTERNAME("elasticsearch");
@@ -234,19 +227,6 @@ public class ServerProperties {
         this.elasticPORT = elasticPORT;
     }
 
-    /**
-     * @return the elasticRESTPORT
-     */
-    public synchronized Integer getElasticRESTPORT() {
-        return elasticRESTPORT;
-    }
-
-    /**
-     * @param elasticRESTPORT the elasticRESTPORT to set
-     */
-    public synchronized void setElasticRESTPORT(Integer elasticRESTPORT) {
-        this.elasticRESTPORT = elasticRESTPORT;
-    }
 
     /**
      * @return the instructionsetfolder

@@ -177,11 +177,11 @@ public class header{
 
 	    public int compare(header header1, header header2) {
 
-	      String headername1 = header1.getHeaderstring().toUpperCase();
-	      String headername2 = header2.getHeaderstring().toUpperCase();
+	      String headername1 = header1.getHeaderstring().toLowerCase();
+	      String headername2 = header2.getHeaderstring().toLowerCase();
 
 	      //ascending order
-	      return headername1.compareTo(headername2);
+	      return headername1.compareToIgnoreCase(headername2);
 
 	      //descending order
 	      //return fruitName2.compareTo(fruitName1);

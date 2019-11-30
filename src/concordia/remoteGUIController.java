@@ -98,7 +98,7 @@ public class remoteGUIController implements Initializable {
     
     // <editor-fold desc="database manager FXML">
     @FXML TableView dbmanagertable;
-    public static dbmanager dbmanager = new dbmanager();
+    public static dbmanager dbmanager = new dbmanager(null);
     @FXML VBox refdbaddpane;
     @FXML Button adddatabutton;
     @FXML Button closebutton;

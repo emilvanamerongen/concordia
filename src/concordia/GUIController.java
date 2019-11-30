@@ -8,7 +8,6 @@ package concordia;
 import Annotator.Searcher;
 import Annotator.AnnotationProcess;
 import Annotator.AnnotationFileInfo;
-import CazyModule.CazyAnnotator;
 import ElasticImport.Parser;
 import ElasticImport.Rawdataprocesthread;
 
@@ -22,7 +21,6 @@ import UniprotModule.IDMappingIndexer;
 import UniprotModule.UniprotAnnotator;
 import UniprotModule.uniprotindexer;
 import gnu.trove.map.hash.THashMap;
-import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,17 +33,12 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static javafx.animation.Animation.INDEFINITE;
@@ -59,7 +52,6 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -69,12 +61,10 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
@@ -86,21 +76,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
 import javafx.util.Duration;
-import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
-import server.ConcordiaServer;
+import javafx.util.converter.IntegerStringConverter;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import static server.ConcordiaServer.ANSI_BLUE;
-import static server.ConcordiaServer.ANSI_RESET;
 import static server.ConcordiaServer.BLUE_BOLD;
 import static server.ConcordiaServer.serverproperties;
 
@@ -124,9 +108,9 @@ public class GUIController implements Initializable {
     
     // <editor-fold desc="database manager FXML">
     public static final String ANSI_RESET = "\u001B[0m";
-    TransportClient elasticsearchclient = null;
+    RestHighLevelClient elasticsearchclient = null;
     @FXML TableView dbmanagertable;
-    public static dbmanager dbmanager = new dbmanager();
+    public static dbmanager dbmanager = new dbmanager(null);
     @FXML VBox refdbaddpane;
     @FXML Button adddatabutton;
     @FXML Button closebutton;
@@ -178,23 +162,21 @@ public class GUIController implements Initializable {
     @FXML ListView cazylist1;
     @FXML Label idmappinglabel;
     @FXML TabPane filespane;
-    @FXML ListView fileslist;
     @FXML Button directorybutton;
-    @FXML Button annotatebutton;
     @FXML VBox annotatorbox;
     @FXML ChoiceBox templatechoicebox;
     @FXML VBox annotationprogressbox;
     @FXML VBox annotationdatabox;
     @FXML AnchorPane annotationprogressanchorpane;
+    @FXML ListView annotatefilespane;
     private AnnotationProcess annotationprocess = null;
     
     public static ArrayList<DBpane> dbpanes = new ArrayList();
     // </editor-fold>
     
     // <editor-fold desc="settings page FXML">
-    @FXML TextField ramfield;
     @FXML Label directorylabel;
-    public Integer availableRAM = 6;
+    
     // </editor-fold>
     
 
@@ -216,15 +198,16 @@ public class GUIController implements Initializable {
     public void elasticconnect(){
         //load properties from server.properties file
         serverproperties.loadproperties();
-        
+        //serverproperties.getElasticPORT()
         //prepare elasticsearch client
         System.out.println(ANSI_BLUE+"preparing elasticsearch client..");
-        
-        Settings settings = Settings.builder().put("cluster.name", serverproperties.getElasticCLUSTERNAME()).build();
-        elasticsearchclient = new PreBuiltTransportClient(settings);
+        elasticsearchclient = new RestHighLevelClient(
+        RestClient.builder(
+                new HttpHost(serverproperties.getElasticIP(), 9200, "http")));
+       
+
         try {
-            elasticsearchclient.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(serverproperties.getElasticIP()), serverproperties.getElasticPORT()));   
-            System.out.println("connected to: "+elasticsearchclient.transportAddresses().get(0).getHost());
+            System.out.println("connected to: "+elasticsearchclient);
             dbmanager.giveclient(elasticsearchclient);
         } catch (Exception ex){
             System.out.println("ERROR while preparing elasticsearch client: "+ex);
@@ -236,8 +219,9 @@ public class GUIController implements Initializable {
         //elasticsearch init 
         elasticconnect();
         dbmanager.read();
+
         //adddatapane init
-        typelist.addAll("tab-delimited","template","uniprot","uniprot ID-mapping xml");
+        typelist.addAll("tab-delimited","template","uniprot","uniprot ID-mapping xml","pfam","pfampositionmap");
         typebox.setItems(typelist);
         closebutton.setVisible(false);
         
@@ -285,11 +269,11 @@ public class GUIController implements Initializable {
             ).setHeaderindex(t.getNewValue());
         });
         //priority column
-        TableColumn<refdb, String> prioritycolumn = new TableColumn<>("priority");
+        TableColumn<refdb, Integer> prioritycolumn = new TableColumn<>("priority");
         prioritycolumn.setCellValueFactory(new PropertyValueFactory<>("priority"));
-        prioritycolumn.setCellFactory(TextFieldTableCell.<refdb>forTableColumn());
+        prioritycolumn.setCellFactory(TextFieldTableCell.<refdb, Integer>forTableColumn(new IntegerStringConverter()));
         prioritycolumn.setOnEditCommit(
-        (CellEditEvent<refdb, String> t) -> {
+        (CellEditEvent<refdb, Integer> t) -> {
         ((refdb) t.getTableView().getItems().get(
             t.getTablePosition().getRow())
             ).setPriority(t.getNewValue());
@@ -319,9 +303,9 @@ public class GUIController implements Initializable {
     @FXML public void importrefdb(){
         String type = typebox.getSelectionModel().getSelectedItem().toString();
         String indexname = namefield.getText();
-        String headerindex = "0";
+        Long headerindex = 0l;
         if (! headerindexfield.getText().isEmpty()){
-        headerindex = headerindexfield.getText();
+            headerindex = Long.parseLong(headerindexfield.getText(),10);
         }
         String filepath = importfilepathfield.getText();
         File importfile = new File(filepath);
@@ -336,7 +320,7 @@ public class GUIController implements Initializable {
         indexprogressanchorpane.setVisible(true);
         
         if (importfile != null && entrydelimiter != null){
-            parser = new Parser(importfile,indexname,entrydelimiter,type,num_workers,custom_types,elasticsearchclient);
+            parser = new Parser(importfile,indexname,entrydelimiter,type,num_workers,custom_types,elasticsearchclient,headerindex);
             System.out.println("Starting parser for: ");
             System.out.println(BLUE_BOLD +"inputfile: \t"+ANSI_RESET+importfile.getAbsolutePath());
             System.out.println(BLUE_BOLD +"indexname: \t"+ANSI_RESET+indexname);
@@ -464,7 +448,7 @@ public class GUIController implements Initializable {
                 db.forceheaderreset();
             }
         }
-        dbmanager = new dbmanager();
+        dbmanager = new dbmanager(elasticsearchclient);
         regeneratefilelinkingtables();
     }
     
@@ -476,7 +460,7 @@ public class GUIController implements Initializable {
         Integer counter = 0;
         while (counter <= 100){
             for (refdb database : referencedatabases){
-                if (database.getPriority().equals(counter.toString())){
+                if (database.getPriority() == counter){
                         mylinkboxes.add(new LinkBox(database.getDbname(), database.getHeaderset()));  
                 }
             }
@@ -593,105 +577,18 @@ public class GUIController implements Initializable {
     
     // </editor-fold>
 
-    // <editor-fold desc="run annotation">
-    //-----------------------------------------------------------------------------------------------------------------------------------------
-    UniprotAnnotator uniprotannotator = null;
-    ArrayList<Button> activebuttons = new ArrayList<>();
-    File uniprotidfile;
-    //pipeline code 
-    Boolean cazyqueue = false;
-    Boolean uniprotqueue = false;
-    ArrayList<File> cazyqueueitems;
-    Boolean cazyactive = false;
-    Properties myproperties = new Properties();
-    Filemanager filemanager = new Filemanager();
-    long tStart = 0l;
-    long tTotal = 0l;
-
-
-
-    /**
-     *
-     */
-    @FXML
-    public void updateblastresultfilelist(){
-        filemanager.blastresultmanager.updatefiles();
-        ObservableList<String> names = FXCollections.observableArrayList(filemanager.blastresultmanager.getFilenames());    
-        SortedList<String> sorted = names.sorted();
-        fileslist.setItems(sorted);     
-        fileslist.setCellFactory(param -> new ListCell<String>() {
-            private ImageView imageView2 = new ImageView();
-            @Override
-            public void updateItem(String name, boolean empty) {
-                super.updateItem(name, empty);
-                if (empty) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    setText(name.replace("ᚒC", "").replace("ᚒF", "").replace("ᚒU", ""));
-                }
-            }
-        });    }
-
-   
-    /**
-     *
-     * @param event
-     */
-    @FXML
-    public void addblastresultfiles(ActionEvent event){
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("move files to blastresult data in project folder");
-        List<File> newfiles = chooser.showOpenMultipleDialog(filespane.getScene().getWindow());
-        if (newfiles != null){
-            for (File file : newfiles){
-                file.renameTo(new File(filemanager.blastresultmanager.getblastresultdirectory().getAbsolutePath()+File.separator+file.getName()));
-            }
-            filemanager.blastresultmanager.updatefiles();
-        }
-        updateblastresultfilelist();
-    }
-
-    /**
-     *
-     */
-    @FXML
-    public void deleteblastresultfile(){
-        ObservableList selectedfile = fileslist.getSelectionModel().getSelectedItems();
-        try{
-        Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle("Delete file");
-        alert.setHeaderText(selectedfile.get(0)+" wil be permanently deleted");
-        alert.setContentText("Are you sure want to permanently delete this file?");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK){
-            File markedfordelete = filemanager.blastresultmanager.getblastresultfiles().get(selectedfile.get(0));
-            Files.delete(markedfordelete.toPath());
-            filemanager.blastresultmanager.updatefiles();
-        } else {
-            System.out.println("deletion canceled");
-        }
-        } catch (Exception ex){
-            System.out.println("no files deleted");
-        }
-        updateblastresultfilelist();
-    }
-
-    
-
-    //-----------------------------------------------------------------------------------------------------------------------------------------------
-    // </editor-fold>
-    
     // <editor-fold desc="run annotation 2">
+    private ArrayList<File> filesToAnnotate = new ArrayList<>();
+    
     private void annotatorinit(){
         ObservableList<refdb> referencedatabases = dbmanager.getReferencedatabases();
         Integer counter = 0;
         while (counter <= 100){
             for (refdb database : referencedatabases){
-                if (database.getPriority().equals(counter.toString())){
-                    //if (! database.getType().equals("template (tab)"))
-                    dbpanes.add(new DBpane(database));  
+                if (database.getPriority().equals(counter)){
+                    if (! database.getType().equals("template")){
+                        dbpanes.add(new DBpane(database));  
+                    }
                 }
             }
             counter++;
@@ -699,27 +596,41 @@ public class GUIController implements Initializable {
         annotatorbox.getChildren().addAll(dbpanes);
         templatechoicebox.getItems().clear();
         for (refdb database : dbmanager.getReferencedatabases()){
-            database.getType();
             if (database.getType().equals("template")){
             templatechoicebox.getItems().add(database.getDbname());}
         }
     }
+
+    @FXML public void addfiles(){
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("select your tab delimited file(s)");
+        List<File> selectedfiles = chooser.showOpenMultipleDialog(annotatefilespane.getScene().getWindow());
+        try {
+            if (!selectedfiles.isEmpty()){
+                for (File afile : selectedfiles){
+                    annotatefilespane.getItems().add(afile.getName());
+                    filesToAnnotate.add(afile);
+                }
+            } 
+        } catch (Exception ex){System.out.println(ex);}
+    }
     
+    @FXML public void clearfiles(){
+        annotatefilespane.getItems().clear();
+        filesToAnnotate.clear();
+    }
     
     @FXML public void startannotator(){
-        ArrayList<File> selecteddata = new ArrayList<File>();
-        ObservableList selecteditems;
-        selecteditems = fileslist.getSelectionModel().getSelectedItems();
-        for (Object item : selecteditems){
-            selecteddata.add(filemanager.blastresultmanager.getblastresultfiles().get(item));
-        }
+        ArrayList<File> selecteddata = filesToAnnotate;
         ArrayList<refdb> annotationsources = new ArrayList<refdb>();
+        
         for (DBpane dbpane : GUIController.dbpanes){
             refdb database = dbpane.getDatabase();
             if (dbpane.checkbox.isSelected()){
                 annotationsources.add(database);
             }
         }
+        System.out.println("sources:"+annotationsources);
         refdb template = null;
         String choiceboxselection = templatechoicebox.getSelectionModel().getSelectedItem().toString();
         for (refdb mydb : dbmanager.getReferencedatabases()){
@@ -728,12 +639,13 @@ public class GUIController implements Initializable {
                 break;
             }
         }
-        
+        System.out.println("template:"+template.getDbname());
         if (template!=null && selecteddata.size()!=0 && annotationsources.size()!=0){
         annotationprocess = new AnnotationProcess(selecteddata,template,annotationsources);
         annotationprocess.start();
         } else {
             System.out.println("Annotation not started!");
+            return;
         }
         for (refdb annotationsource : annotationsources){
             for (header myheader : annotationsource.getHeaderset()){
@@ -771,33 +683,33 @@ public class GUIController implements Initializable {
     }
     
     public void loadindex(header myheader, refdb db){ 
-            THashMap<ByteArrayWrapper, long[]> index = new THashMap<>(1,0.75f);
-                System.out.println("loading: "+filemanager.getIndexdirectory()+File.separator+myheader.getSourcedb()+"."+myheader.getHeaderstring()+".ser");
-                try
-                {
-                   FileInputStream fis = new FileInputStream(filemanager.getIndexdirectory()+File.separator+myheader.getSourcedb()+"."+myheader.getHeaderstring()+".ser");
-                   ObjectInput ois = new ObjectInputStream(fis);
+        THashMap<ByteArrayWrapper, long[]> index = new THashMap<>(1,0.75f);
+        //System.out.println("loading: "+filemanager.getIndexdirectory()+File.separator+myheader.getSourcedb()+"."+myheader.getHeaderstring()+".ser");
+        try
+        {
+           //FileInputStream fis = new FileInputStream(filemanager.getIndexdirectory()+File.separator+myheader.getSourcedb()+"."+myheader.getHeaderstring()+".ser");
+           ObjectInput ois = new ObjectInputStream(null);
 
-                   index = (THashMap) ois.readObject();
-                   System.out.println(index.size());
+           index = (THashMap) ois.readObject();
+           System.out.println(index.size());
 
-                   GUIController.indexstorage.putIfAbsent(myheader.getSourcedb(), new Searcher(db));
-                   GUIController.indexstorage.get(myheader.getSourcedb()).adddata(index, myheader);
-                   ois.close();
-                   fis.close();
-                   
-                }catch(IOException ioe)
-                {
-                   ioe.printStackTrace();
-                   return;
-                }catch(ClassNotFoundException c)
-                {
-                   System.out.println("Class not found");
-                   c.printStackTrace();
-                   return;
-                }
-                System.out.println("Index loaded");
-                
+           GUIController.indexstorage.putIfAbsent(myheader.getSourcedb(), new Searcher(db));
+           GUIController.indexstorage.get(myheader.getSourcedb()).adddata(index, myheader);
+           ois.close();
+           //fis.close();
+
+        }catch(IOException ioe)
+        {
+           ioe.printStackTrace();
+           return;
+        }catch(ClassNotFoundException c)
+        {
+           System.out.println("Class not found");
+           c.printStackTrace();
+           return;
+        }
+        System.out.println("Index loaded");
+
                 
         }
     
@@ -858,50 +770,6 @@ public class GUIController implements Initializable {
     
     // <editor-fold desc="settings">
     //-----------------------------------------------------------------------------------------------------------------------------------------
-    
-    // file manager
-    @FXML
-    private void setdirectory(ActionEvent event) throws FileNotFoundException, IOException{
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("Concordia project folder");
-        File newselectedDirectory = chooser.showDialog(filespane.getScene().getWindow());
-        if (newselectedDirectory != null){
-            filemanager.setProjectdirectory(newselectedDirectory);
-        }      
-        if (newselectedDirectory != null){
-        myproperties.setProperty("projectfolder", filemanager.getProjectdirectory().getAbsolutePath());
-        OutputStream out = new FileOutputStream("concordia.properties");
-        myproperties.store(out, "This is an optional header comment string");
-        out.close();
-        filemanager.annotationmanager.updatefiles();
-        filemanager.blastresultmanager.updatefiles();
-        }
-        setdirectorylabel();
-    }
-    @FXML
-    private void openexplorer(ActionEvent event) throws IOException{
-        Runtime rt = Runtime.getRuntime();
-        try {
-            Process pr = rt.exec("nautilus "+filemanager.getProjectdirectory().getAbsolutePath());
-        } catch (Exception ex){
-            Process pr = rt.exec("explorer "+filemanager.getProjectdirectory().getAbsolutePath());
-        }
-    }
-    
-    private void setdirectorylabel(){
-        directorylabel.setText(filemanager.getProjectdirectory().getAbsolutePath());
-    }
-    
-    @FXML
-    private void changeAvailableRAM(){
-        try{
-        availableRAM = Integer.parseInt(ramfield.getText());
-        myproperties.setProperty("availableRAM", availableRAM.toString());
-        myproperties.store(new FileOutputStream("concordia.properties"), "");       
-        }catch (Exception ex){}
-    }
-    
-    // </editor-fold>
     
     // <editor-fold desc="main gui">
     //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -986,25 +854,9 @@ public class GUIController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         logoview.setImage(logo1);
-        fileslist.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         emptylinkingspace = linkingspace;
-        updateblastresultfilelist();
 
-        fileslist.setItems(FXCollections.observableArrayList(filemanager.blastresultmanager.getFilenames()));
-        activebuttons.add(activebutton1);
-        activebuttons.add(activebutton2);
-        activebuttons.add(activebutton3);
-        activebuttons.add(activebutton4);
-        activebuttons.add(activebutton5);
-        activebuttons.add(annotatebutton);
-        activebuttons.add(addcazybutton);
-        activebuttons.add(adduniprotbutton);
-        try {
-            myproperties.load(new FileInputStream("concordia.properties"));
-        } catch (Exception ex) {       
-        }
-        //settings
-        setdirectorylabel();
+
         //database manager
         dbmanagerinit();
         //annotator
